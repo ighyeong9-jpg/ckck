@@ -77,13 +77,15 @@ export default function DashboardPage() {
             .from('user_settings')
             .select('display_name')
             .eq('user_id', user.id)
-            .single()
+            .maybeSingle()
           setUserName(settings?.display_name || user.email?.split('@')[0] || '사용자')
         }
 
         // 프로젝트
-        const { data: projectsData } = await supabase
+        const { data: projectsData, error: projectsError } = await supabase
           .from('projects').select('*').order('updated_at', { ascending: false })
+
+        if (projectsError) throw projectsError
 
         if (projectsData) {
           setProjects(projectsData)
@@ -181,32 +183,29 @@ export default function DashboardPage() {
           setActivityLog(activities)
 
           // 비용 데이터: 프로젝트별 견적 vs 실비용
-          const costItems: CostData[] = []
-          for (const p of projectsData.slice(0, 6)) {
-            const { data: quoteItems } = await supabase
-              .from('quote_line_items')
-              .select('quantity, unit_price')
-              .eq('project_id', p.id)
-            const { data: costAnalysis } = await supabase
-              .from('cost_analysis')
-              .select('adjusted_cost')
-              .eq('project_id', p.id)
-
-            const quotedTotal = (quoteItems || []).reduce(
-              (sum: number, item: any) => sum + (Number(item.quantity) * Number(item.unit_price)), 0
-            )
-            const actualTotal = (costAnalysis || []).reduce(
-              (sum: number, item: any) => sum + (Number(item.adjusted_cost) || 0), 0
-            )
-
-            if (quotedTotal > 0 || actualTotal > 0) {
-              costItems.push({
-                name: p.name.length > 6 ? p.name.substring(0, 6) + '..' : p.name,
-                견적: Math.round(quotedTotal / 10000),
-                실비용: Math.round(actualTotal / 10000),
-              })
-            }
-          }
+          const top6 = projectsData.slice(0, 6)
+          const costResults = await Promise.all(
+            top6.map(async (p) => {
+              const [{ data: quoteItems }, { data: costAnalysis }] = await Promise.all([
+                supabase.from('quote_line_items').select('quantity, unit_price').eq('project_id', p.id),
+                supabase.from('cost_analysis').select('adjusted_cost').eq('project_id', p.id),
+              ])
+              const quotedTotal = (quoteItems || []).reduce(
+                (sum: number, item: any) => sum + (Number(item.quantity) * Number(item.unit_price)), 0
+              )
+              const actualTotal = (costAnalysis || []).reduce(
+                (sum: number, item: any) => sum + (Number(item.adjusted_cost) || 0), 0
+              )
+              return { name: p.name, quotedTotal, actualTotal }
+            })
+          )
+          const costItems: CostData[] = costResults
+            .filter(r => r.quotedTotal > 0 || r.actualTotal > 0)
+            .map(r => ({
+              name: r.name.length > 6 ? r.name.substring(0, 6) + '..' : r.name,
+              견적: Math.round(r.quotedTotal / 10000),
+              실비용: Math.round(r.actualTotal / 10000),
+            }))
           setCostData(costItems)
 
           // 견적 합계
@@ -495,19 +494,19 @@ export default function DashboardPage() {
 
         {/* Charts Row 2: Cost Chart + Progress Bar */}
         <div className={styles.chartsRow}>
-          {/* 비용 추이 그래프 */}
+          {/* 비용 추이 그래프 - Line Chart */}
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>프로젝트별 비용 비교 (만원)</h2>
+            <h2 className={styles.cardTitle}>프로젝트별 비용 추이 (만원)</h2>
             {costData.length > 0 ? (
               <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={costData} margin={{ left: 0, right: 10, top: 10 }}>
+                <LineChart data={costData} margin={{ left: 0, right: 10, top: 10 }}>
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(value: number) => `${value.toLocaleString()}만원`} />
                   <Legend />
-                  <Bar dataKey="견적" fill="#7c3aed" radius={[4, 4, 0, 0]} barSize={20} />
-                  <Bar dataKey="실비용" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={20} />
-                </BarChart>
+                  <Line type="monotone" dataKey="견적" stroke="#7c3aed" strokeWidth={2.5} dot={{ r: 4, fill: '#7c3aed' }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="실비용" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
+                </LineChart>
               </ResponsiveContainer>
             ) : (
               <div className={styles.chartEmpty}>견적 또는 비용 데이터가 있으면 비교 차트가 표시됩니다</div>

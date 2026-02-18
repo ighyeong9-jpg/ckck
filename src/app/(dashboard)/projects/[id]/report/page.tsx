@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Report } from '@/types/report'
 import { REPORT_TYPES } from '@/types/report'
@@ -23,7 +23,6 @@ interface ProjectData {
 
 export default function ReportPage() {
   const params = useParams()
-  const router = useRouter()
   const projectId = params.id as string
   const supabase = createClient()
   const reportRef = useRef<HTMLDivElement>(null)
@@ -103,7 +102,7 @@ export default function ReportPage() {
           .from('cost_analysis')
           .select('*')
           .eq('project_id', projectId)
-          .single()
+          .maybeSingle()
 
         if (costAnalysis) {
           setProjectData(prev => ({
@@ -328,7 +327,8 @@ export default function ReportPage() {
           {reports.length === 0 ? (
             <div className={styles.emptyState}>
               <span className={styles.emptyIcon}>📄</span>
-              <p>생성된 리포트가 없습니다.</p>
+              <h3>생성된 리포트가 없습니다</h3>
+              <p>위에서 리포트를 생성하면<br/>이력이 여기에 표시됩니다</p>
             </div>
           ) : (
             <div className={styles.reportsList}>

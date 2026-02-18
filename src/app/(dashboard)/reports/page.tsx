@@ -49,10 +49,11 @@ export default function ReportsPage() {
     if (!confirm('이 리포트를 삭제하시겠습니까?')) return
 
     try {
-      await supabase.from('reports').delete().eq('id', id)
+      const { error } = await supabase.from('reports').delete().eq('id', id)
+      if (error) throw error
       setReports(prev => prev.filter(r => r.id !== id))
-    } catch (err) {
-      console.error('Error:', err)
+    } catch (err: any) {
+      alert(`삭제 오류: ${err?.message}`)
     }
   }
 

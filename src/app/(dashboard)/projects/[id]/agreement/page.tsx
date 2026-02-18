@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import type { Agreement, AgreementStatus } from '@/types/agreement'
+import type { AgreementStatus } from '@/types/agreement'
 import { PARTIES } from '@/types/agreement'
 import styles from './page.module.scss'
 
@@ -50,7 +50,7 @@ export default function AgreementPage() {
           .from('agreements')
           .select('*')
           .eq('project_id', projectId)
-          .single()
+          .maybeSingle()
 
         if (agreement) {
           setAgreementId(agreement.id)

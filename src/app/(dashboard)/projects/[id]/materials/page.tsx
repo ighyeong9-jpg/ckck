@@ -36,12 +36,13 @@ export default function MaterialsPage() {
 
   const loadData = async () => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('materials')
         .select('*')
         .eq('project_id', projectId)
         .order('created_at', { ascending: false })
 
+      if (error) throw error
       if (data) setMaterials(data)
     } catch (err) {
       console.error('Error:', err)
@@ -294,7 +295,8 @@ export default function MaterialsPage() {
           {filteredMaterials.length === 0 ? (
             <div className={styles.emptyState}>
               <span className={styles.emptyIcon}>📦</span>
-              <p>등록된 자재가 없습니다.</p>
+              <h3>등록된 자재가 없습니다</h3>
+              <p>자재를 등록하면 입고/출고 현황을<br/>실시간으로 추적할 수 있습니다</p>
             </div>
           ) : (
             filteredMaterials.map(material => {

@@ -164,7 +164,20 @@ export default function ProjectsPage() {
             filteredProjects.map(project => {
               const risk = getRiskGrade(project.risk_score)
               const statusColor = getStatusColor(project.status)
-              const industryIcon = INDUSTRY_ICONS[(project as any).industry] || '🏗️'
+              const industryIcon = INDUSTRY_ICONS[project.industry] || '🏗️'
+              const progress = project.progress || 0
+              // SVG circular progress
+              const radius = 22
+              const circumference = 2 * Math.PI * radius
+              const strokeDashoffset = circumference - (progress / 100) * circumference
+              const timeAgo = (() => {
+                const diff = Date.now() - new Date(project.updated_at).getTime()
+                const mins = Math.floor(diff / 60000)
+                if (mins < 60) return `${mins}분 전`
+                const hours = Math.floor(mins / 60)
+                if (hours < 24) return `${hours}시간 전`
+                return `${Math.floor(hours / 24)}일 전`
+              })()
               return (
                 <Link key={project.id} href={`/projects/${project.id}/diagnostic`} className={styles.projectCard}>
                   <div className={styles.cardColorBar} style={{ background: statusColor }} />
@@ -184,13 +197,32 @@ export default function ProjectsPage() {
                         </span>
                       </div>
                     </div>
-                    <div className={styles.cardProgress}>
-                      <div className={styles.progressInfo}>
-                        <span>진행률</span>
-                        <span className={styles.progressPercent}>{project.progress}%</span>
+                    <div className={styles.cardMiddle}>
+                      <div className={styles.circularProgress}>
+                        <svg width="56" height="56" viewBox="0 0 56 56">
+                          <circle cx="28" cy="28" r={radius} fill="none" stroke="#f3f4f6" strokeWidth="4" />
+                          <circle
+                            cx="28" cy="28" r={radius} fill="none"
+                            stroke={progress >= 100 ? '#10b981' : '#7c3aed'}
+                            strokeWidth="4" strokeLinecap="round"
+                            strokeDasharray={circumference}
+                            strokeDashoffset={strokeDashoffset}
+                            transform="rotate(-90 28 28)"
+                            style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+                          />
+                          <text x="28" y="32" textAnchor="middle" className={styles.circularText}>
+                            {progress}%
+                          </text>
+                        </svg>
                       </div>
-                      <div className={styles.progressTrack}>
-                        <div className={styles.progressFill} style={{ width: `${project.progress}%` }} />
+                      <div className={styles.cardProgress}>
+                        <div className={styles.progressInfo}>
+                          <span>진행률</span>
+                          <span className={styles.progressPercent}>{progress}%</span>
+                        </div>
+                        <div className={styles.progressTrack}>
+                          <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+                        </div>
                       </div>
                     </div>
                     <div className={styles.cardFooter}>
@@ -198,7 +230,7 @@ export default function ProjectsPage() {
                         {project.start_date} ~ {project.end_date}
                       </span>
                       <span className={styles.cardUpdated}>
-                        {new Date(project.updated_at).toLocaleDateString('ko-KR')} 수정
+                        {timeAgo} 수정
                       </span>
                     </div>
                   </div>

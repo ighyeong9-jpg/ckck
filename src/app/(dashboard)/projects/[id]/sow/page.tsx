@@ -265,8 +265,9 @@ export default function SOWPage() {
         <section className={styles.itemsSection}>
           {Object.keys(groupedItems).length === 0 ? (
             <div className={styles.emptyState}>
-              <span className={styles.emptyIcon}>📋</span>
-              <p>견적 항목이 없습니다.</p>
+              <span className={styles.emptyIcon}>💰</span>
+              <h3>항목을 추가하여 견적서를 작성해보세요</h3>
+              <p>공종별 항목과 단가를 입력하면 자동으로<br/>견적서가 생성됩니다</p>
               <button
                 className={styles.emptyBtn}
                 onClick={() => {
@@ -274,7 +275,7 @@ export default function SOWPage() {
                   setShowAddModal(true)
                 }}
               >
-                첫 항목 추가하기
+                + 첫 항목 추가하기
               </button>
             </div>
           ) : (
@@ -306,7 +307,7 @@ export default function SOWPage() {
                       <span>{item.quantity}</span>
                       <span>{formatAmount(item.unit_price)}</span>
                       <span className={styles.amount}>{formatAmount(item.quantity * item.unit_price)}</span>
-                      <span className={styles.actions}>
+                      <span className={styles.rowActions}>
                         <button
                           className={styles.editBtn}
                           onClick={() => openEditModal(item)}

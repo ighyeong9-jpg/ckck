@@ -10,12 +10,14 @@ interface NavItem {
   icon: string
   label: string
   href: string
+  badge?: number
 }
 
 interface SubMenuItem {
   icon: string
   label: string
   path: string
+  badge?: number
 }
 
 const mainNavItems: NavItem[] = [
@@ -51,6 +53,7 @@ export default function Sidebar() {
   const [userName, setUserName] = useState('사용자')
   const [userPlan, setUserPlan] = useState('Free')
   const [subMenuOpen, setSubMenuOpen] = useState(true)
+  const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({})
 
   useEffect(() => {
     const loadUser = async () => {
@@ -70,15 +73,56 @@ export default function Sidebar() {
     loadUser()
   }, [])
 
+  // Load badge counts for current project
+  const projectMatch = pathname.match(/^\/projects\/([^/]+)/)
+  const currentProjectId = projectMatch ? projectMatch[1] : null
+  const isOnProjectPage = !!currentProjectId && currentProjectId !== 'new'
+
+  useEffect(() => {
+    if (!currentProjectId || currentProjectId === 'new') return
+
+    const loadBadges = async () => {
+      try {
+        // Count incomplete diagnostic items
+        const { count: diagTotal } = await supabase
+          .from('diagnostic_responses')
+          .select('*', { count: 'exact', head: true })
+          .eq('project_id', currentProjectId)
+          .eq('checked', false)
+
+        // Count pending processes
+        const { count: pendingProcesses } = await supabase
+          .from('processes')
+          .select('*', { count: 'exact', head: true })
+          .eq('project_id', currentProjectId)
+          .neq('status', 'completed')
+
+        // Count change orders
+        const { count: changeOrders } = await supabase
+          .from('change_orders')
+          .select('*', { count: 'exact', head: true })
+          .eq('project_id', currentProjectId)
+          .eq('status', 'pending')
+
+        const counts: Record<string, number> = {}
+        if (diagTotal && diagTotal > 0) counts['diagnostic'] = diagTotal
+        if (pendingProcesses && pendingProcesses > 0) counts['process'] = pendingProcesses
+        if (changeOrders && changeOrders > 0) counts['changes'] = changeOrders
+
+        setBadgeCounts(counts)
+      } catch (err) {
+        // Silently fail badge counts
+      }
+    }
+
+    loadBadges()
+  }, [currentProjectId])
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/login')
     router.refresh()
   }
-
-  const projectMatch = pathname.match(/^\/projects\/([^/]+)/)
-  const currentProjectId = projectMatch ? projectMatch[1] : null
-  const isOnProjectPage = !!currentProjectId && currentProjectId !== 'new'
 
   const isActive = (href: string) => {
     if (href === '/projects' && pathname.startsWith('/projects')) return true
@@ -135,6 +179,11 @@ export default function Sidebar() {
                         >
                           <span className={styles.subMenuIcon}>{subItem.icon}</span>
                           <span className={styles.subMenuLabel}>{subItem.label}</span>
+                          {badgeCounts[subItem.path] && badgeCounts[subItem.path] > 0 && (
+                            <span className={styles.badge}>
+                              {badgeCounts[subItem.path] > 99 ? '99+' : badgeCounts[subItem.path]}
+                            </span>
+                          )}
                         </Link>
                       </li>
                     ))}

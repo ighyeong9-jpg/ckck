@@ -13,11 +13,15 @@ export default async function ProjectDetailLayout({
   const projectId = params.id
 
   // 프로젝트 이름 가져오기
-  const { data: project } = await supabase
+  const { data: project, error: projectError } = await supabase
     .from('projects')
     .select('name')
     .eq('id', projectId)
     .single()
+
+  if (projectError) {
+    console.error('Project load error:', projectError)
+  }
 
   // 탭 상태 판단: 각 테이블에 데이터가 있는지 체크
   const statusChecks = await Promise.all([

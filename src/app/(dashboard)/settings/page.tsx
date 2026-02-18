@@ -16,13 +16,13 @@ export default function SettingsPage() {
 
   const [formData, setFormData] = useState({
     display_name: '',
-    company_name: '',
+    company: '',
     phone: '',
-    email_notifications: true,
-    push_notifications: true,
+    notify_email: true,
+    notify_push: true,
     weekly_report: true,
     risk_alerts: true,
-    theme: 'light',
+    theme: 'light' as string,
   })
 
   useEffect(() => {
@@ -39,16 +39,16 @@ export default function SettingsPage() {
           .from('user_settings')
           .select('*')
           .eq('user_id', user.id)
-          .single()
+          .maybeSingle()
 
         if (settingsData) {
           setSettings(settingsData)
           setFormData({
             display_name: settingsData.display_name || '',
-            company_name: settingsData.company_name || '',
+            company: settingsData.company || '',
             phone: settingsData.phone || '',
-            email_notifications: settingsData.email_notifications ?? true,
-            push_notifications: settingsData.push_notifications ?? true,
+            notify_email: settingsData.notify_email ?? true,
+            notify_push: settingsData.notify_push ?? true,
             weekly_report: settingsData.weekly_report ?? true,
             risk_alerts: settingsData.risk_alerts ?? true,
             theme: settingsData.theme || 'light',
@@ -57,10 +57,10 @@ export default function SettingsPage() {
           // 설정이 없으면 기본값으로 새로 생성
           setFormData({
             display_name: user.email?.split('@')[0] || '',
-            company_name: '',
+            company: '',
             phone: '',
-            email_notifications: true,
-            push_notifications: true,
+            notify_email: true,
+            notify_push: true,
             weekly_report: true,
             risk_alerts: true,
             theme: 'light',
@@ -166,8 +166,8 @@ export default function SettingsPage() {
                 <label>회사명</label>
                 <input
                   type="text"
-                  value={formData.company_name}
-                  onChange={e => setFormData(prev => ({ ...prev, company_name: e.target.value }))}
+                  value={formData.company}
+                  onChange={e => setFormData(prev => ({ ...prev, company: e.target.value }))}
                   placeholder="(주)회사"
                 />
               </div>
@@ -200,8 +200,8 @@ export default function SettingsPage() {
                 <label className={styles.switch}>
                   <input
                     type="checkbox"
-                    checked={formData.email_notifications}
-                    onChange={e => setFormData(prev => ({ ...prev, email_notifications: e.target.checked }))}
+                    checked={formData.notify_email}
+                    onChange={e => setFormData(prev => ({ ...prev, notify_email: e.target.checked }))}
                   />
                   <span className={styles.slider}></span>
                 </label>
@@ -218,8 +218,8 @@ export default function SettingsPage() {
                 <label className={styles.switch}>
                   <input
                     type="checkbox"
-                    checked={formData.push_notifications}
-                    onChange={e => setFormData(prev => ({ ...prev, push_notifications: e.target.checked }))}
+                    checked={formData.notify_push}
+                    onChange={e => setFormData(prev => ({ ...prev, notify_push: e.target.checked }))}
                   />
                   <span className={styles.slider}></span>
                 </label>

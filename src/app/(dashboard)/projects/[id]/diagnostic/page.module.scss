@@ -204,42 +204,61 @@
   }
 }
 
-// GO/NO-GO Card (prototype style)
+// GO/NO-GO Card - Premium style
 .gonogoCard {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
-  padding: 1.5rem; border-radius: 20px; color: white; margin-bottom: 1.5rem;
-  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+  padding: 1.75rem; border-radius: 20px; color: white; margin-bottom: 1.5rem;
+  box-shadow: 0 8px 32px rgba(79, 70, 229, 0.35);
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  &:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(79, 70, 229, 0.4); }
+  &::before {
+    content: ''; position: absolute; top: -30%; right: -10%;
+    width: 200px; height: 200px; background: rgba(255,255,255,0.06);
+    border-radius: 50%; pointer-events: none;
+  }
+  &::after {
+    content: ''; position: absolute; bottom: -20%; left: 5%;
+    width: 150px; height: 150px; background: rgba(255,255,255,0.03);
+    border-radius: 50%; pointer-events: none;
+  }
 }
 .gonogoHeader {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;
+  position: relative; z-index: 1;
 }
-.gonogoTitle { font-size: 1.25rem; font-weight: 800; }
-.gonogoSubtitle { font-size: 0.7rem; opacity: 0.7; margin-top: 2px; }
+.gonogoTitle { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em; }
+.gonogoSubtitle { font-size: 0.72rem; opacity: 0.7; margin-top: 3px; font-family: monospace; }
 .gonogoBadge {
-  padding: 0.875rem 1.75rem; border-radius: 14px; font-size: 1.5rem; font-weight: 900;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  &.go { background: #10b981; }
-  &.nogo { background: #ef4444; animation: pulseNogo 1s infinite; }
+  padding: 1rem 2rem; border-radius: 14px; font-size: 1.6rem; font-weight: 900;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  letter-spacing: 0.05em;
+  &.go { background: linear-gradient(135deg, #10b981, #059669); }
+  &.nogo { background: linear-gradient(135deg, #ef4444, #dc2626); animation: pulseNogo 1.5s ease-in-out infinite; }
 }
-@keyframes pulseNogo { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+@keyframes pulseNogo { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.03); opacity: 0.85; } }
 .factorsGrid {
-  display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.625rem;
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.75rem;
+  position: relative; z-index: 1;
   @media (max-width: 768px) { grid-template-columns: repeat(3, 1fr); }
 }
 .factor {
-  padding: 0.75rem; border-radius: 10px; text-align: center;
+  padding: 0.875rem; border-radius: 12px; text-align: center;
+  backdrop-filter: blur(4px); transition: transform 0.15s;
+  &:hover { transform: scale(1.03); }
   &.pass { background: rgba(16, 185, 129, 0.2); }
   &.warn { background: rgba(245, 158, 11, 0.2); }
   &.fail { background: rgba(239, 68, 68, 0.2); }
 }
-.factorIcon { font-size: 1.25rem; display: block; }
-.factorName { font-size: 0.65rem; opacity: 0.8; display: block; margin-top: 2px; }
-.factorValue { font-size: 0.85rem; font-weight: 700; display: block; }
+.factorIcon { font-size: 1.375rem; display: block; }
+.factorName { font-size: 0.68rem; opacity: 0.8; display: block; margin-top: 3px; font-weight: 500; }
+.factorValue { font-size: 0.9rem; font-weight: 800; display: block; margin-top: 2px; }
 .factorStatus {
-  font-size: 0.6rem; font-weight: 700; display: block; margin-top: 2px;
-  &.pass { color: #6ee7b7; }
-  &.warn { color: #fcd34d; }
-  &.fail { color: #fca5a5; }
+  font-size: 0.62rem; font-weight: 700; display: block; margin-top: 3px;
+  padding: 1px 6px; border-radius: 4px; display: inline-block;
+  &.pass { color: #6ee7b7; background: rgba(110,231,183,0.1); }
+  &.warn { color: #fcd34d; background: rgba(252,211,77,0.1); }
+  &.fail { color: #fca5a5; background: rgba(252,165,165,0.1); }
 }
 
 // Custom Section

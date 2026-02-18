@@ -135,18 +135,24 @@
   justify-content: center;
   padding: 4rem 2rem;
   background: white;
-  border-radius: 16px;
+  border-radius: 20px;
   text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.03);
+  h3 { font-size: 1.1rem; font-weight: 700; color: #374151; margin: 0.5rem 0 0.5rem; }
 }
 
 .emptyIcon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
 }
 
 .emptyState p {
-  color: #6b7280;
+  color: #9ca3af;
+  font-size: 0.875rem;
   margin-bottom: 1.5rem;
+  line-height: 1.6;
 }
 
 .emptyBtn {

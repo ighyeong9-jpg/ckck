@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import type { CostAnalysis } from '@/types/costAnalysis'
 import { COST_FACTORS } from '@/types/costAnalysis'
 import { calculateCost, formatKRW, type CostFactor } from '@/lib/utils/costCalculator'
 import styles from './page.module.scss'
@@ -40,7 +39,7 @@ export default function CostAnalysisPage() {
 
         if (quoteItems && quoteItems.length > 0) {
           const subtotal = quoteItems.reduce(
-            (sum, item) => sum + (Number(item.quantity) * item.unit_price),
+            (sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)),
             0
           )
           setBaseCost(subtotal)
@@ -51,7 +50,7 @@ export default function CostAnalysisPage() {
           .from('cost_analysis')
           .select('*')
           .eq('project_id', projectId)
-          .single()
+          .maybeSingle()
 
         if (analysis) {
           setAnalysisId(analysis.id)

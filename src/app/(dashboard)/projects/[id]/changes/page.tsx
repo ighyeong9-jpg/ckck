@@ -272,7 +272,8 @@ export default function ChangesPage() {
           {orders.length === 0 ? (
             <div className={styles.emptyState}>
               <span className={styles.emptyIcon}>🔄</span>
-              <p>변경요청이 없습니다.</p>
+              <h3>변경요청이 없습니다</h3>
+              <p>공사 중 변경사항을 기록하면<br/>비용/일정 영향을 추적할 수 있습니다</p>
               <button
                 className={styles.emptyBtn}
                 onClick={() => {
@@ -280,7 +281,7 @@ export default function ChangesPage() {
                   setShowModal(true)
                 }}
               >
-                첫 변경요청 추가하기
+                + 첫 변경요청 추가하기
               </button>
             </div>
           ) : (

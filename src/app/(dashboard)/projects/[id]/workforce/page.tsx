@@ -35,13 +35,14 @@ export default function WorkforcePage() {
 
   const loadData = async () => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('workforce')
         .select('*')
         .eq('project_id', projectId)
         .eq('work_date', selectedDate)
         .order('created_at', { ascending: false })
 
+      if (error) throw error
       if (data) setWorkers(data)
     } catch (err) {
       console.error('Error:', err)

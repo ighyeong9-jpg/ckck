@@ -36,12 +36,13 @@ export default function ProcessPage() {
 
   const loadData = async () => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('processes')
         .select('*')
         .eq('project_id', projectId)
         .order('order_index')
 
+      if (error) throw error
       if (data) setProcesses(data)
     } catch (err) {
       console.error('Error:', err)

@@ -5,6 +5,7 @@ export interface Project {
   user_id: string
   name: string
   client_name: string
+  industry: string
   status: ProjectStatus
   progress: number
   start_date: string

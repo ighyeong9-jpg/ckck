@@ -7,7 +7,9 @@ export interface UserSettings {
   notify_email: boolean
   notify_push: boolean
   notify_sms: boolean
-  theme: 'light' | 'dark'
+  weekly_report: boolean
+  risk_alerts: boolean
+  theme: 'light' | 'dark' | 'system'
   language: string
   created_at: string
   updated_at: string

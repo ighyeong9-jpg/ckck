@@ -23,15 +23,16 @@ export default function CertificatePage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const { data: project } = await supabase
+        const { data: project, error: projectError } = await supabase
           .from('projects')
           .select('name')
           .eq('id', projectId)
           .single()
 
+        if (projectError) throw projectError
         if (project) setProjectName(project.name)
 
-        const { data: cert } = await supabase
+        const { data: cert, error: certError } = await supabase
           .from('verification_certificates')
           .select('*')
           .eq('project_id', projectId)
@@ -40,6 +41,7 @@ export default function CertificatePage() {
           .limit(1)
           .maybeSingle()
 
+        if (certError) throw certError
         if (cert) setCertificate(cert as VerificationCertificate)
       } catch (err) {
         console.error(err)
@@ -78,7 +80,7 @@ export default function CertificatePage() {
     }
   }
 
-  const verifyUrl = certificate
+  const verifyUrl = certificate && typeof window !== 'undefined'
     ? `${window.location.origin}/verify/${certificate.code}`
     : ''
 

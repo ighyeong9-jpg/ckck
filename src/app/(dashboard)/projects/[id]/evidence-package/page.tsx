@@ -406,10 +406,11 @@ export default function EvidencePackagePage() {
         <section className={styles.filesSection}>
           {files.length === 0 ? (
             <div className={styles.emptyState}>
-              <span className={styles.emptyIcon}>📁</span>
-              <p>업로드된 파일이 없습니다.</p>
+              <span className={styles.emptyIcon}>📸</span>
+              <h3>증빙 파일을 업로드해보세요</h3>
+              <p>사진, 문서 등 증빙 자료를 업로드하면<br/>자동으로 카테고리별 정리됩니다</p>
               <label htmlFor="fileUpload" className={styles.emptyBtn}>
-                첫 파일 업로드하기
+                + 첫 파일 업로드하기
               </label>
             </div>
           ) : (
