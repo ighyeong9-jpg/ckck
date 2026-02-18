@@ -40,8 +40,8 @@ const projectSubMenuItems: SubMenuItem[] = [
   { icon: '👷', label: '인력관리', path: 'workforce' },
   { icon: '📦', label: '자재관리', path: 'materials' },
   { icon: '🤖', label: '인증서', path: 'certificate' },
-  { icon: '🚨', label: '하자신고', path: 'defects' },
-  { icon: '🖼️', label: '갤러리', path: 'gallery' },
+  { icon: '🔧', label: '하자요청', path: 'defects' },
+  { icon: '🖼️', label: '현장사진', path: 'gallery' },
 ]
 
 const bottomNavItems: NavItem[] = [
@@ -57,12 +57,17 @@ export default function Sidebar() {
   const [userPlan, setUserPlan] = useState('Free')
   const [subMenuOpen, setSubMenuOpen] = useState(true)
   const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({})
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('sidebar-collapsed') === 'true'
-    }
-    return false
-  })
+  const [collapsed, setCollapsed] = useState(false)
+
+  // Hydration-safe: read localStorage after mount
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-collapsed') === 'true'
+    setCollapsed(saved)
+    document.documentElement.style.setProperty(
+      '--sidebar-width',
+      saved ? '56px' : '260px'
+    )
+  }, [])
 
   useEffect(() => {
     localStorage.setItem('sidebar-collapsed', String(collapsed))
@@ -71,14 +76,6 @@ export default function Sidebar() {
       collapsed ? '56px' : '260px'
     )
   }, [collapsed])
-
-  // Set initial CSS variable on mount
-  useEffect(() => {
-    document.documentElement.style.setProperty(
-      '--sidebar-width',
-      collapsed ? '56px' : '260px'
-    )
-  }, [])
 
   useEffect(() => {
     const loadUser = async () => {

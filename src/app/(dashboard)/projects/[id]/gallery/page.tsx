@@ -27,7 +27,7 @@ export default function GalleryPage() {
     try {
       // Load from evidence_files table
       const { data, error } = await supabase
-        .from('evidence_files')
+        .from('files')
         .select('*')
         .eq('project_id', projectId)
         .order('created_at', { ascending: false })
@@ -41,8 +41,8 @@ export default function GalleryPage() {
             id: f.id,
             url: f.file_url,
             file_name: f.file_name || 'photo',
-            category: f.category || '',
-            description: f.description || null,
+            category: '',
+            description: null,
             uploaded_at: f.created_at,
           }))
         setPhotos(galleryPhotos)
@@ -70,14 +70,15 @@ export default function GalleryPage() {
         const { data: urlData } = supabase.storage.from('evidence').getPublicUrl(fileName)
 
         const { data: newFile, error: insertError } = await supabase
-          .from('evidence_files')
+          .from('files')
           .insert([{
             project_id: projectId,
             file_name: file.name,
             file_url: urlData.publicUrl,
             file_type: file.type,
             file_size: file.size,
-            category: 'gallery',
+            timestamp: new Date().toISOString(),
+            hash_sha256: '',
           }])
           .select()
           .single()
@@ -89,7 +90,7 @@ export default function GalleryPage() {
             id: newFile.id,
             url: newFile.file_url,
             file_name: newFile.file_name,
-            category: newFile.category || '',
+            category: '',
             description: null,
             uploaded_at: newFile.created_at,
           }, ...prev])
@@ -123,7 +124,7 @@ export default function GalleryPage() {
               className={`${styles.viewBtn} ${viewMode === 'gallery' ? styles.active : ''}`}
               onClick={() => setViewMode('gallery')}
             >
-              갤러리
+              현장사진
             </button>
             <button
               className={`${styles.viewBtn} ${viewMode === 'compare' ? styles.active : ''}`}

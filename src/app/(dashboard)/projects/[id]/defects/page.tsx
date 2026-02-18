@@ -106,7 +106,7 @@ export default function DefectsPage() {
         severity: formData.severity,
         status: 'reported' as DefectStatus,
         location: formData.location || null,
-        reported_by: user?.id || null,
+        reported_by: null,
       }
 
       // migration 후 사용 가능한 옵션 컬럼
@@ -171,7 +171,7 @@ export default function DefectsPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('이 하자 신고를 삭제하시겠습니까?')) return
+    if (!confirm('이 하자 요청을 삭제하시겠습니까?')) return
     try {
       const { error } = await supabase.from('defects').delete().eq('id', id)
       if (error) throw error
@@ -257,7 +257,7 @@ export default function DefectsPage() {
             className={styles.addBtn}
             onClick={() => { resetForm(); setShowModal(true) }}
           >
-            + 하자 신고
+            + 하자 요청
           </button>
         </div>
 
@@ -269,7 +269,7 @@ export default function DefectsPage() {
               <h3>등록된 하자가 없습니다</h3>
               <p>현장에서 발견된 하자를 신고하여 체계적으로 관리하세요</p>
               <button className={styles.emptyBtn} onClick={() => { resetForm(); setShowModal(true) }}>
-                + 첫 하자 신고하기
+                + 첫 하자 요청하기
               </button>
             </div>
           ) : (
@@ -326,7 +326,7 @@ export default function DefectsPage() {
         <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2>{editingDefect ? '하자 수정' : '하자 신고'}</h2>
+              <h2>{editingDefect ? '하자 수정' : '하자 요청'}</h2>
               <button onClick={() => setShowModal(false)}>✕</button>
             </div>
             <div className={styles.modalForm}>

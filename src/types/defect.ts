@@ -1,4 +1,4 @@
-export type DefectSeverity = 'minor' | 'medium' | 'major' | 'critical'
+export type DefectSeverity = 'low' | 'medium' | 'high' | 'critical'
 export type DefectStatus = 'reported' | 'reviewing' | 'repairing' | 'completed'
 
 export interface Defect {
@@ -19,14 +19,14 @@ export interface Defect {
 }
 
 export const DEFECT_SEVERITIES = [
-  { id: 'minor' as const, name: '경미', color: '#6b7280', icon: '⚪' },
+  { id: 'low' as const, name: '경미', color: '#6b7280', icon: '⚪' },
   { id: 'medium' as const, name: '보통', color: '#f59e0b', icon: '🟡' },
-  { id: 'major' as const, name: '심각', color: '#f97316', icon: '🟠' },
+  { id: 'high' as const, name: '심각', color: '#f97316', icon: '🟠' },
   { id: 'critical' as const, name: '긴급', color: '#ef4444', icon: '🔴' },
 ]
 
 export const DEFECT_STATUSES = [
-  { id: 'reported' as const, name: '신고됨', color: '#6b7280' },
+  { id: 'reported' as const, name: '요청됨', color: '#6b7280' },
   { id: 'reviewing' as const, name: '확인 중', color: '#3b82f6' },
   { id: 'repairing' as const, name: '수리 중', color: '#f59e0b' },
   { id: 'completed' as const, name: '완료', color: '#10b981' },
