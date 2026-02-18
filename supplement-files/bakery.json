@@ -1,0 +1,33 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "bakery",
+  "industry_name": "제과점",
+  "categories": [
+    {
+      "category_id": "equipment",
+      "category_name": "설비",
+      "items": [
+        {
+          "item_code": "EQ001",
+          "item_name": "오븐 전원",
+          "description": "대형 오븐 전용 전원 설치",
+          "risk_weight": 1.5
+        }
+      ]
+    },
+    {
+      "category_id": "hygiene",
+      "category_name": "위생",
+      "items": [
+        {
+          "item_code": "HY001",
+          "item_name": "작업대 마감",
+          "description": "스테인레스 작업대 설치",
+          "risk_weight": 1.2
+        }
+      ]
+    }
+  ],
+  "pre_questions": [],
+  "auto_terms": []
+}

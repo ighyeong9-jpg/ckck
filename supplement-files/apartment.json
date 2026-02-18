@@ -1,0 +1,62 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "apartment",
+  "industry_name": "아파트",
+  "categories": [
+    {
+      "category_id": "structure",
+      "category_name": "구조",
+      "items": [
+        {
+          "item_code": "ST001",
+          "item_name": "기둥 균열 여부",
+          "description": "주요 기둥에 균열이나 변형이 있는지 확인",
+          "risk_weight": 1.5
+        },
+        {
+          "item_code": "ST002",
+          "item_name": "벽체 수직도",
+          "description": "벽체가 수직으로 시공되었는지 확인",
+          "risk_weight": 1.2
+        }
+      ]
+    },
+    {
+      "category_id": "waterproof",
+      "category_name": "방수",
+      "items": [
+        {
+          "item_code": "WP001",
+          "item_name": "욕실 방수층",
+          "description": "욕실 바닥 및 벽면 방수층 시공 상태",
+          "risk_weight": 1.3
+        },
+        {
+          "item_code": "WP002",
+          "item_name": "베란다 배수",
+          "description": "베란다 배수 시스템 정상 작동 여부",
+          "risk_weight": 1.1
+        }
+      ]
+    }
+  ],
+  "pre_questions": [
+    {
+      "question_id": "PQ001",
+      "question": "세대 수는 몇 개입니까?",
+      "answer_type": "number"
+    },
+    {
+      "question_id": "PQ002",
+      "question": "엘리베이터 설치 여부",
+      "answer_type": "boolean"
+    }
+  ],
+  "auto_terms": [
+    {
+      "term_id": "AT001",
+      "term_text": "공용부 하자는 관리사무소를 통해 처리",
+      "category": "책임범위"
+    }
+  ]
+}

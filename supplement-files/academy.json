@@ -1,0 +1,33 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "academy",
+  "industry_name": "학원",
+  "categories": [
+    {
+      "category_id": "safety",
+      "category_name": "안전",
+      "items": [
+        {
+          "item_code": "SF001",
+          "item_name": "비상구 표시",
+          "description": "비상구 유도등 및 표지판",
+          "risk_weight": 1.6
+        }
+      ]
+    },
+    {
+      "category_id": "acoustics",
+      "category_name": "방음",
+      "items": [
+        {
+          "item_code": "AC001",
+          "item_name": "강의실 방음",
+          "description": "강의실 간 방음 시공",
+          "risk_weight": 1.3
+        }
+      ]
+    }
+  ],
+  "pre_questions": [],
+  "auto_terms": []
+}

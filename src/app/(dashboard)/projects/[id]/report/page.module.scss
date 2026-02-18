@@ -1,0 +1,533 @@
+.container {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: #6b7280;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+// Data Summary
+.dataSummary {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dataGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dataCard {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.dataHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.dataIcon {
+  font-size: 1.25rem;
+}
+
+.dataValue {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.6;
+
+  strong {
+    color: #6366f1;
+  }
+
+  p {
+    margin: 0.25rem 0;
+  }
+}
+
+// Generate Section
+.generateSection {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.reportTypes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.reportTypeBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: #6366f1;
+    background: #eef2ff;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.typeIcon {
+  font-size: 2rem;
+}
+
+.typeName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+// History Section
+.historySection {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.emptyState p {
+  color: #6b7280;
+}
+
+.reportsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.reportCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #eef2ff;
+    transform: translateX(4px);
+  }
+}
+
+.reportInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reportHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reportIcon {
+  font-size: 1.25rem;
+}
+
+.reportType {
+  font-size: 0.75rem;
+  color: #6366f1;
+  font-weight: 600;
+}
+
+.reportTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.reportMeta {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.reportActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.deleteBtn {
+  padding: 0.5rem 1rem;
+  background: #fee2e2;
+  border: none;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background: #fecaca;
+  }
+}
+
+// Modal
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.modalActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pdfBtn {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.modalClose {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5e7eb;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+
+  &:hover {
+    background: #d1d5db;
+  }
+}
+
+.modalContent {
+  padding: 2rem;
+  overflow-y: auto;
+  background: white;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+// Report Detail Styles
+.reportDetailHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+}
+
+.riskSection {
+  margin-bottom: 2rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+}
+
+.riskGrade {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.riskBadge {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.riskInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.riskLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.riskScore {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.detailSection {
+  margin-bottom: 2rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+}
+
+.detailCard {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  span {
+    color: #6b7280;
+  }
+
+  strong {
+    color: #1f2937;
+  }
+
+  &.total {
+    background: #eef2ff;
+    margin: 0.5rem -1rem -1rem;
+    padding: 1rem;
+    border-radius: 0 0 12px 12px;
+
+    span, strong {
+      color: #6366f1;
+      font-weight: 700;
+    }
+  }
+
+  &.difference {
+    strong {
+      color: #10b981;
+    }
+  }
+}
+
+.quoteItemsList {
+  margin-top: 1rem;
+
+  h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+
+  th, td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  th {
+    background: #f3f4f6;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  td {
+    color: #6b7280;
+  }
+
+  td:last-child {
+    font-weight: 600;
+    color: #1f2937;
+  }
+}
+
+.moreItems {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.costFactors {
+  margin-top: 1rem;
+
+  h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.factorsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.factorItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #f3f4f6;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  min-width: 140px;
+
+  span:first-child {
+    color: #6b7280;
+  }
+
+  span:last-child {
+    font-weight: 600;
+    color: #6366f1;
+  }
+}
+
+.reportFooter {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e5e7eb;
+  text-align: center;
+
+  p {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin: 0.25rem 0;
+  }
+}

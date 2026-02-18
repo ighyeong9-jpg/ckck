@@ -1,0 +1,33 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "beauty",
+  "industry_name": "미용실",
+  "categories": [
+    {
+      "category_id": "plumbing",
+      "category_name": "배관",
+      "items": [
+        {
+          "item_code": "PL001",
+          "item_name": "샴푸대 급배수",
+          "description": "샴푸대 급수 및 배수 시스템",
+          "risk_weight": 1.3
+        }
+      ]
+    },
+    {
+      "category_id": "lighting",
+      "category_name": "조명",
+      "items": [
+        {
+          "item_code": "LT001",
+          "item_name": "거울 조명",
+          "description": "시술 거울 조명 밝기 및 색온도",
+          "risk_weight": 1.0
+        }
+      ]
+    }
+  ],
+  "pre_questions": [],
+  "auto_terms": []
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "retail",
+  "industry_name": "소매점",
+  "categories": [
+    {
+      "category_id": "display",
+      "category_name": "진열",
+      "items": [
+        {
+          "item_code": "DS001",
+          "item_name": "선반 내구성",
+          "description": "진열 선반 하중 테스트",
+          "risk_weight": 1.1
+        }
+      ]
+    },
+    {
+      "category_id": "security",
+      "category_name": "보안",
+      "items": [
+        {
+          "item_code": "SC001",
+          "item_name": "CCTV 설치",
+          "description": "매장 CCTV 사각지대 확인",
+          "risk_weight": 1.2
+        }
+      ]
+    }
+  ],
+  "pre_questions": [],
+  "auto_terms": []
+}

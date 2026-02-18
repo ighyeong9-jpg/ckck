@@ -1,0 +1,39 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "cafe",
+  "industry_name": "카페",
+  "categories": [
+    {
+      "category_id": "plumbing",
+      "category_name": "배관",
+      "items": [
+        {
+          "item_code": "PL001",
+          "item_name": "급수 배관",
+          "description": "커피머신 급수 배관 연결 상태",
+          "risk_weight": 1.2
+        }
+      ]
+    },
+    {
+      "category_id": "electrical",
+      "category_name": "전기",
+      "items": [
+        {
+          "item_code": "EL001",
+          "item_name": "전용 회로",
+          "description": "에스프레소 머신 전용 회로 설치",
+          "risk_weight": 1.4
+        }
+      ]
+    }
+  ],
+  "pre_questions": [
+    {
+      "question_id": "PQ001",
+      "question": "좌석 수는?",
+      "answer_type": "number"
+    }
+  ],
+  "auto_terms": []
+}

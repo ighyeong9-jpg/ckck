@@ -1,0 +1,33 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "clinic",
+  "industry_name": "병의원",
+  "categories": [
+    {
+      "category_id": "medical",
+      "category_name": "의료설비",
+      "items": [
+        {
+          "item_code": "MD001",
+          "item_name": "의료가스 배관",
+          "description": "산소/흡인 배관 설치",
+          "risk_weight": 1.8
+        }
+      ]
+    },
+    {
+      "category_id": "hygiene",
+      "category_name": "위생",
+      "items": [
+        {
+          "item_code": "HY001",
+          "item_name": "진료실 바닥",
+          "description": "진료실 바닥 항균 마감",
+          "risk_weight": 1.4
+        }
+      ]
+    }
+  ],
+  "pre_questions": [],
+  "auto_terms": []
+}

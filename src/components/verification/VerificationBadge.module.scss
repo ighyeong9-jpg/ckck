@@ -1,0 +1,23 @@
+// Compact badge (프로젝트 카드용)
+.compactBadge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 6px;
+  color: white; font-size: 0.7rem; font-weight: 800;
+}
+
+// Full badge
+.badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+  border: 2px solid; border-radius: 10px; background: white;
+}
+.badgeGrade {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 0.8rem; font-weight: 800;
+}
+.badgeInfo {
+  display: flex; flex-direction: column;
+}
+.badgeTitle { font-size: 0.7rem; font-weight: 600; color: #374151; }
+.badgeScore { font-size: 0.65rem; color: #6b7280; }

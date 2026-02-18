@@ -1,0 +1,45 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "villa",
+  "industry_name": "빌라",
+  "categories": [
+    {
+      "category_id": "structure",
+      "category_name": "구조",
+      "items": [
+        {
+          "item_code": "ST001",
+          "item_name": "계단 안전난간",
+          "description": "계단 난간 높이 및 견고함",
+          "risk_weight": 1.3
+        }
+      ]
+    },
+    {
+      "category_id": "exterior",
+      "category_name": "외부",
+      "items": [
+        {
+          "item_code": "EX001",
+          "item_name": "외벽 마감",
+          "description": "외벽 타일/도장 상태",
+          "risk_weight": 1.0
+        }
+      ]
+    }
+  ],
+  "pre_questions": [
+    {
+      "question_id": "PQ001",
+      "question": "층수는 몇 층입니까?",
+      "answer_type": "number"
+    }
+  ],
+  "auto_terms": [
+    {
+      "term_id": "AT001",
+      "term_text": "옥상 방수는 준공 후 2년 보증",
+      "category": "보증기간"
+    }
+  ]
+}

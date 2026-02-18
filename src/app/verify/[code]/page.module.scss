@@ -1,0 +1,102 @@
+.page {
+  min-height: 100vh; background: linear-gradient(135deg, #f0f0ff 0%, #f8f9fa 100%);
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+}
+.container {
+  width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 1.25rem;
+}
+.loadingScreen {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 300px; gap: 1rem; color: #6b7280;
+  background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.spinner {
+  width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #7c3aed;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// Header
+.header {
+  text-align: center; padding: 1rem 0;
+}
+.logo {
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: #7c3aed; margin-bottom: 0.25rem;
+}
+.headerTitle { font-size: 1.1rem; font-weight: 600; color: #374151; }
+
+// Valid Result
+.resultValid {
+  background: white; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 2px solid #10b981;
+}
+.validBadge {
+  background: linear-gradient(135deg, #059669, #10b981);
+  padding: 1.25rem; text-align: center; display: flex; align-items: center;
+  justify-content: center; gap: 0.5rem;
+}
+.validIcon { font-size: 1.5rem; }
+.validText { color: white; font-size: 1.1rem; font-weight: 700; }
+
+.certInfo { padding: 1.5rem; }
+
+.gradeBox {
+  text-align: center; padding: 1.25rem; margin-bottom: 1.25rem;
+  border: 3px solid; border-radius: 14px; background: #fafafa;
+}
+.gradeValue { display: block; font-size: 2.5rem; font-weight: 800; line-height: 1; }
+.gradeName { display: block; font-size: 0.85rem; font-weight: 600; color: #374151; margin-top: 0.25rem; }
+.totalScore { display: block; font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-top: 0.5rem; }
+
+.infoGrid { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; }
+.infoRow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6;
+}
+.infoLabel { font-size: 0.8rem; color: #6b7280; }
+.infoValue { font-size: 0.85rem; font-weight: 600; color: #1f2937; }
+.mono { font-family: monospace; letter-spacing: 1px; color: #7c3aed; }
+
+.scoresSection {
+  margin-top: 1rem;
+  h4 { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem; }
+}
+.scoresList { display: flex; flex-direction: column; gap: 0.625rem; }
+.scoreRow {}
+.scoreRowHeader {
+  display: flex; justify-content: space-between; font-size: 0.8rem; color: #374151;
+  margin-bottom: 0.25rem;
+}
+.scoreRowPts { font-weight: 700; }
+.scoreRowBar { height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden; }
+.scoreRowFill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+.badgeInfo {
+  margin-top: 1rem; padding: 0.75rem 1rem; background: #ecfdf5;
+  border-radius: 10px; font-size: 0.85rem; color: #059669;
+  font-weight: 600; text-align: center;
+}
+
+// Invalid Result
+.resultInvalid {
+  background: white; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 2px solid #ef4444;
+}
+.invalidBadge {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  padding: 1.25rem; text-align: center; display: flex; align-items: center;
+  justify-content: center; gap: 0.5rem;
+}
+.invalidIcon { font-size: 1.5rem; }
+.invalidText { color: white; font-size: 1rem; font-weight: 700; }
+.expiredInfo {
+  padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;
+}
+
+// Footer
+.footer {
+  text-align: center; padding: 1rem 0;
+  p { font-size: 0.75rem; color: #9ca3af; }
+}
+.footerSub { font-weight: 600; color: #7c3aed !important; margin-top: 0.25rem; }

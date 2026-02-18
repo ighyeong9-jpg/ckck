@@ -1,0 +1,371 @@
+.container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  color: #1f2937;
+}
+
+// Loading & Error States
+.loadingContainer,
+.errorContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: #6b7280;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorIcon {
+  font-size: 3rem;
+}
+
+.errorContainer h2 {
+  color: #1f2937;
+  font-size: 1.5rem;
+}
+
+// Header (카드 디자인 유지)
+.header {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
+  padding: 2rem;
+}
+
+.headerContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.branding {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logoIcon {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.logoText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+}
+
+.projectInfo {
+  margin-top: 1rem;
+}
+
+.projectTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.shareDate {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+// Main Content
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+}
+
+// Risk Section
+.riskSection {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.gaugeWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+// Breakdown Section
+.breakdownSection {
+  margin-bottom: 2rem;
+}
+
+.statCards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// 카드 내부 디자인 유지 (그라데이션)
+.statCard {
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  &.purple {
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  }
+
+  &.blue {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+  }
+
+  &.green {
+    background: linear-gradient(135deg, #10b981, #14b8a6);
+  }
+
+  &.orange {
+    background: linear-gradient(135deg, #f97316, #fb923c);
+  }
+}
+
+.statIcon {
+  font-size: 2rem;
+  opacity: 0.9;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.statStatus {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+// Cost Section (카드 디자인 유지)
+.costSection {
+  margin-bottom: 2rem;
+}
+
+.costCard {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.costHeader {
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+.costMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.costLabel {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.costTotal {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.costSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: right;
+
+  @media (max-width: 600px) {
+    text-align: left;
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+}
+
+.costItem {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+
+  span:first-child {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.costBreakdown {
+  padding: 1.5rem 2rem;
+  background: rgba(0, 0, 0, 0.1);
+
+  h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+  }
+}
+
+.breakdownGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.breakdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.breakdownIcon {
+  font-size: 1.25rem;
+}
+
+.breakdownLabel {
+  flex: 1;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.breakdownValue {
+  font-weight: 600;
+  color: #fff;
+}
+
+// Footer
+.footer {
+  background: #ffffff;
+  padding: 2rem;
+  margin-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.footerContent {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.expireNotice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  padding: 0.75rem 1.25rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+
+.expireIcon {
+  font-size: 1rem;
+}
+
+.footerBranding {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.footerLogo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.footerSubtitle {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}

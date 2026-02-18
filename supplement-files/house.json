@@ -1,0 +1,39 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "house",
+  "industry_name": "단독주택",
+  "categories": [
+    {
+      "category_id": "foundation",
+      "category_name": "기초",
+      "items": [
+        {
+          "item_code": "FD001",
+          "item_name": "기초 콘크리트 양생",
+          "description": "기초 콘크리트 타설 및 양생 상태",
+          "risk_weight": 1.8
+        }
+      ]
+    },
+    {
+      "category_id": "roofing",
+      "category_name": "지붕",
+      "items": [
+        {
+          "item_code": "RF001",
+          "item_name": "지붕 방수",
+          "description": "지붕 방수층 및 배수 상태",
+          "risk_weight": 1.5
+        }
+      ]
+    }
+  ],
+  "pre_questions": [
+    {
+      "question_id": "PQ001",
+      "question": "대지 면적(평)",
+      "answer_type": "number"
+    }
+  ],
+  "auto_terms": []
+}

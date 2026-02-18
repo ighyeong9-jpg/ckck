@@ -1,0 +1,33 @@
+{
+  "$schema": "./schema.json",
+  "industry_id": "office",
+  "industry_name": "사무실",
+  "categories": [
+    {
+      "category_id": "network",
+      "category_name": "네트워크",
+      "items": [
+        {
+          "item_code": "NW001",
+          "item_name": "랜선 배선",
+          "description": "각 좌석 랜선 배선 설치",
+          "risk_weight": 1.2
+        }
+      ]
+    },
+    {
+      "category_id": "partition",
+      "category_name": "칸막이",
+      "items": [
+        {
+          "item_code": "PT001",
+          "item_name": "파티션 시공",
+          "description": "파티션 수직도 및 견고함",
+          "risk_weight": 1.0
+        }
+      ]
+    }
+  ],
+  "pre_questions": [],
+  "auto_terms": []
+}
