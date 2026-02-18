@@ -287,6 +287,16 @@ export default function CostAnalysisPage() {
           >
             {saving ? '저장 중...' : '분석 결과 저장'}
           </button>
+          <button
+            className={styles.saveBtn}
+            style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }}
+            onClick={() => {
+              const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+              if (btn) btn.click()
+            }}
+          >
+            🤖 AI 적정가 분석
+          </button>
         </section>
       </main>
     </div>

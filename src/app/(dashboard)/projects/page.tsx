@@ -104,6 +104,12 @@ export default function ProjectsPage() {
           <button type="button" className={styles.newProjectBtn} onClick={() => setShowModal(true)}>
             + 새 프로젝트
           </button>
+          <button type="button" className={styles.newProjectBtn} style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }} onClick={() => {
+            const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+            if (btn) btn.click()
+          }}>
+            ⚡ AI 빠른 생성
+          </button>
         </div>
       </header>
 

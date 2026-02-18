@@ -259,6 +259,16 @@ export default function SOWPage() {
           >
             + 항목 추가
           </button>
+          <button
+            className={styles.addBtn}
+            style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }}
+            onClick={() => {
+              const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+              if (btn) btn.click()
+            }}
+          >
+            ⚡ AI 표준 견적
+          </button>
         </section>
 
         {/* Items by Category */}

@@ -302,8 +302,21 @@ export default function ReportPage() {
           </div>
         </section>
 
-        {/* Generate Report */}
+        {/* AI Report */}
         <section className={styles.generateSection}>
+          <button
+            style={{
+              width: '100%', padding: '1rem', background: 'linear-gradient(135deg, #7c3aed, #a78bfa)',
+              border: 'none', borderRadius: '12px', color: 'white', fontSize: '1rem', fontWeight: 700,
+              cursor: 'pointer', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+            }}
+            onClick={() => {
+              const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+              if (btn) btn.click()
+            }}
+          >
+            🤖 AI 리포트 자동 생성
+          </button>
           <h2 className={styles.sectionTitle}>리포트 생성</h2>
           <div className={styles.reportTypes}>
             {REPORT_TYPES.map((type) => (

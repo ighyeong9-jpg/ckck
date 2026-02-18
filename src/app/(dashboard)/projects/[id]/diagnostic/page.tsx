@@ -507,13 +507,25 @@ export default function DiagnosticPage() {
             </div>
           </div>
 
-          <button
-            className={styles.saveBtn}
-            onClick={saveRiskScore}
-            disabled={saving}
-          >
-            {saving ? '저장 중...' : '리스크 점수 저장'}
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <button
+              className={styles.saveBtn}
+              onClick={saveRiskScore}
+              disabled={saving}
+            >
+              {saving ? '저장 중...' : '리스크 점수 저장'}
+            </button>
+            <button
+              className={styles.saveBtn}
+              style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }}
+              onClick={() => {
+                const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+                if (btn) btn.click()
+              }}
+            >
+              🤖 AI 리스크 분석
+            </button>
+          </div>
         </section>
 
         {/* GO/NO-GO 판정 카드 */}
