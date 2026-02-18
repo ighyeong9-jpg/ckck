@@ -40,3 +40,10 @@ export const PARTIES: Party[] = [
   { id: 'contractor', name: '시공사', icon: '🏗️', color: '#f59e0b' },
   { id: 'manager', name: '관리자', icon: '📋', color: '#10b981' },
 ]
+
+export interface SignatureData {
+  dataUrl: string
+  hash: string
+  timestamp: string
+}
+

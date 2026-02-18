@@ -25,6 +25,7 @@ const mainNavItems: NavItem[] = [
   { icon: '📁', label: '프로젝트', href: '/projects' },
   { icon: '📊', label: '리포트', href: '/reports' },
   { icon: '👥', label: '고객관리', href: '/clients' },
+  { icon: '🏢', label: '프로필', href: '/profile' },
 ]
 
 const projectSubMenuItems: SubMenuItem[] = [
@@ -39,6 +40,8 @@ const projectSubMenuItems: SubMenuItem[] = [
   { icon: '👷', label: '인력관리', path: 'workforce' },
   { icon: '📦', label: '자재관리', path: 'materials' },
   { icon: '🤖', label: '인증서', path: 'certificate' },
+  { icon: '🚨', label: '하자신고', path: 'defects' },
+  { icon: '🖼️', label: '갤러리', path: 'gallery' },
 ]
 
 const bottomNavItems: NavItem[] = [
@@ -54,6 +57,28 @@ export default function Sidebar() {
   const [userPlan, setUserPlan] = useState('Free')
   const [subMenuOpen, setSubMenuOpen] = useState(true)
   const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({})
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('sidebar-collapsed') === 'true'
+    }
+    return false
+  })
+
+  useEffect(() => {
+    localStorage.setItem('sidebar-collapsed', String(collapsed))
+    document.documentElement.style.setProperty(
+      '--sidebar-width',
+      collapsed ? '56px' : '260px'
+    )
+  }, [collapsed])
+
+  // Set initial CSS variable on mount
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--sidebar-width',
+      collapsed ? '56px' : '260px'
+    )
+  }, [])
 
   useEffect(() => {
     const loadUser = async () => {
@@ -135,14 +160,37 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
       {/* Logo */}
       <div className={styles.logoSection}>
-        <Link href="/" className={styles.logo}>
-          <span className={styles.logoIcon}>✓</span>
-          <span className={styles.logoText}>Check-In</span>
-        </Link>
-        <span className={styles.tagline}>기록의 편</span>
+        <div className={styles.logoRow}>
+          <Link href="/" className={styles.logo}>
+            <span className={styles.logoIcon}>✓</span>
+            {!collapsed && <span className={styles.logoText}>Check-In</span>}
+          </Link>
+          <button
+            className={styles.toggleBtn}
+            onClick={() => setCollapsed(!collapsed)}
+            title={collapsed ? '사이드바 펼치기' : '사이드바 접기'}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              {collapsed ? (
+                <>
+                  <line x1="3" y1="12" x2="21" y2="12"/>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                  <line x1="3" y1="18" x2="21" y2="18"/>
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="12" x2="21" y2="12"/>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                  <line x1="3" y1="18" x2="21" y2="18"/>
+                </>
+              )}
+            </svg>
+          </button>
+        </div>
+        {!collapsed && <span className={styles.tagline}>기록의 편</span>}
       </div>
 
       {/* Main Navigation */}
@@ -153,13 +201,15 @@ export default function Sidebar() {
               <Link
                 href={item.href}
                 className={`${styles.navItem} ${isActive(item.href) ? styles.active : ''}`}
+                title={collapsed ? item.label : undefined}
               >
                 <span className={styles.navIcon}>{item.icon}</span>
-                <span className={styles.navLabel}>{item.label}</span>
+                {!collapsed && <span className={styles.navLabel}>{item.label}</span>}
+                {collapsed && <span className={styles.tooltip}>{item.label}</span>}
               </Link>
 
               {/* Project Submenu - Accordion */}
-              {item.href === '/projects' && isOnProjectPage && (
+              {item.href === '/projects' && isOnProjectPage && !collapsed && (
                 <>
                   <button
                     className={styles.accordionToggle}
@@ -203,9 +253,11 @@ export default function Sidebar() {
               <Link
                 href={item.href}
                 className={`${styles.navItem} ${isActive(item.href) ? styles.active : ''}`}
+                title={collapsed ? item.label : undefined}
               >
                 <span className={styles.navIcon}>{item.icon}</span>
-                <span className={styles.navLabel}>{item.label}</span>
+                {!collapsed && <span className={styles.navLabel}>{item.label}</span>}
+                {collapsed && <span className={styles.tooltip}>{item.label}</span>}
               </Link>
             </li>
           ))}
@@ -216,17 +268,22 @@ export default function Sidebar() {
           <div className={styles.userAvatar}>
             {userName.charAt(0).toUpperCase()}
           </div>
-          <div className={styles.userInfo}>
-            <span className={styles.userName}>{userName}</span>
-            <span className={styles.userPlan}>{userPlan} Plan</span>
-          </div>
-          <button onClick={handleLogout} className={styles.logoutBtn} title="로그아웃">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-          </button>
+          {!collapsed && (
+            <>
+              <div className={styles.userInfo}>
+                <span className={styles.userName}>{userName}</span>
+                <span className={styles.userPlan}>{userPlan} Plan</span>
+              </div>
+              <button onClick={handleLogout} className={styles.logoutBtn} title="로그아웃">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+              </button>
+            </>
+          )}
+          {collapsed && <span className={styles.tooltip}>{userName}</span>}
         </div>
       </nav>
     </aside>

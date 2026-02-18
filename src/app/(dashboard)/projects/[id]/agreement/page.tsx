@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { AgreementStatus } from '@/types/agreement'
 import { PARTIES } from '@/types/agreement'
+import SignaturePad from '@/components/signature/SignaturePad'
+import { sha256 } from '@/lib/utils/merkleTree'
 import styles from './page.module.scss'
 
 export default function AgreementPage() {
@@ -25,6 +27,12 @@ export default function AgreementPage() {
 
   const [content, setContent] = useState('')
   const [notes, setNotes] = useState('')
+  const [signingParty, setSigningParty] = useState<'client' | 'contractor' | 'manager' | null>(null)
+  const [signatures, setSignatures] = useState<Record<string, string | null>>({
+    client: null,
+    contractor: null,
+    manager: null,
+  })
 
   // 데이터 로드
   useEffect(() => {
@@ -76,6 +84,12 @@ export default function AgreementPage() {
           if (agreement.total_amount > 0) {
             setTotalAmount(agreement.total_amount)
           }
+          // Load existing signatures
+          setSignatures({
+            client: agreement.client_signature || null,
+            contractor: agreement.contractor_signature || null,
+            manager: agreement.manager_signature || null,
+          })
         }
       } catch (err) {
         console.error('Error loading data:', err)
@@ -121,6 +135,26 @@ export default function AgreementPage() {
     }))
   }
 
+  // 서명 처리
+  const handleSign = async (partyId: 'client' | 'contractor' | 'manager', dataUrl: string) => {
+    if (dataUrl === '') {
+      // Cancel signature
+      setSignatures(prev => ({ ...prev, [partyId]: null }))
+      setParties(prev => ({
+        ...prev,
+        [partyId]: { ...prev[partyId], agreed: false, signedAt: null },
+      }))
+    } else {
+      const hash = await sha256(dataUrl)
+      setSignatures(prev => ({ ...prev, [partyId]: dataUrl }))
+      setParties(prev => ({
+        ...prev,
+        [partyId]: { ...prev[partyId], agreed: true, signedAt: new Date().toISOString() },
+      }))
+    }
+    setSigningParty(null)
+  }
+
   // 저장
   const handleSave = async () => {
     setSaving(true)
@@ -132,12 +166,15 @@ export default function AgreementPage() {
         client_agreed: parties.client.agreed,
         client_name: parties.client.name || null,
         client_signed_at: parties.client.signedAt,
+        client_signature: signatures.client || null,
         contractor_agreed: parties.contractor.agreed,
         contractor_name: parties.contractor.name || null,
         contractor_signed_at: parties.contractor.signedAt,
+        contractor_signature: signatures.contractor || null,
         manager_agreed: parties.manager.agreed,
         manager_name: parties.manager.name || null,
         manager_signed_at: parties.manager.signedAt,
+        manager_signature: signatures.manager || null,
         agreement_content: content || null,
         total_amount: totalAmount,
         notes: notes || null,
@@ -225,11 +262,18 @@ export default function AgreementPage() {
                       className={styles.nameInput}
                     />
 
+                    {/* 서명 미리보기 */}
+                    {signatures[party.id] && (
+                      <div className={styles.signaturePreview}>
+                        <img src={signatures[party.id]!} alt="서명" />
+                      </div>
+                    )}
+
                     <button
-                      className={`${styles.agreeBtn} ${partyState.agreed ? styles.agreed : ''}`}
-                      onClick={() => toggleAgreement(party.id)}
+                      className={`${styles.signBtn} ${partyState.agreed ? styles.signed : ''}`}
+                      onClick={() => setSigningParty(party.id)}
                     >
-                      {partyState.agreed ? '✓ 동의함' : '동의하기'}
+                      {partyState.agreed ? '✅ 서명 완료' : '✍️ 서명하기'}
                     </button>
 
                     {partyState.signedAt && (
@@ -281,10 +325,24 @@ export default function AgreementPage() {
         {status === 'completed' && (
           <section className={styles.completedMessage}>
             <span className={styles.completedIcon}>🎉</span>
-            <p>모든 당사자가 동의하였습니다!</p>
+            <p>모든 당사자가 서명을 완료하였습니다!</p>
           </section>
         )}
       </main>
+
+      {/* Signature Pad Modal */}
+      {signingParty && (
+        <div className={styles.signatureOverlay} onClick={() => setSigningParty(null)}>
+          <div onClick={e => e.stopPropagation()}>
+            <SignaturePad
+              partyName={PARTIES.find(p => p.id === signingParty)?.name || ''}
+              existingSignature={signatures[signingParty]}
+              onSign={(dataUrl) => handleSign(signingParty, dataUrl)}
+              onCancel={() => setSigningParty(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

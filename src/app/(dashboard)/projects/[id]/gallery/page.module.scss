@@ -1,0 +1,62 @@
+.container { min-height: 100vh; background: #f8f9fa; }
+
+.loading {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 50vh; gap: 1rem; color: #6b7280;
+}
+.spinner {
+  width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #7c3aed;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+.header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
+}
+
+.viewToggle {
+  display: flex; background: white; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.viewBtn {
+  padding: 0.6rem 1.25rem; border: none; background: transparent;
+  font-size: 0.85rem; font-weight: 500; color: #6b7280; cursor: pointer;
+  &:hover { color: #4f46e5; }
+  &.active { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; font-weight: 600; }
+}
+
+.uploadBtn {
+  padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: none; border-radius: 10px; color: white; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  &:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+}
+
+.stats {
+  font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;
+}
+
+// Compare
+.compareSection {
+  background: white; border-radius: 16px; padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.sectionTitle { font-size: 1.05rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; }
+
+.compareSelectors {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;
+}
+.compareGroup {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  label { font-size: 0.85rem; font-weight: 600; color: #374151; }
+  select {
+    padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.9rem;
+    &:focus { outline: none; border-color: #7c3aed; }
+  }
+}
+.compareEmpty {
+  text-align: center; padding: 2rem; color: #9ca3af; font-size: 0.875rem;
+}

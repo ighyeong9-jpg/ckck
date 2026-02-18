@@ -315,6 +315,15 @@ export default function DashboardPage() {
     return `${days}일 전`
   }
 
+  const getDday = (endDate: string | null, status: string) => {
+    if (!endDate || status === 'completed') return null
+    const daysLeft = Math.ceil((new Date(endDate).getTime() - Date.now()) / 86400000)
+    if (daysLeft < 0) return { label: `D+${Math.abs(daysLeft)}`, type: 'overdue' as const }
+    if (daysLeft === 0) return { label: 'D-Day', type: 'today' as const }
+    if (daysLeft <= 7) return { label: `D-${daysLeft}`, type: 'soon' as const }
+    return null
+  }
+
   const renderTrend = (value: number) => {
     if (value > 0) return <span className={styles.trendUp}>+{value} ▲</span>
     if (value < 0) return <span className={styles.trendDown}>{value} ▼</span>
@@ -355,10 +364,28 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className={styles.container}>
-        <div className={styles.loadingScreen}>
-          <div className={styles.spinner} />
-          <span>대시보드를 불러오는 중...</span>
-        </div>
+        {/* Skeleton Header */}
+        <header className={styles.header}>
+          <div className={styles.headerContent}>
+            <div className={styles.welcome}>
+              <div className={styles.skeletonLine} style={{ width: '200px', height: '28px' }} />
+              <div className={styles.skeletonLine} style={{ width: '160px', height: '16px', marginTop: '8px' }} />
+            </div>
+          </div>
+        </header>
+        <main className={styles.main}>
+          {/* Skeleton KPI */}
+          <section className={styles.kpiGrid}>
+            {[1,2,3,4].map(i => (
+              <div key={i} className={styles.skeletonKpi} />
+            ))}
+          </section>
+          {/* Skeleton Cards */}
+          <div className={styles.chartsRow}>
+            <div className={styles.skeletonCard} />
+            <div className={styles.skeletonCard} />
+          </div>
+        </main>
       </div>
     )
   }
@@ -543,10 +570,12 @@ export default function DashboardPage() {
               {projects.slice(0, 5).map(project => {
                 const risk = getRiskGrade(project.risk_score || 0)
                 const status = getStatusInfo(project.status)
+                const isHighRisk = (project.risk_score || 0) >= 70
+                const dday = getDday(project.end_date, project.status)
                 return (
                   <div
                     key={project.id}
-                    className={styles.recentItem}
+                    className={`${styles.recentItem} ${isHighRisk ? styles.highRisk : ''}`}
                     onClick={() => router.push(`/projects/${project.id}/diagnostic`)}
                   >
                     <div className={styles.recentColorBar} style={{ background: status.color }} />
@@ -554,6 +583,11 @@ export default function DashboardPage() {
                       <span className={styles.recentName}>{project.name}</span>
                       <span className={styles.recentClient}>{project.client_name}</span>
                     </div>
+                    {dday && (
+                      <span className={`${styles.ddayBadge} ${styles[`dday_${dday.type}`]}`}>
+                        {dday.label}
+                      </span>
+                    )}
                     <span className={styles.recentStatus} style={{ background: `${status.color}18`, color: status.color }}>
                       {status.label}
                     </span>
@@ -623,6 +657,107 @@ export default function DashboardPage() {
             </div>
           </section>
         </div>
+
+        {/* 이번 주 할 일 요약 */}
+        <section className={styles.todoSection}>
+          <h2 className={styles.cardTitle}>이번 주 할 일</h2>
+          <div className={styles.todoList}>
+            {projects.filter(p => p.status === 'in_progress').slice(0, 5).map(p => {
+              const dday = getDday(p.end_date, p.status)
+              return (
+                <div key={p.id} className={styles.todoItem} onClick={() => router.push(`/projects/${p.id}/diagnostic`)}>
+                  <div className={styles.todoCheck}>
+                    {p.progress >= 100 ? '✅' : '⬜'}
+                  </div>
+                  <div className={styles.todoContent}>
+                    <span className={styles.todoName}>{p.name}</span>
+                    <span className={styles.todoClient}>{p.client_name}</span>
+                  </div>
+                  <div className={styles.todoProgress}>
+                    <div className={styles.todoBar}>
+                      <div className={styles.todoFill} style={{ width: `${p.progress || 0}%` }} />
+                    </div>
+                    <span>{p.progress || 0}%</span>
+                  </div>
+                  {dday && (
+                    <span className={`${styles.todoDday} ${styles[`dday_${dday.type}`]}`}>
+                      {dday.label}
+                    </span>
+                  )}
+                </div>
+              )
+            })}
+            {projects.filter(p => p.status === 'in_progress').length === 0 && (
+              <div className={styles.scheduleEmpty}>진행중인 프로젝트가 없습니다</div>
+            )}
+          </div>
+        </section>
+
+        {/* 7일 활동 CSS 바 차트 */}
+        <section className={styles.card}>
+          <h2 className={styles.cardTitle}>최근 7일 활동</h2>
+          <div className={styles.activityBarChart}>
+            {Array.from({ length: 7 }, (_, i) => {
+              const d = new Date()
+              d.setDate(d.getDate() - (6 - i))
+              const dateStr = d.toISOString().split('T')[0]
+              const dayLabel = d.toLocaleDateString('ko-KR', { weekday: 'short' })
+              const count = projects.filter(p => {
+                const updated = p.updated_at?.split('T')[0]
+                return updated === dateStr
+              }).length
+              const maxCount = Math.max(1, ...Array.from({ length: 7 }, (_, j) => {
+                const dd = new Date()
+                dd.setDate(dd.getDate() - (6 - j))
+                const ds = dd.toISOString().split('T')[0]
+                return projects.filter(p => p.updated_at?.split('T')[0] === ds).length
+              }))
+              const height = count > 0 ? Math.max(8, (count / maxCount) * 100) : 4
+              return (
+                <div key={i} className={styles.barCol}>
+                  <div className={styles.barWrapper}>
+                    <div
+                      className={styles.barFill}
+                      style={{ height: `${height}%` }}
+                    />
+                  </div>
+                  <span className={styles.barLabel}>{dayLabel}</span>
+                  <span className={styles.barCount}>{count}</span>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* 빠른 액션 버튼 */}
+        <section className={styles.quickActions}>
+          <h2 className={styles.cardTitle}>빠른 액션</h2>
+          <div className={styles.quickGrid}>
+            <button className={styles.quickBtn} onClick={() => router.push('/projects')}>
+              <span className={styles.quickIcon}>📁</span>
+              <span>새 프로젝트</span>
+            </button>
+            <button className={styles.quickBtn} onClick={() => {
+              const firstProject = projects[0]
+              if (firstProject) router.push(`/projects/${firstProject.id}/gallery`)
+              else router.push('/projects')
+            }}>
+              <span className={styles.quickIcon}>📷</span>
+              <span>사진 업로드</span>
+            </button>
+            <button className={styles.quickBtn} onClick={() => {
+              const chatBtn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+              if (chatBtn) chatBtn.click()
+            }}>
+              <span className={styles.quickIcon}>🤖</span>
+              <span>AI 체키</span>
+            </button>
+            <button className={styles.quickBtn} onClick={() => router.push('/reports')}>
+              <span className={styles.quickIcon}>📊</span>
+              <span>리포트</span>
+            </button>
+          </div>
+        </section>
       </main>
     </div>
   )

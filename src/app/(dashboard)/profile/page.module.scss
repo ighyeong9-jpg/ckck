@@ -1,0 +1,134 @@
+.container { min-height: 100vh; background: #f8f9fa; }
+
+.loading {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 50vh; gap: 1rem; color: #6b7280;
+}
+.spinner {
+  width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #7c3aed;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.header {
+  padding: 2rem 1.5rem 1rem;
+  max-width: 900px; margin: 0 auto;
+  h1 { font-size: 1.75rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+  p { font-size: 0.875rem; color: #6b7280; }
+}
+
+.main {
+  max-width: 900px; margin: 0 auto; padding: 0 1.5rem 3rem;
+}
+
+// Stats
+.statsRow {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+.statCard {
+  background: white; border-radius: 14px; padding: 1.25rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.statIcon { font-size: 1.5rem; }
+.statValue { font-size: 1.5rem; font-weight: 700; color: #7c3aed; }
+.statLabel { font-size: 0.75rem; color: #6b7280; }
+
+// Section
+.section {
+  background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.sectionTitle { font-size: 1.1rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; }
+
+// Form
+.formGrid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+.formGroup {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  label { font-size: 0.85rem; font-weight: 600; color: #374151; }
+  input, textarea {
+    padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem;
+    &:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+  }
+}
+
+// Logo
+.logoUpload { display: flex; align-items: center; gap: 1.5rem; }
+.logoPreview {
+  width: 80px; height: 80px; object-fit: cover; border-radius: 12px;
+  border: 2px solid #e5e7eb;
+}
+.logoPlaceholder {
+  width: 80px; height: 80px; background: #f3f4f6; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 2rem;
+}
+.uploadBtn {
+  padding: 0.625rem 1.25rem; background: #f3f4f6; border-radius: 8px;
+  font-size: 0.85rem; cursor: pointer; font-weight: 500; color: #374151;
+  &:hover { background: #e5e7eb; }
+}
+
+// Tags
+.tagGrid { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.tagChip {
+  padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 20px;
+  background: white; font-size: 0.85rem; cursor: pointer; transition: all 0.15s;
+  &:hover { border-color: #7c3aed; }
+  &.tagActive {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white; border-color: transparent;
+  }
+}
+
+// Portfolio
+.portfolioGrid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.75rem;
+}
+.portfolioItem {
+  position: relative; aspect-ratio: 1;
+  img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+}
+.removeBtn {
+  position: absolute; top: 4px; right: 4px;
+  width: 24px; height: 24px; background: #ef4444; color: white;
+  border: none; border-radius: 50%; font-size: 0.7rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.portfolioAddBtn {
+  aspect-ratio: 1; border: 2px dashed #d1d5db; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.85rem; color: #9ca3af;
+  &:hover { border-color: #7c3aed; color: #7c3aed; }
+}
+
+// Public Link
+.publicLink {
+  display: flex; gap: 0.75rem; align-items: center;
+}
+.linkUrl {
+  flex: 1; padding: 0.75rem; background: #f9fafb; border-radius: 8px;
+  font-size: 0.85rem; color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.copyBtn {
+  padding: 0.75rem 1.25rem; background: #4f46e5; color: white;
+  border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+  &:hover { background: #4338ca; }
+}
+.generateBtn {
+  padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer;
+  &:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+}
+
+// Save
+.saveBtn {
+  width: 100%; padding: 1rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: none; border-radius: 12px; color: white; font-weight: 700; font-size: 1rem;
+  cursor: pointer; transition: all 0.2s;
+  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.3); }
+  &:disabled { opacity: 0.7; cursor: not-allowed; }
+}

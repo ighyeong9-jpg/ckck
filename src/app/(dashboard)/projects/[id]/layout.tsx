@@ -35,12 +35,14 @@ export default async function ProjectDetailLayout({
     supabase.from('processes').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
     supabase.from('workforce').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
     supabase.from('materials').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
+    supabase.from('defects').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
+    supabase.from('evidence_files').select('id', { count: 'exact', head: true }).eq('project_id', projectId).like('file_type', 'image/%'),
   ])
 
   const tabKeys = [
     'diagnostic', 'sow', 'cost-analysis', 'changes',
     'evidence-package', 'agreement', 'report',
-    'process', 'workforce', 'materials',
+    'process', 'workforce', 'materials', 'defects', 'gallery',
   ]
 
   const tabStatuses: Record<string, 'completed' | 'in_progress' | 'not_started'> = {}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { Project, ProjectStatus, CreateProjectInput } from '@/types/project'
+import QuickStart from '@/components/onboarding/QuickStart'
 import styles from './page.module.scss'
 
 const INDUSTRY_ICONS: Record<string, string> = {
@@ -18,6 +19,7 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
   const [showModal, setShowModal] = useState(false)
+  const [showQuickStart, setShowQuickStart] = useState(false)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -31,6 +33,10 @@ export default function ProjectsPage() {
         .from('projects').select('*').order('created_at', { ascending: false })
       if (error) throw error
       setProjects(data || [])
+      // Show QuickStart for first-time users
+      if (data && data.length === 0) {
+        setShowQuickStart(true)
+      }
     } catch (err: any) {
       console.error('Error fetching projects:', err)
       setError(err.message)
@@ -62,6 +68,33 @@ export default function ProjectsPage() {
     }
   }
 
+  const handleQuickStartComplete = async (data: {
+    industry: string; area: string; budget: string; projectName: string; clientName: string
+  }) => {
+    setShowQuickStart(false)
+    // Trigger AI Agent to create the project
+    const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+    if (btn) {
+      btn.click()
+      // Send message to Agent after panel opens
+      setTimeout(() => {
+        const input = document.querySelector('input[placeholder="체키에게 물어보세요..."]') as HTMLInputElement
+        if (input) {
+          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+            window.HTMLInputElement.prototype, 'value'
+          )?.set
+          nativeInputValueSetter?.call(input, `${data.industry} ${data.area}평 ${data.projectName} 프로젝트 만들어줘. 고객명: ${data.clientName}${data.budget ? `, 예산: ${data.budget}만원` : ''}`)
+          input.dispatchEvent(new Event('input', { bubbles: true }))
+          // Auto-submit
+          setTimeout(() => {
+            const sendBtn = input.closest('div')?.querySelector('button:last-child') as HTMLButtonElement
+            if (sendBtn && !sendBtn.disabled) sendBtn.click()
+          }, 300)
+        }
+      }, 500)
+    }
+  }
+
   const getStatusText = (status: ProjectStatus) => {
     const m: Record<string, string> = { planning: '기획', in_progress: '진행중', review: '검토', completed: '완료' }
     return m[status] || status
@@ -80,15 +113,46 @@ export default function ProjectsPage() {
     return { grade: 'F', color: '#ef4444', bg: '#fee2e2' }
   }
 
+  const getDday = (endDate: string | null, status: string) => {
+    if (!endDate || status === 'completed') return null
+    const daysLeft = Math.ceil((new Date(endDate).getTime() - Date.now()) / 86400000)
+    if (daysLeft < 0) return { label: `D+${Math.abs(daysLeft)}`, type: 'overdue' as const }
+    if (daysLeft === 0) return { label: 'D-Day', type: 'today' as const }
+    if (daysLeft <= 7) return { label: `D-${daysLeft}`, type: 'soon' as const }
+    return null
+  }
+
+  const formatDateKR = (dateStr: string | null) => {
+    if (!dateStr) return ''
+    const d = new Date(dateStr)
+    return d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+  }
+
   const filteredProjects = filter === 'all' ? projects : projects.filter(p => p.status === filter)
 
   if (loading) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>
-          <div className={styles.spinner} />
-          <span>프로젝트를 불러오는 중...</span>
-        </div>
+        <header className={styles.header}>
+          <div className={styles.headerContent}>
+            <div>
+              <div className={styles.skeletonLine} style={{ width: '120px', height: '28px' }} />
+              <div className={styles.skeletonLine} style={{ width: '200px', height: '16px', marginTop: '8px' }} />
+            </div>
+          </div>
+        </header>
+        <main className={styles.main}>
+          <section className={styles.statCards}>
+            {[1,2,3,4].map(i => (
+              <div key={i} className={styles.skeletonStat} />
+            ))}
+          </section>
+          <section className={styles.projectList}>
+            {[1,2,3].map(i => (
+              <div key={i} className={styles.skeletonProject} />
+            ))}
+          </section>
+        </main>
       </div>
     )
   }
@@ -162,9 +226,14 @@ export default function ProjectsPage() {
               </div>
               <h3>첫 프로젝트를 만들어보세요!</h3>
               <p>프로젝트를 생성하면 진단부터 리포트까지<br/>모든 과정을 체계적으로 관리할 수 있습니다</p>
-              <button type="button" className={styles.emptyBtn} onClick={() => setShowModal(true)}>
-                + 새 프로젝트 만들기
-              </button>
+              <div className={styles.emptyActions}>
+                <button type="button" className={styles.emptyBtn} onClick={() => setShowModal(true)}>
+                  + 새 프로젝트 만들기
+                </button>
+                <button type="button" className={styles.emptyBtnAlt} onClick={() => setShowQuickStart(true)}>
+                  ⚡ 퀵스타트로 시작
+                </button>
+              </div>
             </div>
           ) : (
             filteredProjects.map(project => {
@@ -172,6 +241,8 @@ export default function ProjectsPage() {
               const statusColor = getStatusColor(project.status)
               const industryIcon = INDUSTRY_ICONS[project.industry] || '🏗️'
               const progress = project.progress || 0
+              const dday = getDday(project.end_date, project.status)
+              const isHighRisk = project.risk_score >= 70
               // SVG circular progress
               const radius = 22
               const circumference = 2 * Math.PI * radius
@@ -185,7 +256,11 @@ export default function ProjectsPage() {
                 return `${Math.floor(hours / 24)}일 전`
               })()
               return (
-                <Link key={project.id} href={`/projects/${project.id}/diagnostic`} className={styles.projectCard}>
+                <Link
+                  key={project.id}
+                  href={`/projects/${project.id}/diagnostic`}
+                  className={`${styles.projectCard} ${isHighRisk ? styles.highRisk : ''}`}
+                >
                   <div className={styles.cardColorBar} style={{ background: statusColor }} />
                   <div className={styles.cardBody}>
                     <div className={styles.cardTop}>
@@ -195,6 +270,11 @@ export default function ProjectsPage() {
                         <span className={styles.projectClient}>{project.client_name}</span>
                       </div>
                       <div className={styles.cardBadges}>
+                        {dday && (
+                          <span className={`${styles.ddayBadge} ${styles[`dday_${dday.type}`]}`}>
+                            {dday.label}
+                          </span>
+                        )}
                         <span className={styles.statusBadge} style={{ background: `${statusColor}18`, color: statusColor }}>
                           {getStatusText(project.status)}
                         </span>
@@ -233,7 +313,7 @@ export default function ProjectsPage() {
                     </div>
                     <div className={styles.cardFooter}>
                       <span className={styles.cardDate}>
-                        {project.start_date} ~ {project.end_date}
+                        {formatDateKR(project.start_date)} ~ {formatDateKR(project.end_date)}
                       </span>
                       <span className={styles.cardUpdated}>
                         {timeAgo} 수정
@@ -300,6 +380,14 @@ export default function ProjectsPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* QuickStart Onboarding */}
+      {showQuickStart && (
+        <QuickStart
+          onComplete={handleQuickStartComplete}
+          onClose={() => setShowQuickStart(false)}
+        />
       )}
     </div>
   )

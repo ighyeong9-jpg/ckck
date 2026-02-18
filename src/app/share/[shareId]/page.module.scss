@@ -4,7 +4,7 @@
   color: #1f2937;
 }
 
-// Loading & Error States
+// Loading & Error
 .loadingContainer,
 .errorContainer {
   min-height: 100vh;
@@ -26,24 +26,20 @@
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
-.errorIcon {
-  font-size: 3rem;
-}
+.errorIcon { font-size: 3rem; }
+.errorContainer h2 { color: #1f2937; font-size: 1.5rem; }
 
-.errorContainer h2 {
-  color: #1f2937;
-  font-size: 1.5rem;
-}
-
-// Header (카드 디자인 유지)
+// Header
 .header {
   background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
-  padding: 2rem;
+  padding: 1.5rem 1rem;
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
 }
 
 .headerContent {
@@ -89,240 +85,248 @@
   border-radius: 12px;
 }
 
-.projectInfo {
-  margin-top: 1rem;
+.projectInfo { margin-top: 1rem; }
+
+.projectTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.industryIcon {
+  font-size: 2rem;
 }
 
 .projectTitle {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
   color: #fff;
+
+  @media (min-width: 768px) {
+    font-size: 2rem;
+  }
 }
 
 .shareDate {
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.5rem;
 }
 
-// Main Content
+// Main
 .main {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
 }
 
 .sectionTitle {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: #1f2937;
 }
 
-// Risk Section
-.riskSection {
-  background: #ffffff;
+// Progress Gauge Section
+.progressSection {
+  background: #fff;
   border-radius: 16px;
-  padding: 2rem;
-  margin-bottom: 2rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.gaugeWrapper {
   display: flex;
-  justify-content: center;
-  padding: 1rem 0;
-}
-
-// Breakdown Section
-.breakdownSection {
-  margin-bottom: 2rem;
-}
-
-.statCards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-// 카드 내부 디자인 유지 (그라데이션)
-.statCard {
-  border-radius: 12px;
-  padding: 1.25rem;
-  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-  &.purple {
-    background: linear-gradient(135deg, #8b5cf6, #a855f7);
-  }
+.progressGauge {
+  width: 180px;
+  height: 180px;
 
-  &.blue {
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
-  }
-
-  &.green {
-    background: linear-gradient(135deg, #10b981, #14b8a6);
-  }
-
-  &.orange {
-    background: linear-gradient(135deg, #f97316, #fb923c);
+  @media (min-width: 768px) {
+    width: 220px;
+    height: 220px;
   }
 }
 
-.statIcon {
-  font-size: 2rem;
-  opacity: 0.9;
+.progressSvg {
+  width: 100%;
+  height: 100%;
 }
 
-.statContent {
+.progressPctText {
+  font-size: 2.5rem;
+  font-weight: 700;
+  fill: #1f2937;
+}
+
+.progressLabel {
+  font-size: 0.875rem;
+  fill: #6b7280;
+}
+
+// AI 인증 뱃지
+.certBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border-radius: 20px;
+  color: #fff;
+  font-size: 0.875rem;
+}
+
+.certIcon { font-size: 1.25rem; }
+.certGrade { font-weight: 700; }
+.certScore { opacity: 0.8; }
+
+// Overview Cards
+.overviewCards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+}
+
+.overviewCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.statLabel {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.9);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+.ocIcon { font-size: 1.5rem; }
+.ocLabel { font-size: 0.75rem; color: #6b7280; }
+.ocValue { font-size: 1rem; font-weight: 600; color: #1f2937; word-break: break-all; }
 
-.statValue {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.statStatus {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
-// Cost Section (카드 디자인 유지)
-.costSection {
-  margin-bottom: 2rem;
-}
-
-.costCard {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+// Timeline Section
+.timelineSection {
+  background: #fff;
   border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.costHeader {
-  padding: 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-}
-
-.costMain {
+.timelineList {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-.costLabel {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.costTotal {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.costSummary {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  text-align: right;
-
-  @media (max-width: 600px) {
-    text-align: left;
-    flex-direction: row;
-    gap: 1.5rem;
-  }
-}
-
-.costItem {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.9);
-
-  span:first-child {
-    color: rgba(255, 255, 255, 0.7);
-  }
-}
-
-.costBreakdown {
-  padding: 1.5rem 2rem;
-  background: rgba(0, 0, 0, 0.1);
-
-  h3 {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 1rem;
-  }
-}
-
-.breakdownGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.breakdownItem {
+.timelineItem {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
 }
 
-.breakdownIcon {
-  font-size: 1.25rem;
-}
-
-.breakdownLabel {
-  flex: 1;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.breakdownValue {
-  font-weight: 600;
+.timelineDot {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.timelineContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.timelineName {
+  min-width: 60px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+
+  @media (min-width: 768px) {
+    min-width: 100px;
+  }
+}
+
+.timelineBar {
+  flex: 1;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.timelineFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.timelinePct {
+  font-size: 0.75rem;
+  color: #6b7280;
+  min-width: 32px;
+  text-align: right;
+}
+
+// Schedule Section
+.scheduleSection {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.scheduleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    gap: 2rem;
+  }
+}
+
+.scheduleItem {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.scheduleLabel {
+  color: #6b7280;
+  font-weight: 500;
 }
 
 // Footer
 .footer {
-  background: #ffffff;
-  padding: 2rem;
-  margin-top: 2rem;
+  background: #fff;
+  padding: 1.5rem 1rem;
+  margin-top: 1rem;
   border-top: 1px solid #e5e7eb;
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
 }
 
 .footerContent {
@@ -346,9 +350,7 @@
   border-radius: 8px;
 }
 
-.expireIcon {
-  font-size: 1rem;
-}
+.expireIcon { font-size: 1rem; }
 
 .footerBranding {
   display: flex;

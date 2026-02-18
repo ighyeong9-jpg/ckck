@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Process, ProcessStatus } from '@/types/process'
-import { PROCESS_STATUS } from '@/types/process'
+import { PROCESS_STATUS, DEFAULT_PROCESSES } from '@/types/process'
 import styles from './page.module.scss'
 
 type ViewMode = 'list' | 'gantt'
@@ -166,6 +166,51 @@ export default function ProcessPage() {
     }
   }
 
+  // 템플릿 불러오기
+  const loadTemplate = async () => {
+    if (processes.length > 0 && !confirm('기존 공정이 있습니다. 템플릿을 추가로 불러올까요?')) return
+
+    setSaving(true)
+    try {
+      const today = new Date()
+      const templateData = DEFAULT_PROCESSES.map((name, idx) => {
+        const start = new Date(today)
+        start.setDate(start.getDate() + idx * 7)
+        const end = new Date(start)
+        end.setDate(end.getDate() + 6)
+        return {
+          project_id: projectId,
+          name,
+          description: '',
+          status: 'pending' as const,
+          progress: 0,
+          start_date: start.toISOString().split('T')[0],
+          end_date: end.toISOString().split('T')[0],
+          order_index: processes.length + idx,
+        }
+      })
+
+      const { data, error } = await supabase
+        .from('processes')
+        .insert(templateData)
+        .select()
+
+      if (error) throw error
+      if (data) setProcesses(prev => [...prev, ...data])
+    } catch (err: any) {
+      alert(`템플릿 로드 오류: ${err?.message}`)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // 지연 공종 감지
+  const isDelayed = (process: Process) => {
+    if (process.status === 'completed') return false
+    if (!process.end_date) return false
+    return new Date(process.end_date) < new Date()
+  }
+
   const getStatusInfo = (status: string) => PROCESS_STATUS.find(s => s.id === status)
 
   const overallProgress = processes.length > 0
@@ -296,15 +341,24 @@ export default function ProcessPage() {
               공정표
             </button>
           </div>
-          <button
-            className={styles.addBtn}
-            onClick={() => {
-              resetForm()
-              setShowModal(true)
-            }}
-          >
-            + 공정 추가
-          </button>
+          <div className={styles.actionBtns}>
+            <button
+              className={styles.templateBtn}
+              onClick={loadTemplate}
+              disabled={saving}
+            >
+              📋 템플릿 불러오기
+            </button>
+            <button
+              className={styles.addBtn}
+              onClick={() => {
+                resetForm()
+                setShowModal(true)
+              }}
+            >
+              + 공정 추가
+            </button>
+          </div>
         </div>
 
         {/* Status Legend */}
@@ -339,8 +393,9 @@ export default function ProcessPage() {
                   {processes.map((process, idx) => {
                     const barStyle = getBarStyle(process)
                     const hasDates = process.start_date && process.end_date
+                    const delayed = isDelayed(process)
                     return (
-                      <div key={process.id} className={styles.ganttRow} onClick={() => openEditModal(process)}>
+                      <div key={process.id} className={`${styles.ganttRow} ${delayed ? styles.ganttRowDelayed : ''}`} onClick={() => openEditModal(process)}>
                         <div className={styles.ganttLabelCol}>
                           <span className={styles.ganttIndex}>{idx + 1}</span>
                           <span className={styles.ganttName}>{process.name}</span>
@@ -403,8 +458,9 @@ export default function ProcessPage() {
             ) : (
               processes.map((process, index) => {
                 const statusInfo = getStatusInfo(process.status)
+                const delayed = isDelayed(process)
                 return (
-                  <div key={process.id} className={styles.processCard}>
+                  <div key={process.id} className={`${styles.processCard} ${delayed ? styles.processCardDelayed : ''}`}>
                     <div className={styles.processIndex}>{index + 1}</div>
                     <div className={styles.processInfo}>
                       <h3>{process.name}</h3>

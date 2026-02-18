@@ -1,8 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import Sidebar from '@/components/layout/Sidebar'
-import AgentChat from '@/components/agent/AgentChat'
-import styles from './layout.module.scss'
+import DashboardShell from '@/components/layout/DashboardShell'
 
 export default async function DashboardLayout({
   children,
@@ -18,12 +16,8 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className={styles.layout}>
-      <Sidebar />
-      <main className={styles.main}>
-        {children}
-      </main>
-      <AgentChat />
-    </div>
+    <DashboardShell>
+      {children}
+    </DashboardShell>
   )
 }

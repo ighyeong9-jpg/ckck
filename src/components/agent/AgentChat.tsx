@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import styles from './AgentChat.module.scss'
 
@@ -9,6 +9,47 @@ interface Message {
   content: string
   tool?: string
   toolSuccess?: boolean
+}
+
+interface SuggestionChip {
+  label: string
+  message: string
+  icon: string
+}
+
+const PAGE_SUGGESTIONS: Record<string, SuggestionChip[]> = {
+  '/projects': [
+    { icon: '🏗️', label: '프로젝트 생성', message: '카페 20평 프로젝트 만들어줘' },
+    { icon: '📊', label: '현황 요약', message: '전체 프로젝트 현황 알려줘' },
+  ],
+  '/dashboard': [
+    { icon: '📈', label: '리스크 분석', message: '전체 리스크 현황 분석해줘' },
+    { icon: '📋', label: '오늘 할일', message: '오늘 해야 할 작업 알려줘' },
+  ],
+  'diagnostic': [
+    { icon: '🔍', label: '리스크 분석', message: '리스크 분석해줘' },
+    { icon: '📋', label: '체크리스트 점검', message: '체크리스트 분석해줘' },
+  ],
+  'sow': [
+    { icon: '💰', label: '견적 생성', message: '표준 견적 생성해줘' },
+    { icon: '📊', label: '단가 비교', message: '견적 단가 분석해줘' },
+  ],
+  'cost-analysis': [
+    { icon: '💵', label: '적정가 분석', message: '적정가 분석해줘' },
+    { icon: '📉', label: '비용 최적화', message: '비용 절감 방안 분석해줘' },
+  ],
+  'report': [
+    { icon: '📄', label: '리포트 생성', message: '리포트 생성해줘' },
+    { icon: '📊', label: '요약 보기', message: '프로젝트 요약해줘' },
+  ],
+  'changes': [
+    { icon: '🔄', label: '변경 등록', message: '변경사항 등록해줘' },
+    { icon: '📋', label: '변경 이력', message: '변경 이력 분석해줘' },
+  ],
+  'certificate': [
+    { icon: '🤖', label: 'AI 검증', message: 'AI 검증 점수 확인해줘' },
+    { icon: '📜', label: '인증서 발급', message: '인증서 발급해줘' },
+  ],
 }
 
 export default function AgentChat() {
@@ -25,14 +66,31 @@ export default function AgentChat() {
   const projectIdMatch = pathname.match(/\/projects\/([^/]+)/)
   const projectId = projectIdMatch ? projectIdMatch[1] : undefined
 
+  // 현재 페이지에 맞는 추천 칩 결정
+  const suggestions = useMemo(() => {
+    // Check project sub-pages first
+    if (projectId) {
+      const subPage = pathname.split('/').pop() || ''
+      if (PAGE_SUGGESTIONS[subPage]) return PAGE_SUGGESTIONS[subPage]
+    }
+    // Check main pages
+    if (pathname.startsWith('/projects') && !projectId) return PAGE_SUGGESTIONS['/projects']
+    if (pathname.startsWith('/dashboard')) return PAGE_SUGGESTIONS['/dashboard']
+    // Default suggestions
+    return [
+      { icon: '🏗️', label: '프로젝트 생성', message: '프로젝트 만들어줘' },
+      { icon: '❓', label: '도움말', message: '무엇을 할 수 있어?' },
+    ]
+  }, [pathname, projectId])
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return
+  const sendMessage = async (msgText?: string) => {
+    const userMsg = (msgText || input).trim()
+    if (!userMsg || loading) return
 
-    const userMsg = input.trim()
     setInput('')
     setMessages(prev => [...prev, { role: 'user', content: userMsg }])
     setLoading(true)
@@ -78,6 +136,10 @@ export default function AgentChat() {
       e.preventDefault()
       sendMessage()
     }
+  }
+
+  const handleChipClick = (chip: SuggestionChip) => {
+    sendMessage(chip.message)
   }
 
   const toolLabels: Record<string, string> = {
@@ -147,6 +209,21 @@ export default function AgentChat() {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Suggestion Chips */}
+          <div className={styles.suggestionsArea}>
+            {suggestions.map((chip, i) => (
+              <button
+                key={i}
+                className={styles.suggestionChip}
+                onClick={() => handleChipClick(chip)}
+                disabled={loading}
+              >
+                <span>{chip.icon}</span>
+                {chip.label}
+              </button>
+            ))}
+          </div>
+
           <div className={styles.inputArea}>
             <input
               className={styles.input}
@@ -158,7 +235,7 @@ export default function AgentChat() {
             />
             <button
               className={styles.sendBtn}
-              onClick={sendMessage}
+              onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
             >
               전송
