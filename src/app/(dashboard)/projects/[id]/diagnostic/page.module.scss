@@ -132,6 +132,23 @@
   }
 }
 
+.statusMessage {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  padding: 0.5rem 1rem;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-md);
+  margin-top: 0.5rem;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .riskBreakdown {
   display: flex;
   flex-direction: column;

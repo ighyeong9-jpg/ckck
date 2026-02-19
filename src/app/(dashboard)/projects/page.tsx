@@ -315,6 +315,12 @@ export default function ProjectsPage() {
                       <span className={styles.cardDate}>
                         {formatDateKR(project.start_date)} ~ {formatDateKR(project.end_date)}
                       </span>
+                      <span className={styles.smartBadge}>
+                        {project.status === 'completed' ? '✅ 완료' :
+                         risk.grade === 'A' ? '🛡️ 안전 관리중' :
+                         risk.grade === 'B' ? '📋 스마트 관리중' :
+                         '⚡ AI 모니터링중'}
+                      </span>
                       <span className={styles.cardUpdated}>
                         {timeAgo} 수정
                       </span>

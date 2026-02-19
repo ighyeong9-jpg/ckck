@@ -479,6 +479,14 @@ export default function DiagnosticPage() {
               <span>완료율</span>
               <strong>{getCompletionRate()}%</strong>
             </div>
+            <div className={styles.statusMessage}>
+              {getCompletionRate() === 0 && '체크리스트를 시작해보세요!'}
+              {getCompletionRate() > 0 && getCompletionRate() < 30 && '좋은 시작이에요! 계속 진행해보세요 💪'}
+              {getCompletionRate() >= 30 && getCompletionRate() < 60 && '순조롭게 진행 중이에요! 👍'}
+              {getCompletionRate() >= 60 && getCompletionRate() < 90 && '거의 다 됐어요! 조금만 더! 🔥'}
+              {getCompletionRate() >= 90 && getCompletionRate() < 100 && '완벽에 가까워요! 마무리해주세요 ✨'}
+              {getCompletionRate() === 100 && '완벽합니다! 현장 진단 완료! 🎉'}
+            </div>
           </div>
 
           <div className={styles.riskBreakdown}>

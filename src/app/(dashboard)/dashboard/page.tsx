@@ -391,14 +391,40 @@ export default function DashboardPage() {
     )
   }
 
+  // 시간대별 인사말
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 6) return { text: '늦은 밤까지 수고하세요', emoji: '🌙' }
+    if (hour < 9) return { text: '좋은 아침이에요', emoji: '🌅' }
+    if (hour < 12) return { text: '활기찬 오전이에요', emoji: '☀️' }
+    if (hour < 14) return { text: '점심 식사는 하셨나요?', emoji: '🍚' }
+    if (hour < 18) return { text: '오후도 힘내세요', emoji: '💪' }
+    if (hour < 21) return { text: '오늘 하루도 수고했어요', emoji: '🌆' }
+    return { text: '편안한 저녁 되세요', emoji: '🌙' }
+  }
+
+  // 동기부여 한마디
+  const tips = [
+    '체키와 함께라면 현장 관리가 쉬워집니다',
+    '사진 한 장이 최고의 증거입니다',
+    '꼼꼼한 기록이 분쟁을 예방합니다',
+    '체크리스트를 완료하면 리스크가 줄어듭니다',
+    '오늘의 기록이 내일의 방패가 됩니다',
+    'AI 검증으로 프로젝트 신뢰도를 높이세요',
+    '변경사항은 반드시 기록하세요',
+    '정기적인 리포트가 고객 신뢰를 만듭니다',
+  ]
+  const todayTip = tips[new Date().getDate() % tips.length]
+  const greeting = getGreeting()
+
   return (
     <div className={styles.container}>
       {/* Welcome Header */}
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.welcome}>
-            <h1>안녕하세요, {userName}님</h1>
-            <p>오늘의 현장 현황입니다</p>
+            <h1>{greeting.emoji} {greeting.text}, {userName}님</h1>
+            <p>{todayTip}</p>
           </div>
           <div className={styles.headerDate}>
             {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
@@ -741,6 +767,30 @@ export default function DashboardPage() {
           </div>
         </section>
 
+        {/* 성과/마일스톤 */}
+        <section className={styles.card}>
+          <h2 className={styles.cardTitle}>나의 성과</h2>
+          <div className={styles.achievementGrid}>
+            {[
+              { icon: '🏗️', label: '프로젝트 생성', count: stats.totalProjects, target: 1, desc: '첫 프로젝트 시작!' },
+              { icon: '✅', label: '프로젝트 완료', count: stats.completedProjects, target: 1, desc: '첫 프로젝트 완료!' },
+              { icon: '📊', label: '리스크 관리', count: stats.totalProjects - stats.highRiskProjects, target: 3, desc: '안전한 프로젝트 3개' },
+              { icon: '💰', label: '견적 전문가', count: stats.totalQuoteAmount > 0 ? 1 : 0, target: 1, desc: '첫 견적 작성!' },
+            ].map((ach, i) => {
+              const achieved = ach.count >= ach.target
+              return (
+                <div key={i} className={`${styles.achievementCard} ${achieved ? styles.achieved : ''}`}>
+                  <span className={styles.achievementIcon}>{achieved ? ach.icon : '🔒'}</span>
+                  <span className={styles.achievementLabel}>{ach.label}</span>
+                  <span className={styles.achievementDesc}>
+                    {achieved ? ach.desc : `${ach.count}/${ach.target}`}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
         {/* 빠른 액션 버튼 */}
         <section className={styles.quickActions}>
           <h2 className={styles.cardTitle}>빠른 액션</h2>
@@ -762,7 +812,7 @@ export default function DashboardPage() {
               if (chatBtn) chatBtn.click()
             }}>
               <span className={styles.quickIcon}>🤖</span>
-              <span>AI 체키</span>
+              <span>AI 체키 (Ctrl+K)</span>
             </button>
             <button className={styles.quickBtn} onClick={() => router.push('/reports')}>
               <span className={styles.quickIcon}>📊</span>

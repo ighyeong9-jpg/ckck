@@ -208,6 +208,13 @@
   padding-top: 0.5rem; border-top: 1px solid var(--color-border-light);
 }
 .cardDate { font-size: 0.75rem; color: var(--color-text-muted); }
+.smartBadge {
+  font-size: 0.65rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(59,130,246,0.08));
+  color: var(--color-primary);
+  white-space: nowrap;
+}
 .cardUpdated { font-size: 0.7rem; color: var(--color-text-muted); }
 
 // Empty State

@@ -408,6 +408,36 @@
 }
 .quickIcon { font-size: 1.75rem; }
 
+// Achievement Grid
+.achievementGrid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;
+  @media (max-width: 600px) { grid-template-columns: repeat(2, 1fr); }
+}
+.achievementCard {
+  display: flex; flex-direction: column; align-items: center; gap: 0.375rem;
+  padding: 1rem 0.5rem; border-radius: 14px;
+  border: 2px dashed var(--color-border);
+  background: var(--color-border-light);
+  transition: all 0.3s ease;
+  opacity: 0.5;
+}
+.achievementCard.achieved {
+  border: 2px solid var(--color-success);
+  background: var(--color-success-light);
+  opacity: 1;
+  animation: badgePop 0.5s ease;
+}
+.achievementIcon { font-size: 1.5rem; }
+.achievementLabel { font-size: 0.75rem; font-weight: 700; color: var(--color-text); text-align: center; }
+.achievementDesc { font-size: 0.65rem; color: var(--color-text-muted); text-align: center; }
+.achieved .achievementDesc { color: var(--color-success); font-weight: 600; }
+
+@keyframes badgePop {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
 @media (max-width: 480px) {
   .headerContent { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
   .kpiCard { padding: 1.25rem; }

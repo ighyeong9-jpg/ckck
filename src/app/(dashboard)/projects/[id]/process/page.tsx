@@ -326,6 +326,28 @@ export default function ProcessPage() {
           </div>
         </section>
 
+        {/* Progress Encouragement */}
+        {processes.length > 0 && (() => {
+          const completed = processes.filter(p => p.status === 'completed').length
+          const total = processes.length
+          const rate = Math.round((completed / total) * 100)
+          const delayed = processes.filter(p => p.status === 'delayed').length
+          let message = ''
+          let color = ''
+          if (delayed > 0) { message = `지연 공정 ${delayed}건을 확인해주세요`; color = '#ef4444' }
+          else if (rate === 0) { message = '공정을 시작해볼까요? 화이팅!'; color = '#6b7280' }
+          else if (rate < 30) { message = '순조로운 시작이에요! 계속 진행해주세요 💪'; color = '#3b82f6' }
+          else if (rate < 60) { message = '잘 진행되고 있어요! 절반에 가까워지고 있습니다 👍'; color = '#7c3aed' }
+          else if (rate < 90) { message = '거의 다 왔어요! 마무리가 보입니다 🔥'; color = '#f59e0b' }
+          else if (rate < 100) { message = '완벽에 가까워요! 마지막 공정만 남았습니다 ✨'; color = '#10b981' }
+          else { message = '모든 공정이 완료되었습니다! 🎉'; color = '#10b981' }
+          return (
+            <div style={{ padding: '0.75rem 1rem', background: `${color}10`, borderLeft: `3px solid ${color}`, borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600, color, marginBottom: '1rem' }}>
+              {message} ({rate}% 완료)
+            </div>
+          )
+        })()}
+
         {/* Actions + View Toggle */}
         <div className={styles.actions}>
           <div className={styles.viewToggle}>

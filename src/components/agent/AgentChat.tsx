@@ -89,11 +89,28 @@ const PAGE_SUGGESTIONS: Record<string, SuggestionChip[]> = {
   ],
 }
 
+// 시간대별 체키 인사말
+function getChekiGreeting(): string {
+  const hour = new Date().getHours()
+  const greetings = [
+    { range: [0, 6], msgs: ['늦은 시간까지 수고하세요! 🌙', '야근 중이시군요. 힘내세요! 🌙'] },
+    { range: [6, 9], msgs: ['좋은 아침이에요! ☀️', '오늘도 좋은 하루 되세요! 🌅'] },
+    { range: [9, 12], msgs: ['활기찬 오전이에요! 💪', '오전 작업 화이팅! ☀️'] },
+    { range: [12, 14], msgs: ['점심 맛있게 드세요! 🍚', '잠깐 쉬어가세요! ☕'] },
+    { range: [14, 18], msgs: ['오후도 파이팅이에요! 💪', '오후도 순조롭길 바라요! 🌤️'] },
+    { range: [18, 21], msgs: ['하루 마무리 잘하세요! 🌆', '오늘도 수고하셨어요! 👏'] },
+    { range: [21, 24], msgs: ['편안한 저녁 되세요! 🌙', '오늘도 고생했어요! 🌃'] },
+  ]
+  const match = greetings.find(g => hour >= g.range[0] && hour < g.range[1])
+  const msgs = match?.msgs || greetings[0].msgs
+  return msgs[Math.floor(Math.random() * msgs.length)]
+}
+
 export default function AgentChat() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'ai', content: '안녕하세요! 체키입니다 🤖\n무엇을 도와드릴까요?\n\n예시:\n• "카페 20평 프로젝트 만들어줘"\n• "견적 만들어줘"\n• "리스크 분석해줘"' },
+    { role: 'ai', content: `${getChekiGreeting()}\n체키입니다 🤖 무엇을 도와드릴까요?\n\n인테리어는 물론 무엇이든 물어보세요!\n• "카페 20평 견적 알려줘"\n• "리스크 분석해줘"\n• 일반 질문도 OK!` },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -123,6 +140,21 @@ export default function AgentChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
+
+  // Ctrl+K 단축키로 체키 열기/닫기
+  useEffect(() => {
+    const handleKeyboard = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        setOpen(prev => !prev)
+      }
+      if (e.key === 'Escape' && open) {
+        setOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyboard)
+    return () => window.removeEventListener('keydown', handleKeyboard)
+  }, [open])
 
   // 외부에서 메시지를 보내는 이벤트 리스너 (QuickActions 연동)
   useEffect(() => {
@@ -233,8 +265,10 @@ export default function AgentChat() {
         className={`${styles.floatingBtn} ${open ? styles.hasPanel : ''}`}
         onClick={() => setOpen(!open)}
         aria-label="AI 비서 체키"
+        title="체키 AI 비서 (Ctrl+K)"
       >
         {open ? '✕' : '🤖'}
+        {!open && <span className={styles.shortcutHint}>Ctrl+K</span>}
       </button>
 
       {/* Chat Panel */}
