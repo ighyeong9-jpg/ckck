@@ -610,12 +610,18 @@ function isRateLimitError(error: any): boolean {
     || msg.includes('Too Many Requests')
 }
 
+export interface ImageData {
+  base64: string
+  mimeType: string
+}
+
 async function callGeminiWithModel(
   genAI: GoogleGenerativeAI,
   modelName: string,
   userMessage: string,
   ctx: ProjectContext | null,
   conversationHistory?: Array<{ role: string; content: string }>,
+  image?: ImageData,
 ): Promise<GeminiResponse> {
   const model = genAI.getGenerativeModel({
     model: modelName,
@@ -641,9 +647,20 @@ async function callGeminiWithModel(
     }
   }
 
+  // 사용자 메시지 parts 구성 (텍스트 + 이미지)
+  const userParts: any[] = [{ text: contextPrefix + userMessage }]
+  if (image?.base64) {
+    userParts.push({
+      inlineData: {
+        mimeType: image.mimeType || 'image/jpeg',
+        data: image.base64,
+      },
+    })
+  }
+
   contents.push({
     role: 'user',
-    parts: [{ text: contextPrefix + userMessage }],
+    parts: userParts,
   })
 
   // Gemini API 호출
@@ -704,6 +721,7 @@ export async function callGemini(
   userMessage: string,
   ctx: ProjectContext | null,
   conversationHistory?: Array<{ role: string; content: string }>,
+  image?: ImageData,
 ): Promise<GeminiResponse> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -718,7 +736,7 @@ export async function callGemini(
     const modelName = GEMINI_MODELS[i]
     try {
       console.log(`[체키] ${modelName} 시도 중...`)
-      const result = await callGeminiWithModel(genAI, modelName, userMessage, ctx, conversationHistory)
+      const result = await callGeminiWithModel(genAI, modelName, userMessage, ctx, conversationHistory, image)
       console.log(`[체키] ${modelName} 응답 성공 ✓`)
       return result
     } catch (error: any) {

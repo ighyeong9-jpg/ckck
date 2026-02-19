@@ -19,7 +19,7 @@ import { callGemini } from '@/lib/ai/gemini-provider'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { messages, projectId, pageContext } = body
+    const { messages, projectId, pageContext, image } = body
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: '메시지가 필요합니다.' }, { status: 400 })
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
           content: typeof msg === 'string' ? msg : (msg.content || ''),
         })).slice(-10)
 
-        const result = await callGemini(userMessage, ctx, history)
+        const result = await callGemini(userMessage, ctx, history, image || undefined)
 
         return NextResponse.json({
           success: true,

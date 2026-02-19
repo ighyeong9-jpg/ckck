@@ -9,6 +9,7 @@ interface Message {
   content: string
   tool?: string
   toolSuccess?: boolean
+  imageUrl?: string
 }
 
 interface SuggestionChip {
@@ -114,7 +115,11 @@ export default function AgentChat() {
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageBase64, setImageBase64] = useState<string | null>(null)
+  const [imageMimeType, setImageMimeType] = useState<string>('image/jpeg')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 현재 프로젝트 ID 추출
   const projectIdMatch = pathname.match(/\/projects\/([^/]+)/)
@@ -169,12 +174,60 @@ export default function AgentChat() {
     return () => window.removeEventListener('cheki-send', handler)
   }, [loading])
 
+  // 파일 선택 핸들러
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // 이미지 파일 검증
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다. (JPG, PNG, GIF, WebP)')
+      return
+    }
+
+    // 10MB 제한
+    if (file.size > 10 * 1024 * 1024) {
+      alert('파일 크기는 10MB 이하만 가능합니다.')
+      return
+    }
+
+    setImageMimeType(file.type)
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string
+      setImagePreview(dataUrl)
+      // base64 데이터만 추출 (data:image/jpeg;base64, 부분 제거)
+      setImageBase64(dataUrl.split(',')[1])
+    }
+    reader.readAsDataURL(file)
+
+    // input 초기화 (같은 파일 다시 선택 가능)
+    e.target.value = ''
+  }
+
+  const removeImage = () => {
+    setImagePreview(null)
+    setImageBase64(null)
+  }
+
   const sendMessage = async (msgText?: string) => {
     const userMsg = (msgText || input).trim()
-    if (!userMsg || loading) return
+    if ((!userMsg && !imageBase64) || loading) return
+
+    const currentImage = imagePreview
+    const currentBase64 = imageBase64
+    const currentMime = imageMimeType
 
     setInput('')
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }])
+    setImagePreview(null)
+    setImageBase64(null)
+
+    setMessages(prev => [...prev, {
+      role: 'user',
+      content: userMsg || '📷 이미지 분석 요청',
+      imageUrl: currentImage || undefined,
+    }])
     setLoading(true)
 
     try {
@@ -182,9 +235,15 @@ export default function AgentChat() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: userMsg }],
+          messages: [{ role: 'user', content: userMsg || '이 이미지를 분석해줘' }],
           projectId,
           pageContext: pathname,
+          ...(currentBase64 && {
+            image: {
+              base64: currentBase64,
+              mimeType: currentMime,
+            }
+          }),
         }),
       })
 
@@ -297,6 +356,9 @@ export default function AgentChat() {
                   key={i}
                   className={`${styles.message} ${msg.role === 'user' ? styles.userMsg : styles.aiMsg}`}
                 >
+                  {msg.imageUrl && (
+                    <img src={msg.imageUrl} alt="업로드 이미지" className={styles.chatImage} />
+                  )}
                   {msg.content}
                 </div>
               )
@@ -327,19 +389,43 @@ export default function AgentChat() {
             ))}
           </div>
 
+          {/* Image Preview */}
+          {imagePreview && (
+            <div className={styles.imagePreview}>
+              <img src={imagePreview} alt="미리보기" />
+              <button className={styles.imageRemove} onClick={removeImage}>✕</button>
+              <span className={styles.imageLabel}>📷 이미지 첨부됨</span>
+            </div>
+          )}
+
           <div className={styles.inputArea}>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept="image/*"
+              style={{ display: 'none' }}
+            />
+            <button
+              className={styles.uploadBtn}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading}
+              title="사진/파일 업로드"
+            >
+              📷
+            </button>
             <input
               className={styles.input}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="체키에게 물어보세요..."
+              placeholder={imagePreview ? "이미지에 대해 질문하세요..." : "체키에게 물어보세요..."}
               disabled={loading}
             />
             <button
               className={styles.sendBtn}
               onClick={() => sendMessage()}
-              disabled={loading || !input.trim()}
+              disabled={loading || (!input.trim() && !imageBase64)}
             >
               전송
             </button>
