@@ -703,8 +703,8 @@ async function fallbackToGemini(message: string): Promise<ToolResult> {
     }
   }
 
-  // 모델 폴백 체인: 2.5-flash(20RPD) → 2.0-flash(1500RPD)
-  const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-flash']
+  // 모델 폴백 체인: 2.5-flash → 2.5-flash-lite (2.0-flash는 2026-03-03 퇴역)
+  const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite']
 
   for (let i = 0; i < FALLBACK_MODELS.length; i++) {
     try {

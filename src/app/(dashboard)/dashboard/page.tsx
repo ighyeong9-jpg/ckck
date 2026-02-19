@@ -3,70 +3,75 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import dynamic from 'next/dynamic'
 import QuickActions from '@/components/ui/QuickActions'
+import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 import styles from './page.module.scss'
 
-const PieChart = dynamic(() => import('recharts').then(m => m.PieChart), { ssr: false })
-const Pie = dynamic(() => import('recharts').then(m => m.Pie), { ssr: false })
-const Cell = dynamic(() => import('recharts').then(m => m.Cell), { ssr: false })
-const BarChart = dynamic(() => import('recharts').then(m => m.BarChart), { ssr: false })
-const Bar = dynamic(() => import('recharts').then(m => m.Bar), { ssr: false })
-const XAxis = dynamic(() => import('recharts').then(m => m.XAxis), { ssr: false })
-const YAxis = dynamic(() => import('recharts').then(m => m.YAxis), { ssr: false })
-const Tooltip = dynamic(() => import('recharts').then(m => m.Tooltip), { ssr: false })
-const LineChart = dynamic(() => import('recharts').then(m => m.LineChart), { ssr: false })
-const Line = dynamic(() => import('recharts').then(m => m.Line), { ssr: false })
-const Legend = dynamic(() => import('recharts').then(m => m.Legend), { ssr: false })
-const ResponsiveContainer = dynamic(() => import('recharts').then(m => m.ResponsiveContainer), { ssr: false })
+// ─── 타입 ─────────────────────────────────────────────────
 
-interface DashboardStats {
-  totalProjects: number
-  activeProjects: number
-  completedProjects: number
-  highRiskProjects: number
-  totalQuoteAmount: number
-  weekTrend: { total: number; active: number; highRisk: number; completed: number }
-}
-
-interface RiskGrade {
-  name: string
-  value: number
-  color: string
-}
-
-interface CostData {
-  name: string
-  견적: number
-  실비용: number
-}
-
-interface ActivityItem {
+interface UrgentProject {
   id: string
-  type: 'project_create' | 'project_update' | 'status_change'
-  message: string
-  time: string
-  color: string
+  name: string
+  clientName: string
+  status: string
+  riskScore: number
+  progress: number
+  endDate: string | null
+  daysLeft: number | null   // null = 마감 미설정
+  industry: string
+  urgencyScore: number      // 긴급도 (높을수록 먼저)
 }
+
+interface RiskAlert {
+  id: string
+  projectId: string
+  projectName: string
+  severity: 'CRITICAL' | 'DANGER' | 'WARNING' | 'INFO'
+  title: string
+  message: string
+  actionUrl: string
+}
+
+interface PendingItem {
+  id: string
+  projectId: string
+  projectName: string
+  type: 'change_order' | 'checklist' | 'deadline'
+  title: string
+  count: number
+  actionUrl: string
+}
+
+// ─── 상수 ─────────────────────────────────────────────────
+
+const INDUSTRY_ICONS: Record<string, string> = {
+  cafe: '☕', restaurant: '🍽️', bar: '🍺', bakery: '🥐', beauty: '💇',
+  clinic: '🏥', fitness: '💪', retail: '🛒', office: '🏢', academy: '📚',
+  apartment: '🏠', villa: '🏡', house: '🏘️',
+}
+
+const SEVERITY_COLOR: Record<string, string> = {
+  CRITICAL: '#ef4444', DANGER: '#f97316', WARNING: '#f59e0b', INFO: '#3b82f6'
+}
+const SEVERITY_BG: Record<string, string> = {
+  CRITICAL: '#fee2e2', DANGER: '#ffedd5', WARNING: '#fef3c7', INFO: '#eff6ff'
+}
+const SEVERITY_ICON: Record<string, string> = {
+  CRITICAL: '🚨', DANGER: '⚠️', WARNING: '💛', INFO: '💡'
+}
+
+// ─── 메인 컴포넌트 ─────────────────────────────────────────
 
 export default function DashboardPage() {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const [userName, setUserName] = useState('')
-  const [stats, setStats] = useState<DashboardStats>({
-    totalProjects: 0, activeProjects: 0, completedProjects: 0,
-    highRiskProjects: 0, totalQuoteAmount: 0,
-    weekTrend: { total: 0, active: 0, highRisk: 0, completed: 0 },
-  })
-  const [projects, setProjects] = useState<any[]>([])
-  const [riskData, setRiskData] = useState<RiskGrade[]>([])
-  const [avgRiskScore, setAvgRiskScore] = useState(0)
-  const [progressData, setProgressData] = useState<any[]>([])
-  const [costData, setCostData] = useState<CostData[]>([])
-  const [activityLog, setActivityLog] = useState<ActivityItem[]>([])
-  const [upcomingSchedule, setUpcomingSchedule] = useState<any[]>([])
-  const [alerts, setAlerts] = useState<{ type: 'danger' | 'warning' | 'info'; icon: string; title: string; desc: string; action?: string }[]>([])
+  const [stats, setStats] = useState({ total: 0, active: 0, highRisk: 0, completed: 0 })
+  const [urgentProjects, setUrgentProjects] = useState<UrgentProject[]>([])
+  const [riskAlerts, setRiskAlerts] = useState<RiskAlert[]>([])
+  const [pendingItems, setPendingItems] = useState<PendingItem[]>([])
 
   useEffect(() => {
     const load = async () => {
@@ -82,199 +87,186 @@ export default function DashboardPage() {
           setUserName(settings?.display_name || user.email?.split('@')[0] || '사용자')
         }
 
-        // 프로젝트
-        const { data: projectsData, error: projectsError } = await supabase
-          .from('projects').select('*').order('updated_at', { ascending: false })
+        // 프로젝트 전체
+        const { data: projects } = await supabase
+          .from('projects')
+          .select('*')
+          .order('updated_at', { ascending: false })
 
-        if (projectsError) throw projectsError
+        if (!projects) return
 
-        if (projectsData) {
-          setProjects(projectsData)
+        const now = Date.now()
 
-          let active = 0, completed = 0, highRisk = 0
-          const grades: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, F: 0 }
-          let totalRisk = 0
+        // ── KPI 집계 ──────────────────────────────────────
+        const active = projects.filter(p => p.status === 'in_progress').length
+        const completed = projects.filter(p => p.status === 'completed').length
+        const highRisk = projects.filter(p => (p.risk_score ?? 0) >= 70).length
+        const totalCount = projects.length
+        setStats({ total: totalCount, active, highRisk, completed })
 
-          // 전주 대비 증감 계산
-          const now = new Date()
-          const oneWeekAgo = new Date(now); oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-          const twoWeeksAgo = new Date(now); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
+        // 최초 방문 시 온보딩 자동 표시
+        if (totalCount === 0 && !localStorage.getItem('onboarding_done')) {
+          setShowOnboarding(true)
+        }
 
-          let thisWeekTotal = 0, lastWeekTotal = 0
-          let thisWeekActive = 0, lastWeekActive = 0
-          let thisWeekHighRisk = 0, lastWeekHighRisk = 0
-          let thisWeekCompleted = 0, lastWeekCompleted = 0
-
-          projectsData.forEach(p => {
-            if (p.status === 'in_progress') active++
-            if (p.status === 'completed') completed++
-            if (p.risk_score >= 70) highRisk++
-
-            const s = p.risk_score || 0
-            totalRisk += s
-            if (s <= 20) grades.A++
-            else if (s <= 40) grades.B++
-            else if (s <= 60) grades.C++
-            else if (s <= 80) grades.D++
-            else grades.F++
-
-            // 주간 트렌드
-            const created = new Date(p.created_at)
-            if (created >= oneWeekAgo) {
-              thisWeekTotal++
-              if (p.status === 'in_progress') thisWeekActive++
-              if (p.risk_score >= 70) thisWeekHighRisk++
-              if (p.status === 'completed') thisWeekCompleted++
-            } else if (created >= twoWeeksAgo) {
-              lastWeekTotal++
-              if (p.status === 'in_progress') lastWeekActive++
-              if (p.risk_score >= 70) lastWeekHighRisk++
-              if (p.status === 'completed') lastWeekCompleted++
+        // ── 긴급도 계산 및 정렬 ──────────────────────────
+        const urgent: UrgentProject[] = projects
+          .filter(p => p.status !== 'completed')
+          .map(p => {
+            let daysLeft: number | null = null
+            if (p.end_date) {
+              daysLeft = Math.ceil((new Date(p.end_date).getTime() - now) / 86400000)
             }
-          })
-
-          // 평균 리스크 점수
-          setAvgRiskScore(projectsData.length > 0 ? Math.round(totalRisk / projectsData.length) : 0)
-
-          // 리스크 도넛 데이터
-          const riskColors: Record<string, string> = {
-            A: '#10b981', B: '#34d399', C: '#fbbf24', D: '#f97316', F: '#ef4444'
-          }
-          setRiskData(
-            Object.entries(grades)
-              .filter(([, v]) => v > 0)
-              .map(([name, value]) => ({ name: `${name}등급`, value, color: riskColors[name] }))
-          )
-
-          // 공정 진행률 바 차트 (최근 6개)
-          setProgressData(
-            projectsData.slice(0, 6).map(p => ({
-              name: p.name.length > 8 ? p.name.substring(0, 8) + '...' : p.name,
-              진행률: p.progress || 0,
-            }))
-          )
-
-          // 이번 주 일정
-          const weekEnd = new Date(now)
-          weekEnd.setDate(weekEnd.getDate() + 7)
-          const nowStr = now.toISOString().split('T')[0]
-          const weekEndStr = weekEnd.toISOString().split('T')[0]
-          const upcoming = projectsData.filter(p => {
-            return (p.start_date >= nowStr && p.start_date <= weekEndStr) ||
-                   (p.end_date >= nowStr && p.end_date <= weekEndStr)
-          }).slice(0, 5)
-          setUpcomingSchedule(upcoming)
-
-          // 최근 활동 타임라인 (프로젝트 업데이트 기반)
-          const activities: ActivityItem[] = projectsData.slice(0, 8).map(p => {
-            const statusLabel: Record<string, string> = {
-              planning: '기획 단계', in_progress: '진행 중', review: '검토 중', completed: '완료'
-            }
-            const statusColors: Record<string, string> = {
-              planning: '#6b7280', in_progress: '#3b82f6', review: '#f59e0b', completed: '#10b981'
+            // 긴급도 점수: 리스크 고점 + 마감 임박 + 지연 가중
+            let urgencyScore = (p.risk_score ?? 0)
+            if (daysLeft !== null) {
+              if (daysLeft < 0) urgencyScore += 50
+              else if (daysLeft <= 3) urgencyScore += 35
+              else if (daysLeft <= 7) urgencyScore += 20
+              else if (daysLeft <= 14) urgencyScore += 8
             }
             return {
               id: p.id,
-              type: 'project_update' as const,
-              message: `${p.client_name} - ${p.name} (${statusLabel[p.status] || p.status})`,
-              time: p.updated_at,
-              color: statusColors[p.status] || '#6b7280',
+              name: p.name,
+              clientName: p.client_name,
+              status: p.status,
+              riskScore: p.risk_score ?? 0,
+              progress: p.progress ?? 0,
+              endDate: p.end_date,
+              daysLeft,
+              industry: p.industry ?? '',
+              urgencyScore,
             }
           })
-          setActivityLog(activities)
+          .sort((a, b) => b.urgencyScore - a.urgencyScore)
+          .slice(0, 6)
+        setUrgentProjects(urgent)
 
-          // 비용 데이터: 프로젝트별 견적 vs 실비용
-          const top6 = projectsData.slice(0, 6)
-          const costResults = await Promise.all(
-            top6.map(async (p) => {
-              const [{ data: quoteItems }, { data: costAnalysis }] = await Promise.all([
-                supabase.from('quote_line_items').select('quantity, unit_price').eq('project_id', p.id),
-                supabase.from('cost_analysis').select('adjusted_cost').eq('project_id', p.id),
-              ])
-              const quotedTotal = (quoteItems || []).reduce(
-                (sum: number, item: any) => sum + (Number(item.quantity) * Number(item.unit_price)), 0
-              )
-              const actualTotal = (costAnalysis || []).reduce(
-                (sum: number, item: any) => sum + (Number(item.adjusted_cost) || 0), 0
-              )
-              return { name: p.name, quotedTotal, actualTotal }
+        // ── AI 리스크 알림 생성 (규칙 기반) ─────────────
+        const alerts: RiskAlert[] = []
+        projects.forEach(p => {
+          if (p.status === 'completed') return
+          const riskScore = p.risk_score ?? 0
+          const daysLeft = p.end_date
+            ? Math.ceil((new Date(p.end_date).getTime() - now) / 86400000)
+            : null
+
+          if (daysLeft !== null && daysLeft < 0) {
+            alerts.push({
+              id: `overdue-${p.id}`,
+              projectId: p.id,
+              projectName: p.name,
+              severity: 'CRITICAL',
+              title: `마감 ${Math.abs(daysLeft)}일 초과`,
+              message: `${p.name}의 마감일이 지났습니다. 고객과 일정을 조율하고 합의서를 갱신해주세요.`,
+              actionUrl: `/projects/${p.id}/agreement`,
             })
-          )
-          const costItems: CostData[] = costResults
-            .filter(r => r.quotedTotal > 0 || r.actualTotal > 0)
-            .map(r => ({
-              name: r.name.length > 6 ? r.name.substring(0, 6) + '..' : r.name,
-              견적: Math.round(r.quotedTotal / 10000),
-              실비용: Math.round(r.actualTotal / 10000),
-            }))
-          setCostData(costItems)
-
-          // 견적 합계
-          const { data: quoteData } = await supabase
-            .from('quote_line_items').select('quantity, unit_price')
-          let totalAmount = 0
-          if (quoteData) {
-            totalAmount = quoteData.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0)
-          }
-
-          // 알림 생성
-          const newAlerts: typeof alerts = []
-          const highRiskProjects = projectsData.filter(p => p.risk_score >= 70)
-          if (highRiskProjects.length > 0) {
-            newAlerts.push({
-              type: 'danger', icon: '🚨',
-              title: `고위험 프로젝트 ${highRiskProjects.length}건`,
-              desc: highRiskProjects.map(p => p.name).join(', ') + ' - 리스크 점검이 필요합니다',
+          } else if (daysLeft !== null && daysLeft <= 3) {
+            alerts.push({
+              id: `soon-${p.id}`,
+              projectId: p.id,
+              projectName: p.name,
+              severity: 'DANGER',
+              title: `D-${daysLeft} 마감 임박`,
+              message: `${p.name}이 ${daysLeft}일 후 마감입니다. 미완료 공정을 확인하세요.`,
+              actionUrl: `/projects/${p.id}/process`,
             })
           }
-          const deadlineSoon = projectsData.filter(p => {
-            if (!p.end_date || p.status === 'completed') return false
-            const daysLeft = Math.ceil((new Date(p.end_date).getTime() - Date.now()) / 86400000)
-            return daysLeft >= 0 && daysLeft <= 7
+
+          if (riskScore >= 80) {
+            alerts.push({
+              id: `risk-critical-${p.id}`,
+              projectId: p.id,
+              projectName: p.name,
+              severity: 'CRITICAL',
+              title: `리스크 F등급 (${riskScore}점)`,
+              message: `${p.name}의 리스크가 매우 높습니다. 즉시 체크리스트를 확인해주세요.`,
+              actionUrl: `/projects/${p.id}/diagnostic`,
+            })
+          } else if (riskScore >= 60) {
+            alerts.push({
+              id: `risk-high-${p.id}`,
+              projectId: p.id,
+              projectName: p.name,
+              severity: 'DANGER',
+              title: `리스크 D등급 (${riskScore}점)`,
+              message: `${p.name}의 리스크 점수가 높습니다. 진단 체크리스트를 점검하세요.`,
+              actionUrl: `/projects/${p.id}/diagnostic`,
+            })
+          }
+        })
+
+        // 심각도 순 정렬
+        const severityOrder: Record<string, number> = { CRITICAL: 0, DANGER: 1, WARNING: 2, INFO: 3 }
+        alerts.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity])
+        setRiskAlerts(alerts.slice(0, 5))
+
+        // ── 승인 대기 항목 ──────────────────────────────
+        const pending: PendingItem[] = []
+
+        // 변경사항 승인 대기 (status 'requested' = DB 기본값, 승인 대기 상태)
+        const { data: changeOrders } = await supabase
+          .from('change_orders')
+          .select('id, project_id, title, status')
+          .eq('status', 'requested')
+          .limit(20)
+
+        if (changeOrders && changeOrders.length > 0) {
+          // 프로젝트별 집계
+          const byProject: Record<string, { count: number; projectName: string }> = {}
+          changeOrders.forEach((c: any) => {
+            const proj = projects.find(p => p.id === c.project_id)
+            if (!proj) return
+            if (!byProject[c.project_id]) {
+              byProject[c.project_id] = { count: 0, projectName: proj.name }
+            }
+            byProject[c.project_id].count++
           })
-          if (deadlineSoon.length > 0) {
-            newAlerts.push({
-              type: 'warning', icon: '⚠️',
-              title: `마감 임박 프로젝트 ${deadlineSoon.length}건`,
-              desc: deadlineSoon.map(p => p.name).join(', ') + ' - 7일 이내 마감',
+          Object.entries(byProject).forEach(([projectId, { count, projectName }]) => {
+            pending.push({
+              id: `co-${projectId}`,
+              projectId,
+              projectName,
+              type: 'change_order',
+              title: '변경사항 승인 대기',
+              count,
+              actionUrl: `/projects/${projectId}/changes`,
             })
-          }
-          const delayedProjects = projectsData.filter(p => {
-            if (!p.end_date || p.status === 'completed') return false
-            return new Date(p.end_date).getTime() < Date.now()
-          })
-          if (delayedProjects.length > 0) {
-            newAlerts.push({
-              type: 'danger', icon: '🚫',
-              title: `마감 초과 프로젝트 ${delayedProjects.length}건`,
-              desc: delayedProjects.map(p => p.name).join(', ') + ' - 즉시 확인이 필요합니다',
-            })
-          }
-          if (active > 0 && completed === 0) {
-            newAlerts.push({
-              type: 'info', icon: '💡',
-              title: '아직 완료된 프로젝트가 없습니다',
-              desc: '진행중인 프로젝트를 관리하고 완료 처리하세요',
-            })
-          }
-          setAlerts(newAlerts)
-
-          setStats({
-            totalProjects: projectsData.length,
-            activeProjects: active,
-            completedProjects: completed,
-            highRiskProjects: highRisk,
-            totalQuoteAmount: totalAmount,
-            weekTrend: {
-              total: thisWeekTotal - lastWeekTotal,
-              active: thisWeekActive - lastWeekActive,
-              highRisk: thisWeekHighRisk - lastWeekHighRisk,
-              completed: thisWeekCompleted - lastWeekCompleted,
-            },
           })
         }
+
+        // 미완료 체크리스트 (30% 미만이고 진행중)
+        const activeProjects = projects.filter(p => p.status === 'in_progress')
+        await Promise.all(
+          activeProjects.slice(0, 5).map(async p => {
+            const [{ count: total }, { count: done }] = await Promise.all([
+              supabase.from('diagnostic_responses').select('*', { count: 'exact', head: true }).eq('project_id', p.id),
+              supabase.from('diagnostic_responses').select('*', { count: 'exact', head: true }).eq('project_id', p.id).eq('checked', true),
+            ])
+            if (total && total > 0 && done !== null) {
+              const pct = Math.round((done / total) * 100)
+              if (pct < 40 && (p.progress ?? 0) > 30) {
+                pending.push({
+                  id: `cl-${p.id}`,
+                  projectId: p.id,
+                  projectName: p.name,
+                  type: 'checklist',
+                  title: `체크리스트 ${pct}% 완료`,
+                  count: total - done,
+                  actionUrl: `/projects/${p.id}/diagnostic`,
+                })
+              }
+            }
+          })
+        )
+
+        pending.sort((a, b) => {
+          const typeOrder: Record<string, number> = { change_order: 0, deadline: 1, checklist: 2 }
+          return typeOrder[a.type] - typeOrder[b.type]
+        })
+        setPendingItems(pending.slice(0, 6))
       } catch (err) {
-        console.error('Error loading dashboard:', err)
+        console.error('Dashboard load error:', err)
       } finally {
         setLoading(false)
       }
@@ -282,228 +274,105 @@ export default function DashboardPage() {
     load()
   }, [])
 
-  const formatAmount = (amount: number) => {
-    if (amount >= 100000000) return `${(amount / 100000000).toFixed(1)}억원`
-    if (amount >= 10000) return `${(amount / 10000).toFixed(0)}만원`
-    return `${amount.toLocaleString()}원`
+  // ─── 헬퍼 ────────────────────────────────────────────────
+
+  const getGreeting = () => {
+    const h = new Date().getHours()
+    if (h < 6) return { text: '늦은 밤까지 수고하세요', emoji: '🌙' }
+    if (h < 9) return { text: '좋은 아침이에요', emoji: '🌅' }
+    if (h < 12) return { text: '활기찬 오전이에요', emoji: '☀️' }
+    if (h < 14) return { text: '점심 식사는 하셨나요?', emoji: '🍚' }
+    if (h < 18) return { text: '오후도 힘내세요', emoji: '💪' }
+    if (h < 21) return { text: '오늘도 수고했어요', emoji: '🌆' }
+    return { text: '편안한 저녁 되세요', emoji: '🌙' }
   }
 
   const getRiskGrade = (score: number) => {
     if (score <= 20) return { grade: 'A', color: '#10b981' }
     if (score <= 40) return { grade: 'B', color: '#34d399' }
-    if (score <= 60) return { grade: 'C', color: '#fbbf24' }
+    if (score <= 60) return { grade: 'C', color: '#f59e0b' }
     if (score <= 80) return { grade: 'D', color: '#f97316' }
     return { grade: 'F', color: '#ef4444' }
   }
 
-  const getStatusInfo = (status: string) => {
-    const map: Record<string, { label: string; color: string }> = {
-      planning: { label: '기획', color: '#6b7280' },
-      in_progress: { label: '진행중', color: '#3b82f6' },
-      review: { label: '검토', color: '#f59e0b' },
-      completed: { label: '완료', color: '#10b981' },
-    }
-    return map[status] || { label: status, color: '#6b7280' }
+  const getDdayLabel = (daysLeft: number | null) => {
+    if (daysLeft === null) return null
+    if (daysLeft < 0) return { text: `D+${Math.abs(daysLeft)}`, type: 'overdue' }
+    if (daysLeft === 0) return { text: 'D-Day', type: 'today' }
+    if (daysLeft <= 7) return { text: `D-${daysLeft}`, type: 'soon' }
+    return { text: `D-${daysLeft}`, type: 'normal' }
   }
 
-  const getTimeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime()
-    const mins = Math.floor(diff / 60000)
-    if (mins < 60) return `${mins}분 전`
-    const hours = Math.floor(mins / 60)
-    if (hours < 24) return `${hours}시간 전`
-    const days = Math.floor(hours / 24)
-    return `${days}일 전`
+  const getStatusLabel = (status: string) => {
+    const m: Record<string, string> = { planning: '기획', in_progress: '진행중', review: '검토', completed: '완료' }
+    return m[status] ?? status
   }
 
-  const getDday = (endDate: string | null, status: string) => {
-    if (!endDate || status === 'completed') return null
-    const daysLeft = Math.ceil((new Date(endDate).getTime() - Date.now()) / 86400000)
-    if (daysLeft < 0) return { label: `D+${Math.abs(daysLeft)}`, type: 'overdue' as const }
-    if (daysLeft === 0) return { label: 'D-Day', type: 'today' as const }
-    if (daysLeft <= 7) return { label: `D-${daysLeft}`, type: 'soon' as const }
-    return null
-  }
-
-  const renderTrend = (value: number) => {
-    if (value > 0) return <span className={styles.trendUp}>+{value} ▲</span>
-    if (value < 0) return <span className={styles.trendDown}>{value} ▼</span>
-    return <span className={styles.trendNeutral}>변동없음</span>
-  }
-
-  // 반원형 게이지 SVG 계산
-  const renderGauge = (score: number) => {
-    const risk = getRiskGrade(score)
-    const angle = (score / 100) * 180
-    const radians = (angle * Math.PI) / 180
-    const x = 100 + 70 * Math.cos(Math.PI - radians)
-    const y = 100 - 70 * Math.sin(Math.PI - radians)
-    const largeArc = angle > 90 ? 1 : 0
-
-    return (
-      <div className={styles.gaugeContainer}>
-        <svg viewBox="0 0 200 120" className={styles.gaugeSvg}>
-          {/* 배경 호 */}
-          <path d="M 30 100 A 70 70 0 0 1 170 100" fill="none" stroke="#e5e7eb" strokeWidth="14" strokeLinecap="round" />
-          {/* 값 호 */}
-          {score > 0 && (
-            <path d={`M 30 100 A 70 70 0 ${largeArc} 1 ${x} ${y}`} fill="none" stroke={risk.color} strokeWidth="14" strokeLinecap="round" />
-          )}
-          {/* 중앙 텍스트 */}
-          <text x="100" y="85" textAnchor="middle" className={styles.gaugeScore}>{score}</text>
-          <text x="100" y="105" textAnchor="middle" className={styles.gaugeLabel}>{risk.grade}등급</text>
-        </svg>
-        <div className={styles.gaugeLabels}>
-          <span>0</span>
-          <span className={styles.gaugeTitle}>평균 리스크</span>
-          <span>100</span>
-        </div>
-      </div>
-    )
-  }
+  // ─── 스켈레톤 로딩 ───────────────────────────────────────
 
   if (loading) {
     return (
       <div className={styles.container}>
-        {/* Skeleton Header */}
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <div className={styles.welcome}>
-              <div className={styles.skeletonLine} style={{ width: '200px', height: '28px' }} />
+              <div className={styles.skeletonLine} style={{ width: '220px', height: '28px' }} />
               <div className={styles.skeletonLine} style={{ width: '160px', height: '16px', marginTop: '8px' }} />
             </div>
           </div>
         </header>
         <main className={styles.main}>
-          {/* Skeleton KPI */}
           <section className={styles.kpiGrid}>
-            {[1,2,3,4].map(i => (
-              <div key={i} className={styles.skeletonKpi} />
-            ))}
+            {[1,2,3,4].map(i => <div key={i} className={styles.skeletonKpi} />)}
           </section>
-          {/* Skeleton Cards */}
-          <div className={styles.chartsRow}>
-            <div className={styles.skeletonCard} />
-            <div className={styles.skeletonCard} />
+          <div className={styles.triplePanel}>
+            {[1,2,3].map(i => <div key={i} className={styles.skeletonCard} />)}
           </div>
         </main>
       </div>
     )
   }
 
-  // 시간대별 인사말
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 6) return { text: '늦은 밤까지 수고하세요', emoji: '🌙' }
-    if (hour < 9) return { text: '좋은 아침이에요', emoji: '🌅' }
-    if (hour < 12) return { text: '활기찬 오전이에요', emoji: '☀️' }
-    if (hour < 14) return { text: '점심 식사는 하셨나요?', emoji: '🍚' }
-    if (hour < 18) return { text: '오후도 힘내세요', emoji: '💪' }
-    if (hour < 21) return { text: '오늘 하루도 수고했어요', emoji: '🌆' }
-    return { text: '편안한 저녁 되세요', emoji: '🌙' }
-  }
-
-  // 동기부여 한마디
-  const tips = [
-    '체키와 함께라면 현장 관리가 쉬워집니다',
-    '사진 한 장이 최고의 증거입니다',
-    '꼼꼼한 기록이 분쟁을 예방합니다',
-    '체크리스트를 완료하면 리스크가 줄어듭니다',
-    '오늘의 기록이 내일의 방패가 됩니다',
-    'AI 검증으로 프로젝트 신뢰도를 높이세요',
-    '변경사항은 반드시 기록하세요',
-    '정기적인 리포트가 고객 신뢰를 만듭니다',
-  ]
-  const todayTip = tips[new Date().getDate() % tips.length]
   const greeting = getGreeting()
 
   return (
     <div className={styles.container}>
-      {/* Welcome Header */}
+      {showOnboarding && <OnboardingWizard onComplete={() => setShowOnboarding(false)} />}
+      {/* ── 헤더 ─────────────────────────────────────────── */}
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.welcome}>
             <h1>{greeting.emoji} {greeting.text}, {userName}님</h1>
-            <p>{todayTip}</p>
+            <p>
+              {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
+            </p>
           </div>
-          <div className={styles.headerDate}>
-            {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
-          </div>
+          <button className={styles.newProjectBtn} onClick={() => router.push('/projects')}>
+            + 새 프로젝트
+          </button>
         </div>
       </header>
 
       <main className={styles.main}>
-        {/* Alert Cards */}
-        {alerts.length > 0 && (
-          <section className={styles.alertSection}>
-            {alerts.map((alert, i) => (
-              <div key={i} className={`${styles.alertCard} ${styles[`alert_${alert.type}`]}`}>
-                <span className={styles.alertIcon}>{alert.icon}</span>
-                <div className={styles.alertContent}>
-                  <div className={styles.alertTitle}>{alert.title}</div>
-                  <div className={styles.alertDesc}>{alert.desc}</div>
-                </div>
-              </div>
-            ))}
-          </section>
-        )}
-
-        {/* KPI Cards */}
+        {/* ── KPI 카드 ─────────────────────────────────── */}
         <section className={styles.kpiGrid}>
-          <div className={`${styles.kpiCard} ${styles.kpiPurple}`}>
-            <div className={styles.kpiIcon}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          {[
+            { label: '전체 프로젝트', value: stats.total, color: '#7c3aed', icon: '📁' },
+            { label: '진행중', value: stats.active, color: '#3b82f6', icon: '🔄' },
+            { label: '고위험', value: stats.highRisk, color: '#ef4444', icon: '🚨' },
+            { label: '완료', value: stats.completed, color: '#10b981', icon: '✅' },
+          ].map((kpi, i) => (
+            <div key={i} className={styles.kpiCard} style={{ '--kpi-color': kpi.color } as React.CSSProperties}>
+              <span className={styles.kpiIcon}>{kpi.icon}</span>
+              <div className={styles.kpiInfo}>
+                <span className={styles.kpiValue}>{kpi.value}</span>
+                <span className={styles.kpiLabel}>{kpi.label}</span>
+              </div>
             </div>
-            <div className={styles.kpiInfo}>
-              <span className={styles.kpiValue}>{stats.totalProjects}</span>
-              <span className={styles.kpiLabel}>전체 프로젝트</span>
-              <span className={styles.kpiTrend}>{renderTrend(stats.weekTrend.total)}</span>
-            </div>
-          </div>
-          <div className={`${styles.kpiCard} ${styles.kpiBlue}`}>
-            <div className={styles.kpiIcon}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div className={styles.kpiInfo}>
-              <span className={styles.kpiValue}>{stats.activeProjects}</span>
-              <span className={styles.kpiLabel}>진행중</span>
-              <span className={styles.kpiTrend}>{renderTrend(stats.weekTrend.active)}</span>
-            </div>
-          </div>
-          <div className={`${styles.kpiCard} ${styles.kpiRed}`}>
-            <div className={styles.kpiIcon}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            </div>
-            <div className={styles.kpiInfo}>
-              <span className={styles.kpiValue}>{stats.highRiskProjects}</span>
-              <span className={styles.kpiLabel}>고위험</span>
-              <span className={styles.kpiTrend}>{renderTrend(stats.weekTrend.highRisk)}</span>
-            </div>
-          </div>
-          <div className={`${styles.kpiCard} ${styles.kpiGreen}`}>
-            <div className={styles.kpiIcon}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-            <div className={styles.kpiInfo}>
-              <span className={styles.kpiValue}>{stats.completedProjects}</span>
-              <span className={styles.kpiLabel}>완료</span>
-              <span className={styles.kpiTrend}>{renderTrend(stats.weekTrend.completed)}</span>
-            </div>
-          </div>
+          ))}
         </section>
 
-        {/* Total Amount Banner */}
-        <section className={styles.amountBanner}>
-          <div className={styles.amountInfo}>
-            <span className={styles.amountLabel}>총 견적 금액</span>
-            <span className={styles.amountValue}>{formatAmount(stats.totalQuoteAmount)}</span>
-          </div>
-          <div className={styles.amountDeco}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 0 1 0 4H8"/><path d="M12 18V6"/></svg>
-          </div>
-        </section>
-
-        {/* AI Quick Actions */}
+        {/* ── AI 체키 바로가기 ──────────────────────────── */}
         <QuickActions
           title="AI 체키 바로가기"
           actions={[
@@ -514,309 +383,215 @@ export default function DashboardPage() {
           ]}
         />
 
-        {/* Charts Row 1: Risk Donut + Risk Gauge */}
-        <div className={styles.chartsRow}>
-          {/* Risk Donut */}
-          <section className={styles.card}>
-            <h2 className={styles.cardTitle}>리스크 등급 분포</h2>
-            {riskData.length > 0 ? (
-              <div className={styles.chartWrap}>
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie data={riskData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} dataKey="value" paddingAngle={3}>
-                      {riskData.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className={styles.legendList}>
-                  {riskData.map((d, i) => (
-                    <div key={i} className={styles.legendItem}>
-                      <span className={styles.legendDot} style={{ background: d.color }} />
-                      <span>{d.name}</span>
-                      <strong>{d.value}개</strong>
-                    </div>
-                  ))}
-                </div>
+        {/* ── 프로젝트 없을 때 웰컴 상태 ───────────────── */}
+        {stats.total === 0 && (
+          <div className={styles.welcomeState}>
+            <span className={styles.welcomeIcon}>🏗️</span>
+            <h2 className={styles.welcomeTitle}>Check-In에 오신 것을 환영해요!</h2>
+            <p className={styles.welcomeDesc}>
+              첫 번째 프로젝트를 만들면 AI가 리스크 분석, 공정 관리, 자동 리포트를 도와드려요.
+            </p>
+            <div className={styles.welcomeSteps}>
+              <div className={styles.welcomeStep}><span>1️⃣</span> 프로젝트 생성</div>
+              <div className={styles.welcomeStep}><span>2️⃣</span> 진단 체크리스트</div>
+              <div className={styles.welcomeStep}><span>3️⃣</span> AI 리스크 분석</div>
+            </div>
+            <button className={styles.welcomeBtn} onClick={() => router.push('/projects')}>
+              첫 프로젝트 만들기 →
+            </button>
+          </div>
+        )}
+
+        {/* ── 3대 핵심 패널 ────────────────────────────── */}
+        <div className={styles.triplePanel}>
+
+          {/* 패널 1: 오늘 확인할 현장 (긴급도 순) */}
+          <section className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>
+                <span className={styles.panelDot} style={{ background: '#ef4444' }} />
+                오늘 확인할 현장
+              </h2>
+              <span className={styles.panelBadge}>{urgentProjects.length}건</span>
+            </div>
+
+            {urgentProjects.length === 0 ? (
+              <div className={styles.panelEmpty}>
+                <span>🎉</span>
+                <p>긴급 현장이 없습니다</p>
               </div>
             ) : (
-              <div className={styles.chartEmpty}>프로젝트를 추가하면 리스크 분포가 표시됩니다</div>
-            )}
-          </section>
-
-          {/* Risk Gauge */}
-          <section className={styles.card}>
-            <h2 className={styles.cardTitle}>전체 리스크 게이지</h2>
-            {projects.length > 0 ? (
-              renderGauge(avgRiskScore)
-            ) : (
-              <div className={styles.chartEmpty}>프로젝트를 추가하면 리스크 게이지가 표시됩니다</div>
-            )}
-          </section>
-        </div>
-
-        {/* Charts Row 2: Cost Chart + Progress Bar */}
-        <div className={styles.chartsRow}>
-          {/* 비용 추이 그래프 - Line Chart */}
-          <section className={styles.card}>
-            <h2 className={styles.cardTitle}>프로젝트별 비용 추이 (만원)</h2>
-            {costData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <LineChart data={costData} margin={{ left: 0, right: 10, top: 10 }}>
-                  <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(value: number) => `${value.toLocaleString()}만원`} />
-                  <Legend />
-                  <Line type="monotone" dataKey="견적" stroke="#7c3aed" strokeWidth={2.5} dot={{ r: 4, fill: '#7c3aed' }} activeDot={{ r: 6 }} />
-                  <Line type="monotone" dataKey="실비용" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className={styles.chartEmpty}>견적 또는 비용 데이터가 있으면 비교 차트가 표시됩니다</div>
-            )}
-          </section>
-
-          {/* Progress Bar Chart */}
-          <section className={styles.card}>
-            <h2 className={styles.cardTitle}>프로젝트별 진행률</h2>
-            {progressData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={progressData} layout="vertical" margin={{ left: 0, right: 20 }}>
-                  <XAxis type="number" domain={[0, 100]} hide />
-                  <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 12 }} />
-                  <Tooltip formatter={(value: number) => `${value}%`} />
-                  <Bar dataKey="진행률" fill="#7c3aed" radius={[0, 6, 6, 0]} barSize={18} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className={styles.chartEmpty}>프로젝트를 추가하면 진행률 차트가 표시됩니다</div>
-            )}
-          </section>
-        </div>
-
-        {/* Bottom Row: Recent + Schedule + Activity Timeline */}
-        <div className={styles.tripleRow}>
-          {/* Recent Projects */}
-          <section className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>최근 프로젝트</h2>
-              <button className={styles.viewAllBtn} onClick={() => router.push('/projects')}>전체보기</button>
-            </div>
-            <div className={styles.recentList}>
-              {projects.slice(0, 5).map(project => {
-                const risk = getRiskGrade(project.risk_score || 0)
-                const status = getStatusInfo(project.status)
-                const isHighRisk = (project.risk_score || 0) >= 70
-                const dday = getDday(project.end_date, project.status)
-                return (
-                  <div
-                    key={project.id}
-                    className={`${styles.recentItem} ${isHighRisk ? styles.highRisk : ''}`}
-                    onClick={() => router.push(`/projects/${project.id}/diagnostic`)}
-                  >
-                    <div className={styles.recentColorBar} style={{ background: status.color }} />
-                    <div className={styles.recentInfo}>
-                      <span className={styles.recentName}>{project.name}</span>
-                      <span className={styles.recentClient}>{project.client_name}</span>
-                    </div>
-                    {dday && (
-                      <span className={`${styles.ddayBadge} ${styles[`dday_${dday.type}`]}`}>
-                        {dday.label}
+              <ul className={styles.urgentList}>
+                {urgentProjects.map(p => {
+                  const dday = getDdayLabel(p.daysLeft)
+                  const risk = getRiskGrade(p.riskScore)
+                  const isUrgent = p.urgencyScore >= 60
+                  return (
+                    <li
+                      key={p.id}
+                      className={`${styles.urgentItem} ${isUrgent ? styles.urgentHigh : ''}`}
+                      onClick={() => router.push(`/projects/${p.id}/diagnostic`)}
+                    >
+                      <span className={styles.urgentIcon}>
+                        {INDUSTRY_ICONS[p.industry] || '🏗️'}
                       </span>
-                    )}
-                    <span className={styles.recentStatus} style={{ background: `${status.color}18`, color: status.color }}>
-                      {status.label}
-                    </span>
-                    <span className={styles.riskGradeBadge} style={{ background: `${risk.color}18`, color: risk.color }}>
-                      {risk.grade}
-                    </span>
-                    <span className={styles.recentTime}>{getTimeAgo(project.updated_at)}</span>
-                  </div>
-                )
-              })}
-              {projects.length === 0 && (
-                <div className={styles.emptyState}>
-                  <div className={styles.emptyIcon}>
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                  </div>
-                  <h3>첫 프로젝트를 만들어보세요!</h3>
-                  <p>프로젝트를 생성하고 진단부터 리포트까지 한번에 관리하세요</p>
-                  <button className={styles.emptyBtn} onClick={() => router.push('/projects')}>
-                    프로젝트 만들기
-                  </button>
-                </div>
-              )}
-            </div>
+                      <div className={styles.urgentInfo}>
+                        <span className={styles.urgentName}>{p.name}</span>
+                        <span className={styles.urgentClient}>{p.clientName}</span>
+                        <div className={styles.urgentProgress}>
+                          <div className={styles.urgentProgressBar}>
+                            <div
+                              className={styles.urgentProgressFill}
+                              style={{ width: `${p.progress}%` }}
+                            />
+                          </div>
+                          <span className={styles.urgentProgressPct}>{p.progress}%</span>
+                        </div>
+                      </div>
+                      <div className={styles.urgentMeta}>
+                        {dday && (
+                          <span
+                            className={styles.ddayBadge}
+                            style={{
+                              background: dday.type === 'overdue' ? '#fee2e2' : dday.type === 'today' ? '#fef3c7' : dday.type === 'soon' ? '#fff7ed' : '#f3f4f6',
+                              color: dday.type === 'overdue' ? '#ef4444' : dday.type === 'today' ? '#d97706' : dday.type === 'soon' ? '#f97316' : '#6b7280',
+                            }}
+                          >
+                            {dday.text}
+                          </span>
+                        )}
+                        <span
+                          className={styles.riskBadge}
+                          style={{ color: risk.color, background: `${risk.color}18` }}
+                        >
+                          {risk.grade}등급
+                        </span>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+
+            <button className={styles.panelViewAll} onClick={() => router.push('/projects')}>
+              전체 프로젝트 보기 →
+            </button>
           </section>
 
-          {/* Activity Timeline */}
-          <section className={styles.card}>
-            <h2 className={styles.cardTitle}>최근 활동</h2>
-            <div className={styles.activityList}>
-              {activityLog.length > 0 ? activityLog.map((activity, i) => (
-                <div key={i} className={styles.activityItem}>
-                  <div className={styles.activityDot} style={{ background: activity.color }} />
-                  {i < activityLog.length - 1 && <div className={styles.activityLine} />}
-                  <div className={styles.activityContent}>
-                    <span className={styles.activityMessage}>{activity.message}</span>
-                    <span className={styles.activityTime}>{getTimeAgo(activity.time)}</span>
-                  </div>
-                </div>
-              )) : (
-                <div className={styles.scheduleEmpty}>아직 활동 내역이 없습니다</div>
-              )}
+          {/* 패널 2: AI 감지 리스크 */}
+          <section className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>
+                <span className={styles.panelDot} style={{ background: '#f97316' }} />
+                AI 감지 리스크
+              </h2>
+              <span
+                className={styles.panelBadge}
+                style={riskAlerts.some(a => a.severity === 'CRITICAL') ? { background: '#fee2e2', color: '#ef4444' } : {}}
+              >
+                {riskAlerts.length}건
+              </span>
             </div>
+
+            {riskAlerts.length === 0 ? (
+              <div className={styles.panelEmpty}>
+                <span>🛡️</span>
+                <p>감지된 리스크가 없어요</p>
+              </div>
+            ) : (
+              <ul className={styles.alertList}>
+                {riskAlerts.map(alert => (
+                  <li
+                    key={alert.id}
+                    className={styles.alertItem}
+                    onClick={() => router.push(alert.actionUrl)}
+                    style={{ '--alert-color': SEVERITY_COLOR[alert.severity], '--alert-bg': SEVERITY_BG[alert.severity] } as React.CSSProperties}
+                  >
+                    <span className={styles.alertSeverityIcon}>{SEVERITY_ICON[alert.severity]}</span>
+                    <div className={styles.alertContent}>
+                      <div className={styles.alertHeader}>
+                        <span className={styles.alertProject}>{alert.projectName}</span>
+                        <span
+                          className={styles.alertSeverityBadge}
+                          style={{ color: SEVERITY_COLOR[alert.severity], background: SEVERITY_BG[alert.severity] }}
+                        >
+                          {alert.severity}
+                        </span>
+                      </div>
+                      <span className={styles.alertTitle}>{alert.title}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <button className={styles.panelViewAll} onClick={() => router.push('/projects')}>
+              전체 리스크 관리 →
+            </button>
           </section>
 
-          {/* Schedule */}
-          <section className={styles.card}>
-            <h2 className={styles.cardTitle}>이번 주 일정</h2>
-            <div className={styles.scheduleList}>
-              {upcomingSchedule.length > 0 ? upcomingSchedule.map(p => (
-                <div key={p.id} className={styles.scheduleItem} onClick={() => router.push(`/projects/${p.id}/process`)}>
-                  <div className={styles.scheduleDot} />
-                  <div className={styles.scheduleInfo}>
-                    <span className={styles.scheduleName}>{p.name}</span>
-                    <span className={styles.scheduleDate}>
-                      {p.start_date} ~ {p.end_date}
-                    </span>
-                  </div>
-                  <span className={styles.scheduleStatus} style={{ color: getStatusInfo(p.status).color }}>
-                    {getStatusInfo(p.status).label}
-                  </span>
-                </div>
-              )) : (
-                <div className={styles.scheduleEmpty}>
-                  <span>이번 주 예정된 일정이 없습니다</span>
-                </div>
-              )}
+          {/* 패널 3: 승인 대기 항목 */}
+          <section className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>
+                <span className={styles.panelDot} style={{ background: '#f59e0b' }} />
+                승인 대기 항목
+              </h2>
+              <span
+                className={styles.panelBadge}
+                style={pendingItems.length > 0 ? { background: '#fef3c7', color: '#d97706' } : {}}
+              >
+                {pendingItems.length}건
+              </span>
             </div>
+
+            {pendingItems.length === 0 ? (
+              <div className={styles.panelEmpty}>
+                <span>✅</span>
+                <p>대기 중인 항목이 없어요</p>
+              </div>
+            ) : (
+              <ul className={styles.pendingList}>
+                {pendingItems.map(item => (
+                  <li
+                    key={item.id}
+                    className={styles.pendingItem}
+                    onClick={() => router.push(item.actionUrl)}
+                  >
+                    <span className={styles.pendingTypeIcon}>
+                      {item.type === 'change_order' ? '📝' : item.type === 'checklist' ? '☑️' : '📅'}
+                    </span>
+                    <div className={styles.pendingInfo}>
+                      <span className={styles.pendingProject}>{item.projectName}</span>
+                      <span className={styles.pendingTitle}>{item.title}</span>
+                    </div>
+                    <span className={styles.pendingCount}>{item.count}건</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <button className={styles.panelViewAll} onClick={() => router.push('/projects')}>
+              전체 항목 확인 →
+            </button>
           </section>
         </div>
 
-        {/* 이번 주 할 일 요약 */}
-        <section className={styles.todoSection}>
-          <h2 className={styles.cardTitle}>이번 주 할 일</h2>
-          <div className={styles.todoList}>
-            {projects.filter(p => p.status === 'in_progress').slice(0, 5).map(p => {
-              const dday = getDday(p.end_date, p.status)
-              return (
-                <div key={p.id} className={styles.todoItem} onClick={() => router.push(`/projects/${p.id}/diagnostic`)}>
-                  <div className={styles.todoCheck}>
-                    {p.progress >= 100 ? '✅' : '⬜'}
-                  </div>
-                  <div className={styles.todoContent}>
-                    <span className={styles.todoName}>{p.name}</span>
-                    <span className={styles.todoClient}>{p.client_name}</span>
-                  </div>
-                  <div className={styles.todoProgress}>
-                    <div className={styles.todoBar}>
-                      <div className={styles.todoFill} style={{ width: `${p.progress || 0}%` }} />
-                    </div>
-                    <span>{p.progress || 0}%</span>
-                  </div>
-                  {dday && (
-                    <span className={`${styles.todoDday} ${styles[`dday_${dday.type}`]}`}>
-                      {dday.label}
-                    </span>
-                  )}
-                </div>
-              )
-            })}
-            {projects.filter(p => p.status === 'in_progress').length === 0 && (
-              <div className={styles.scheduleEmpty}>진행중인 프로젝트가 없습니다</div>
-            )}
-          </div>
-        </section>
-
-        {/* 7일 활동 CSS 바 차트 */}
-        <section className={styles.card}>
-          <h2 className={styles.cardTitle}>최근 7일 활동</h2>
-          <div className={styles.activityBarChart}>
-            {Array.from({ length: 7 }, (_, i) => {
-              const d = new Date()
-              d.setDate(d.getDate() - (6 - i))
-              const dateStr = d.toISOString().split('T')[0]
-              const dayLabel = d.toLocaleDateString('ko-KR', { weekday: 'short' })
-              const count = projects.filter(p => {
-                const updated = p.updated_at?.split('T')[0]
-                return updated === dateStr
-              }).length
-              const maxCount = Math.max(1, ...Array.from({ length: 7 }, (_, j) => {
-                const dd = new Date()
-                dd.setDate(dd.getDate() - (6 - j))
-                const ds = dd.toISOString().split('T')[0]
-                return projects.filter(p => p.updated_at?.split('T')[0] === ds).length
-              }))
-              const height = count > 0 ? Math.max(8, (count / maxCount) * 100) : 4
-              return (
-                <div key={i} className={styles.barCol}>
-                  <div className={styles.barWrapper}>
-                    <div
-                      className={styles.barFill}
-                      style={{ height: `${height}%` }}
-                    />
-                  </div>
-                  <span className={styles.barLabel}>{dayLabel}</span>
-                  <span className={styles.barCount}>{count}</span>
-                </div>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* 성과/마일스톤 */}
-        <section className={styles.card}>
-          <h2 className={styles.cardTitle}>나의 성과</h2>
-          <div className={styles.achievementGrid}>
-            {[
-              { icon: '🏗️', label: '프로젝트 생성', count: stats.totalProjects, target: 1, desc: '첫 프로젝트 시작!' },
-              { icon: '✅', label: '프로젝트 완료', count: stats.completedProjects, target: 1, desc: '첫 프로젝트 완료!' },
-              { icon: '📊', label: '리스크 관리', count: stats.totalProjects - stats.highRiskProjects, target: 3, desc: '안전한 프로젝트 3개' },
-              { icon: '💰', label: '견적 전문가', count: stats.totalQuoteAmount > 0 ? 1 : 0, target: 1, desc: '첫 견적 작성!' },
-            ].map((ach, i) => {
-              const achieved = ach.count >= ach.target
-              return (
-                <div key={i} className={`${styles.achievementCard} ${achieved ? styles.achieved : ''}`}>
-                  <span className={styles.achievementIcon}>{achieved ? ach.icon : '🔒'}</span>
-                  <span className={styles.achievementLabel}>{ach.label}</span>
-                  <span className={styles.achievementDesc}>
-                    {achieved ? ach.desc : `${ach.count}/${ach.target}`}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* 빠른 액션 버튼 */}
-        <section className={styles.quickActions}>
-          <h2 className={styles.cardTitle}>빠른 액션</h2>
+        {/* ── 빠른 액션 ────────────────────────────────── */}
+        <section className={styles.quickActionsSection}>
+          <h2 className={styles.sectionTitle}>빠른 액션</h2>
           <div className={styles.quickGrid}>
             <button className={styles.quickBtn} onClick={() => router.push('/projects')}>
-              <span className={styles.quickIcon}>📁</span>
-              <span>새 프로젝트</span>
+              <span>📁</span><span>새 프로젝트</span>
             </button>
-            <button className={styles.quickBtn} onClick={() => {
-              const firstProject = projects[0]
-              if (firstProject) router.push(`/projects/${firstProject.id}/gallery`)
-              else router.push('/projects')
-            }}>
-              <span className={styles.quickIcon}>📷</span>
-              <span>사진 업로드</span>
-            </button>
-            <button className={styles.quickBtn} onClick={() => {
-              const chatBtn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
-              if (chatBtn) chatBtn.click()
-            }}>
-              <span className={styles.quickIcon}>🤖</span>
-              <span>AI 체키 (Ctrl+K)</span>
+            <button className={styles.quickBtn} onClick={() => router.push('/ai-chat')}>
+              <span>🤖</span><span>AI 채팅</span>
             </button>
             <button className={styles.quickBtn} onClick={() => router.push('/reports')}>
-              <span className={styles.quickIcon}>📊</span>
-              <span>리포트</span>
+              <span>📊</span><span>리포트</span>
+            </button>
+            <button className={styles.quickBtn} onClick={() => router.push('/clients')}>
+              <span>👥</span><span>고객관리</span>
             </button>
           </div>
         </section>

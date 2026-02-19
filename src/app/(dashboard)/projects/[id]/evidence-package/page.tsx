@@ -6,8 +6,32 @@ import { createClient } from '@/lib/supabase/client'
 import type { EvidenceFile } from '@/types/evidenceFile'
 import { FILE_CATEGORIES } from '@/types/evidenceFile'
 import { getMerkleRoot, verifyEvidencePackage, type VerificationResult } from '@/lib/utils/merkleTree'
+import type { AutoCheckResult } from '@/lib/ai/auto-checker'
 import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
+
+// 이미지 파일 확장자 목록
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'bmp']
+const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/bmp']
+
+function isImageFile(file: EvidenceFile): boolean {
+  const ext = file.file_name.split('.').pop()?.toLowerCase() ?? ''
+  return IMAGE_EXTENSIONS.includes(ext) || IMAGE_MIME_TYPES.includes(file.file_type ?? '')
+}
+
+// GO/NO-GO 판정에 대응하는 친절 안내 문구
+const GO_NO_GO_LABEL: Record<string, { label: string; message: string }> = {
+  'GO':          { label: '진행해도 좋아요',       message: '주요 항목이 모두 기준을 충족했습니다. 현재 공정을 그대로 이어가셔도 됩니다.' },
+  'NO-GO':       { label: '즉시 확인이 필요해요',   message: '기준을 충족하지 못한 항목이 발견되었습니다. 아래 내용을 확인하시고 보완 후 재검토해 주세요.' },
+  'CONDITIONAL': { label: '추가 확인 후 진행하세요', message: '사진만으로는 판단하기 어려운 항목이 있어요. 현장에서 직접 확인해 주시면 더 정확한 결과를 드릴 수 있습니다.' },
+}
+
+// 체크 항목 결과 레이블
+const ITEM_RESULT_LABEL: Record<string, { icon: string; label: string }> = {
+  'PASS':      { icon: '✅', label: '양호해요' },
+  'FAIL':      { icon: '❌', label: '확인이 필요해요' },
+  'UNCERTAIN': { icon: '❓', label: '사진으로는 확인이 어려워요' },
+}
 
 export default function EvidencePackagePage() {
   const params = useParams()
@@ -22,6 +46,12 @@ export default function EvidencePackagePage() {
   const [merkleRoot, setMerkleRoot] = useState<string>('')
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null)
   const [verifying, setVerifying] = useState(false)
+
+  // AI 자동 체크 상태
+  const [aiChecking, setAiChecking] = useState<string | null>(null)   // 현재 분석 중인 file.id
+  const [aiResult, setAiResult] = useState<AutoCheckResult | null>(null)
+  const [aiResultFile, setAiResultFile] = useState<string>('')         // 분석된 파일명
+  const [showAiModal, setShowAiModal] = useState(false)
 
   // 데이터 로드
   useEffect(() => {
@@ -147,6 +177,66 @@ export default function EvidencePackagePage() {
     } catch (err: any) {
       console.error('Error deleting:', err)
       alert(`삭제 오류: ${err?.message || JSON.stringify(err)}`)
+    }
+  }
+
+  // AI 자동 체크
+  const handleAiCheck = async (file: EvidenceFile) => {
+    if (!isImageFile(file)) {
+      alert('이미지 파일만 AI 분석이 가능합니다.')
+      return
+    }
+
+    setAiChecking(file.id)
+    setAiResult(null)
+    setAiResultFile(file.file_name)
+
+    try {
+      // Storage에서 파일 다운로드
+      const { data: blob, error: dlError } = await supabase.storage
+        .from('evidence')
+        .download(file.storage_path)
+
+      if (dlError || !blob) throw new Error('파일 다운로드 실패: ' + dlError?.message)
+
+      // base64 변환
+      const buffer = await blob.arrayBuffer()
+      const bytes = new Uint8Array(buffer)
+      let binary = ''
+      bytes.forEach(b => { binary += String.fromCharCode(b) })
+      const base64 = btoa(binary)
+
+      // 공개 URL 가져오기
+      const { data: urlData } = supabase.storage
+        .from('evidence')
+        .getPublicUrl(file.storage_path)
+      const photoUrl = urlData?.publicUrl ?? ''
+
+      // API 호출
+      const res = await fetch('/api/ai/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId,
+          imageBase64: base64,
+          mimeType: file.file_type || 'image/jpeg',
+          photoUrl,
+        }),
+      })
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData?.error || `서버 오류 (${res.status})`)
+      }
+
+      const result: AutoCheckResult = await res.json()
+      setAiResult(result)
+      setShowAiModal(true)
+    } catch (err: any) {
+      console.error('[AI Check]', err)
+      alert(`AI 분석 오류: ${err?.message}`)
+    } finally {
+      setAiChecking(null)
     }
   }
 
@@ -409,6 +499,110 @@ export default function EvidencePackagePage() {
           </p>
         </section>
 
+        {/* AI 체크 결과 모달 */}
+        {showAiModal && aiResult && (() => {
+          const verdict = GO_NO_GO_LABEL[aiResult.goNoGo] ?? GO_NO_GO_LABEL['CONDITIONAL']
+          return (
+            <div className={styles.modalOverlay} onClick={() => setShowAiModal(false)}>
+              <div className={styles.modal} onClick={e => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                  <h2>AI 현장 점검 리포트</h2>
+                  <button className={styles.modalClose} onClick={() => setShowAiModal(false)}>✕</button>
+                </div>
+
+                <div className={styles.modalBody}>
+                  {/* 판정 요약 카드 — 공감 먼저 */}
+                  <div className={styles.aiSummary}>
+                    <span className={styles.aiFileName}>{aiResultFile}</span>
+                    <div className={styles.aiMeta}>
+                      <span className={styles.aiProcess}>{aiResult.detectedProcess} 공종</span>
+                      <span className={styles.aiConfidence}>
+                        분석 신뢰도 {Math.round(aiResult.confidence * 100)}%
+                      </span>
+                    </div>
+                    {/* 판정 — 친절 레이블 + 기술 코드 병기 */}
+                    <div className={`${styles.verdictBanner} ${styles[`goNoGo${aiResult.goNoGo.replace('-', '')}`]}`}>
+                      <span className={styles.verdictLabel}>{verdict.label}</span>
+                      <span className={styles.verdictCode}>{aiResult.goNoGo}</span>
+                    </div>
+                    <p className={styles.verdictMessage}>{verdict.message}</p>
+                  </div>
+
+                  {/* 항목별 확인 결과 */}
+                  {aiResult.checkedItems.length > 0 && (
+                    <div className={styles.aiSection}>
+                      <h3>항목별 확인 결과</h3>
+                      <div className={styles.checkedItems}>
+                        {aiResult.checkedItems.map(item => {
+                          const res = ITEM_RESULT_LABEL[item.result] ?? ITEM_RESULT_LABEL['UNCERTAIN']
+                          return (
+                            <div key={item.itemId} className={`${styles.checkedItem} ${styles[`item${item.result}`]}`}>
+                              <div className={styles.itemHeader}>
+                                <span className={styles.itemResult}>{res.icon}</span>
+                                <span className={styles.itemName}>{item.itemName}</span>
+                                <span className={styles.itemResultLabel}>{res.label}</span>
+                              </div>
+                              <p className={styles.itemReason}>{item.reason}</p>
+                              {item.legalBasis && (
+                                <p className={styles.itemLegal}>관련 기준: {item.legalBasis}</p>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 함께 살펴볼 부분 */}
+                  {aiResult.issues.length > 0 && (
+                    <div className={styles.aiSection}>
+                      <h3>함께 살펴볼 부분이에요</h3>
+                      <ul className={styles.issueList}>
+                        {aiResult.issues.map((issue, i) => (
+                          <li key={i} className={styles.issueItem}>{issue}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* 이렇게 해보시면 좋아요 */}
+                  {aiResult.recommendations.length > 0 && (
+                    <div className={styles.aiSection}>
+                      <h3>이렇게 해보시면 좋아요</h3>
+                      <ul className={styles.recommendList}>
+                        {aiResult.recommendations.map((rec, i) => (
+                          <li key={i} className={styles.recommendItem}>{rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* 현장에서 직접 확인해 주세요 */}
+                  {aiResult.requiresHumanReview.length > 0 && (
+                    <div className={styles.aiSection}>
+                      <h3>현장에서 직접 확인해 주세요</h3>
+                      <ul className={styles.reviewList}>
+                        {aiResult.requiresHumanReview.map((item, i) => (
+                          <li key={i} className={styles.reviewItem}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.modalFooter}>
+                  <p className={styles.aiDisclaimer}>
+                    AI가 사진을 바탕으로 분석한 결과예요. 최종 판단은 항상 전문가의 현장 확인과 함께해 주세요.
+                  </p>
+                  <button className={styles.modalConfirmBtn} onClick={() => setShowAiModal(false)}>
+                    알겠어요
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Files List */}
         <section className={styles.filesSection}>
           {files.length === 0 ? (
@@ -454,6 +648,16 @@ export default function EvidencePackagePage() {
                           )}
                         </div>
                         <div className={styles.fileActions}>
+                          {isImageFile(file) && (
+                            <button
+                              className={styles.aiCheckBtn}
+                              onClick={() => handleAiCheck(file)}
+                              disabled={aiChecking === file.id}
+                              title="AI 자동 품질 체크"
+                            >
+                              {aiChecking === file.id ? '분석 중...' : 'AI 체크'}
+                            </button>
+                          )}
                           <button
                             className={styles.downloadBtn}
                             onClick={() => handleDownload(file)}

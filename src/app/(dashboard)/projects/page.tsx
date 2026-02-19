@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { Project, ProjectStatus, CreateProjectInput } from '@/types/project'
 import QuickStart from '@/components/onboarding/QuickStart'
+import { DEFAULT_PROCESSES } from '@/types/process'
+import { logActivity } from '@/lib/activity/logger'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 const INDUSTRY_ICONS: Record<string, string> = {
@@ -15,6 +18,7 @@ const INDUSTRY_ICONS: Record<string, string> = {
 
 export default function ProjectsPage() {
   const supabase = createClient()
+  const toast = useToast()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
@@ -22,6 +26,7 @@ export default function ProjectsPage() {
   const [showQuickStart, setShowQuickStart] = useState(false)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const [formData, setFormData] = useState<CreateProjectInput>({
     name: '', client_name: '', status: 'planning', start_date: '', end_date: '',
@@ -49,6 +54,18 @@ export default function ProjectsPage() {
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault()
+    // 폼 유효성 검사
+    const errs: Record<string, string> = {}
+    if (!formData.name.trim()) errs.name = '프로젝트명을 입력해주세요.'
+    if (!formData.client_name.trim()) errs.client_name = '고객명을 입력해주세요.'
+    if (formData.start_date && formData.end_date && formData.end_date < formData.start_date) {
+      errs.end_date = '종료일은 시작일 이후여야 합니다.'
+    }
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs)
+      return
+    }
+    setFieldErrors({})
     setCreating(true)
     setError(null)
     try {
@@ -58,11 +75,40 @@ export default function ProjectsPage() {
         .from('projects').insert([{ ...formData, user_id: user.id, progress: 0, risk_score: 0 }])
         .select().single()
       if (error) throw error
+
+      // 기본 공정 자동 생성 (DEFAULT_PROCESSES)
+      if (data?.id) {
+        const today = new Date().toISOString().split('T')[0]
+        const processRows = DEFAULT_PROCESSES.map((name, i) => ({
+          project_id: data.id,
+          name,
+          status: 'pending',
+          progress: 0,
+          order_index: i,
+          start_date: formData.start_date || today,
+          end_date: formData.end_date || null,
+        }))
+        await supabase.from('processes').insert(processRows)
+
+        // 활동 로그
+        logActivity(supabase, {
+          userId: user.id,
+          projectId: data.id,
+          action: 'project_created',
+          targetType: 'project',
+          targetId: data.id,
+          meta: { name: data.name, clientName: data.client_name, status: data.status },
+        }).catch(() => {})
+      }
+
       setProjects(prev => [data, ...prev])
       setFormData({ name: '', client_name: '', status: 'planning', start_date: '', end_date: '' })
       setShowModal(false)
+      toast.success(`"${data.name}" 프로젝트가 생성되었어요! 기본 공정 ${DEFAULT_PROCESSES.length}개도 자동으로 추가했습니다.`)
     } catch (err: any) {
-      setError(err.message)
+      const msg = err?.message?.includes('duplicate') ? '이미 같은 이름의 프로젝트가 있어요.' : (err.message || '생성 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.')
+      setError(msg)
+      toast.error(msg)
     } finally {
       setCreating(false)
     }
@@ -343,16 +389,20 @@ export default function ProjectsPage() {
             </div>
             <form onSubmit={handleCreateProject} className={styles.modalForm}>
               <div className={styles.formGroup}>
-                <label htmlFor="name">프로젝트명</label>
+                <label htmlFor="name">프로젝트명 <span className={styles.required}>*</span></label>
                 <input id="name" type="text" value={formData.name}
-                  onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="예: 강남 오피스텔 리모델링" required />
+                  onChange={e => { setFormData(prev => ({ ...prev, name: e.target.value })); setFieldErrors(prev => ({ ...prev, name: '' })) }}
+                  placeholder="예: 강남 오피스텔 리모델링"
+                  className={fieldErrors.name ? styles.inputError : ''} />
+                {fieldErrors.name && <span className={styles.fieldError}>{fieldErrors.name}</span>}
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="client_name">고객명</label>
+                <label htmlFor="client_name">고객명 <span className={styles.required}>*</span></label>
                 <input id="client_name" type="text" value={formData.client_name}
-                  onChange={e => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
-                  placeholder="예: 홍길동" required />
+                  onChange={e => { setFormData(prev => ({ ...prev, client_name: e.target.value })); setFieldErrors(prev => ({ ...prev, client_name: '' })) }}
+                  placeholder="예: 홍길동"
+                  className={fieldErrors.client_name ? styles.inputError : ''} />
+                {fieldErrors.client_name && <span className={styles.fieldError}>{fieldErrors.client_name}</span>}
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="status">상태</label>
@@ -373,7 +423,9 @@ export default function ProjectsPage() {
                 <div className={styles.formGroup}>
                   <label htmlFor="end_date">종료일</label>
                   <input id="end_date" type="date" value={formData.end_date}
-                    onChange={e => setFormData(prev => ({ ...prev, end_date: e.target.value }))} required />
+                    onChange={e => { setFormData(prev => ({ ...prev, end_date: e.target.value })); setFieldErrors(prev => ({ ...prev, end_date: '' })) }}
+                    className={fieldErrors.end_date ? styles.inputError : ''} />
+                  {fieldErrors.end_date && <span className={styles.fieldError}>{fieldErrors.end_date}</span>}
                 </div>
               </div>
               {error && <div className={styles.formError}>{error}</div>}

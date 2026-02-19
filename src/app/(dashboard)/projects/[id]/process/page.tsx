@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import type { Process, ProcessStatus } from '@/types/process'
 import { PROCESS_STATUS, DEFAULT_PROCESSES } from '@/types/process'
 import QuickActions from '@/components/ui/QuickActions'
+import { logActivity } from '@/lib/activity/logger'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 type ViewMode = 'list' | 'gantt'
@@ -14,6 +16,7 @@ export default function ProcessPage() {
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
+  const toast = useToast()
   const [processes, setProcesses] = useState<Process[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -162,8 +165,30 @@ export default function ProcessPage() {
       setProcesses(prev => prev.map(p =>
         p.id === process.id ? { ...p, status: newStatus as any, progress: newProgress } : p
       ))
+
+      // 공정 완료 시 다음 공종 리스크 예측 (fire-and-forget)
+      if (newStatus === 'completed') {
+        fetch('/api/ai/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ projectId, completedProcessId: process.id }),
+        }).catch(() => { /* 예측 실패해도 UI 무관 */ })
+      }
+
+      // 활동 로그 (fire-and-forget)
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) return
+        logActivity(supabase, {
+          userId: user.id,
+          projectId,
+          action: newStatus === 'completed' ? 'process_completed' : 'process_status_changed',
+          targetType: 'process',
+          targetId: process.id,
+          meta: { processName: process.name, from: process.status, to: newStatus },
+        }).catch(() => {})
+      }).catch(() => {})
     } catch (err: any) {
-      alert(`상태 변경 오류: ${err?.message}`)
+      toast.error(`상태 변경 중 문제가 생겼어요. (${err?.message})`)
     }
   }
 
@@ -197,9 +222,12 @@ export default function ProcessPage() {
         .select()
 
       if (error) throw error
-      if (data) setProcesses(prev => [...prev, ...data])
+      if (data) {
+        setProcesses(prev => [...prev, ...data])
+        toast.success(`기본 공정 ${data.length}개가 추가되었어요!`)
+      }
     } catch (err: any) {
-      alert(`템플릿 로드 오류: ${err?.message}`)
+      toast.error(`템플릿 불러오기 중 문제가 생겼어요. (${err?.message})`)
     } finally {
       setSaving(false)
     }

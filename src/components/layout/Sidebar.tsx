@@ -23,6 +23,8 @@ interface SubMenuItem {
 const mainNavItems: NavItem[] = [
   { icon: '🏠', label: '대시보드', href: '/dashboard' },
   { icon: '📁', label: '프로젝트', href: '/projects' },
+  { icon: '🤖', label: 'AI 채팅', href: '/ai-chat' },
+  { icon: '📒', label: 'AI 노트북', href: '/notebook' },
   { icon: '📊', label: '리포트', href: '/reports' },
   { icon: '👥', label: '고객관리', href: '/clients' },
   { icon: '🏢', label: '프로필', href: '/profile' },
@@ -83,12 +85,12 @@ export default function Sidebar() {
       if (user) {
         const { data } = await supabase
           .from('user_settings')
-          .select('display_name, subscription_plan')
+          .select('display_name')
           .eq('user_id', user.id)
           .single()
         if (data) {
           setUserName(data.display_name || user.email?.split('@')[0] || '사용자')
-          setUserPlan(data.subscription_plan === 'pro' ? 'Pro' : data.subscription_plan === 'enterprise' ? 'Enterprise' : 'Free')
+          // subscription_plan 컬럼이 아직 DB에 없으므로 기본값 유지 (Free)
         }
       }
     }
@@ -119,12 +121,12 @@ export default function Sidebar() {
           .eq('project_id', currentProjectId)
           .neq('status', 'completed')
 
-        // Count change orders
+        // Count change orders (status 'requested' = 승인 대기)
         const { count: changeOrders } = await supabase
           .from('change_orders')
           .select('*', { count: 'exact', head: true })
           .eq('project_id', currentProjectId)
-          .eq('status', 'pending')
+          .eq('status', 'requested')
 
         const counts: Record<string, number> = {}
         if (diagTotal && diagTotal > 0) counts['diagnostic'] = diagTotal

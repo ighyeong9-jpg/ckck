@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import ProjectDetailHeader from './ProjectDetailHeader'
+import ProjectContextTracker from '@/components/project/ProjectContextTracker'
 import styles from './layout.module.scss'
 
 export default async function ProjectDetailLayout({
@@ -57,6 +58,11 @@ export default async function ProjectDetailLayout({
 
   return (
     <div className={styles.projectLayout}>
+      {/* AI 채팅 컨텍스트 추적: 현재 프로젝트를 localStorage에 저장 */}
+      <ProjectContextTracker
+        projectId={projectId}
+        projectName={project?.name || '프로젝트'}
+      />
       <ProjectDetailHeader
         projectId={projectId}
         projectName={project?.name || '프로젝트'}

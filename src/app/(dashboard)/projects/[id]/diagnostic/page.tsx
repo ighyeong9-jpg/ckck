@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { logActivity } from '@/lib/activity/logger'
+import { useToast } from '@/components/ui/Toast'
 import {
   checklistMap,
   checklistOptions,
@@ -35,6 +37,7 @@ export default function DiagnosticPage() {
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
+  const toast = useToast()
 
   // 상태
   const [selectedIndustry, setSelectedIndustry] = useState<IndustryType>('cafe')
@@ -206,10 +209,23 @@ export default function DiagnosticPage() {
     setRiskGrade(getRiskGradeAndLevel(scores.total))
   }, [responses, allItems, selectedIndustry])
 
+  // 체크리스트 완료율 → projects.progress 자동 업데이트
+  const autoUpdateProgress = async (updatedResponses: Record<string, boolean>) => {
+    const total = allItems.length
+    if (total === 0) return
+    const done = Object.values(updatedResponses).filter(Boolean).length
+    const progress = Math.round((done / total) * 100)
+    await supabase
+      .from('projects')
+      .update({ progress })
+      .eq('id', projectId)
+  }
+
   // 체크 상태 변경
   const handleCheck = async (itemId: string, item: ChecklistItem | CustomItem) => {
     const newChecked = !responses[itemId]
-    setResponses(prev => ({ ...prev, [itemId]: newChecked }))
+    const updatedResponses = { ...responses, [itemId]: newChecked }
+    setResponses(updatedResponses)
 
     try {
       const { error } = await supabase
@@ -228,6 +244,9 @@ export default function DiagnosticPage() {
         })
 
       if (error) throw error
+
+      // 체크리스트 완료율 → projects.progress 자동 업데이트
+      autoUpdateProgress(updatedResponses).catch(() => {})
     } catch (err) {
       console.error('Error saving response:', err)
     }
@@ -246,10 +265,24 @@ export default function DiagnosticPage() {
         .eq('id', projectId)
 
       if (error) throw error
-      alert('리스크 점수가 저장되었습니다.')
+
+      // 활동 로그
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        logActivity(supabase, {
+          userId: user.id,
+          projectId,
+          action: 'risk_score_saved',
+          targetType: 'diagnostic',
+          targetId: projectId,
+          meta: { riskScore: riskScores.total, grade: riskGrade.grade, industry: selectedIndustry },
+        }).catch(() => {})
+      }
+
+      toast.success(`리스크 점수 ${riskScores.total}점(${riskGrade.grade}등급)이 저장되었어요.`)
     } catch (err) {
       console.error('Error saving risk score:', err)
-      alert('저장 중 오류가 발생했습니다.')
+      toast.error('저장 중 문제가 생겼어요. 잠시 후 다시 시도해주세요.')
     } finally {
       setSaving(false)
     }
