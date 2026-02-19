@@ -703,37 +703,57 @@ async function fallbackToGemini(message: string): Promise<ToolResult> {
     }
   }
 
-  try {
-    const { GoogleGenerativeAI } = await import('@google/generative-ai')
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      systemInstruction: CHEKI_SYSTEM_PROMPT,
-    })
+  // 모델 폴백 체인: 2.5-flash(20RPD) → 2.0-flash(1500RPD)
+  const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash']
 
-    const result = await model.generateContent(message)
-    const response = result.response.text()
+  for (let i = 0; i < FALLBACK_MODELS.length; i++) {
+    try {
+      const { GoogleGenerativeAI } = await import('@google/generative-ai')
+      const genAI = new GoogleGenerativeAI(apiKey)
+      const model = genAI.getGenerativeModel({
+        model: FALLBACK_MODELS[i],
+        systemInstruction: CHEKI_SYSTEM_PROMPT,
+      })
 
-    return {
-      tool: 'gemini_answer',
-      success: true,
-      message: response,
+      const result = await model.generateContent(message)
+      const response = result.response.text()
+      console.log(`[체키 폴백] ${FALLBACK_MODELS[i]} 응답 성공`)
+
+      return {
+        tool: 'gemini_answer',
+        success: true,
+        message: response,
+      }
+    } catch (error: any) {
+      const msg = error?.message || ''
+      const isRateLimit = error?.status === 429 || msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota')
+
+      if (isRateLimit && i < FALLBACK_MODELS.length - 1) {
+        console.warn(`[체키 폴백] ${FALLBACK_MODELS[i]} 할당량 초과 → ${FALLBACK_MODELS[i + 1]}로 전환`)
+        continue
+      }
+
+      console.error('Gemini 폴백 호출 오류:', error?.message)
+      return {
+        tool: 'general_answer',
+        success: true,
+        message: `🤖 안녕하세요! 체키입니다.\n\n` +
+          `죄송합니다. 지금 AI 엔진에 일시적인 문제가 있습니다.\n잠시 후 다시 시도해주세요.\n\n` +
+          `💬 인테리어 관련은 키워드를 포함해서 질문하시면 바로 답변됩니다:\n` +
+          `  • 견적, 비용, 얼마 → 비용 관련\n` +
+          `  • 체크리스트, 점검 → 점검 관련\n` +
+          `  • 공정, 순서, 절차 → 공정 관련\n` +
+          `  • 하자, 누수, 곰팡이 → 하자 관련\n` +
+          `  • 소방, 법, 허가 → 법규 관련\n\n` +
+          `그 외 일반 질문은 AI 엔진 복구 후 답변 가능합니다.`,
+      }
     }
-  } catch (error: any) {
-    console.error('Gemini 폴백 호출 오류:', error?.message)
-    return {
-      tool: 'general_answer',
-      success: true,
-      message: `🤖 안녕하세요! 체키입니다.\n\n` +
-        `죄송합니다. 지금 AI 엔진에 일시적인 문제가 있습니다.\n잠시 후 다시 시도해주세요.\n\n` +
-        `💬 인테리어 관련은 키워드를 포함해서 질문하시면 바로 답변됩니다:\n` +
-        `  • 견적, 비용, 얼마 → 비용 관련\n` +
-        `  • 체크리스트, 점검 → 점검 관련\n` +
-        `  • 공정, 순서, 절차 → 공정 관련\n` +
-        `  • 하자, 누수, 곰팡이 → 하자 관련\n` +
-        `  • 소방, 법, 허가 → 법규 관련\n\n` +
-        `그 외 일반 질문은 AI 엔진 복구 후 답변 가능합니다.`,
-    }
+  }
+
+  return {
+    tool: 'general_answer',
+    success: true,
+    message: `🤖 체키입니다. AI 엔진이 일시적으로 바쁩니다. 잠시 후 다시 시도해주세요.`,
   }
 }
 

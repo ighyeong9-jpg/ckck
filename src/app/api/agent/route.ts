@@ -3,11 +3,12 @@
  * AI Agent "체키" API 엔드포인트
  *
  * 우선순위:
- * 1. GEMINI_API_KEY → Gemini 2.5 Flash (Function Calling)
+ * 1. GEMINI_API_KEY → Gemini (2.5-flash → 2.0-flash 자동 폴백)
  * 2. ANTHROPIC_API_KEY → Claude (나중에 구현)
  * 3. 둘 다 없음 → Mock 모드 (키워드 기반 도구 실행)
  *
- * Gemini 에러 시 → Mock 모드로 자동 폴백
+ * Gemini 할당량 초과(429) → 다음 모델로 자동 전환
+ * 모든 모델 실패 시 → Mock 모드로 폴백
  */
 
 import { NextRequest, NextResponse } from 'next/server'

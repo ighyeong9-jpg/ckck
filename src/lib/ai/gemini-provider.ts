@@ -1,7 +1,11 @@
 /**
  * Gemini AI Provider
- * 체키 AI 비서의 두뇌 역할 - Gemini 2.5 Flash 모델 사용
+ * 체키 AI 비서의 두뇌 역할 - Gemini Flash 모델 사용
  * Function Calling으로 100+개 도구를 자연어로 연결
+ *
+ * 모델 폴백 체인:
+ *   gemini-2.5-flash (20 RPD 무료) → gemini-2.0-flash (1,500 RPD 무료)
+ *   할당량 초과(429) 시 자동 전환
  */
 
 import {
@@ -589,19 +593,30 @@ export interface GeminiResponse {
   data?: any
 }
 
-export async function callGemini(
+// 모델 폴백 체인: 할당량 초과 시 자동 전환
+// gemini-2.5-flash: 20 RPD (무료) - 더 똑똑함
+// gemini-2.0-flash: 1,500 RPD (무료) - 안정적
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'] as const
+
+function isRateLimitError(error: any): boolean {
+  const msg = error?.message || ''
+  return error?.status === 429
+    || msg.includes('429')
+    || msg.includes('RESOURCE_EXHAUSTED')
+    || msg.includes('quota')
+    || msg.includes('rate limit')
+    || msg.includes('Too Many Requests')
+}
+
+async function callGeminiWithModel(
+  genAI: GoogleGenerativeAI,
+  modelName: string,
   userMessage: string,
   ctx: ProjectContext | null,
   conversationHistory?: Array<{ role: string; content: string }>,
 ): Promise<GeminiResponse> {
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) {
-    throw new Error('GEMINI_API_KEY가 설정되지 않았습니다.')
-  }
-
-  const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: modelName,
     systemInstruction: CHEKI_SYSTEM_PROMPT,
     tools: [TOOL_DECLARATIONS],
   })
@@ -681,4 +696,35 @@ export async function callGemini(
   }
 
   return { message: textResponse }
+}
+
+export async function callGemini(
+  userMessage: string,
+  ctx: ProjectContext | null,
+  conversationHistory?: Array<{ role: string; content: string }>,
+): Promise<GeminiResponse> {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY가 설정되지 않았습니다.')
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey)
+
+  // 모델 폴백 체인: 2.5-flash → 2.0-flash
+  for (let i = 0; i < GEMINI_MODELS.length; i++) {
+    const modelName = GEMINI_MODELS[i]
+    try {
+      const result = await callGeminiWithModel(genAI, modelName, userMessage, ctx, conversationHistory)
+      console.log(`[체키] ${modelName} 응답 성공`)
+      return result
+    } catch (error: any) {
+      if (isRateLimitError(error) && i < GEMINI_MODELS.length - 1) {
+        console.warn(`[체키] ${modelName} 할당량 초과 → ${GEMINI_MODELS[i + 1]}로 자동 전환`)
+        continue
+      }
+      throw error
+    }
+  }
+
+  throw new Error('모든 Gemini 모델의 할당량이 초과되었습니다.')
 }
