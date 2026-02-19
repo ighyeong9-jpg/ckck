@@ -596,7 +596,7 @@ export interface GeminiResponse {
 // 모델 폴백 체인: 할당량 초과 시 자동 전환
 // gemini-2.5-flash: 20 RPD (무료) - 더 똑똑함
 // gemini-2.0-flash: 1,500 RPD (무료) - 안정적
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'] as const
+const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash'] as const
 
 function isRateLimitError(error: any): boolean {
   const msg = error?.message || ''

@@ -704,7 +704,7 @@ async function fallbackToGemini(message: string): Promise<ToolResult> {
   }
 
   // 모델 폴백 체인: 2.5-flash(20RPD) → 2.0-flash(1500RPD)
-  const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash']
+  const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash']
 
   for (let i = 0; i < FALLBACK_MODELS.length; i++) {
     try {
