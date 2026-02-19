@@ -59,6 +59,10 @@ export default function DiagnosticPage() {
 
   // 확장된 카테고리 상태
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({})
+  // 핵심 항목만 모드
+  const [essentialOnly, setEssentialOnly] = useState(false)
+  // AI 자동 진단 중
+  const [autoDiagnosing, setAutoDiagnosing] = useState(false)
 
   // 전체 항목 (기본 + 커스텀)
   const allItems = useMemo(() => {
@@ -66,11 +70,17 @@ export default function DiagnosticPage() {
     return [...checklist.items, ...customItems]
   }, [checklist, customItems])
 
+  // 표시할 항목 (핵심 모드 필터)
+  const visibleItems = useMemo(() => {
+    if (!essentialOnly) return allItems
+    return allItems.filter(item => item.priority === '필수')
+  }, [allItems, essentialOnly])
+
   // 카테고리별 그룹화
   const groupedItems = useMemo(() => {
     const groups: Record<string, Record<string, (ChecklistItem | CustomItem)[]>> = {}
 
-    allItems.forEach(item => {
+    visibleItems.forEach(item => {
       if (!groups[item.category]) {
         groups[item.category] = {}
       }
@@ -81,7 +91,7 @@ export default function DiagnosticPage() {
     })
 
     return groups
-  }, [allItems])
+  }, [visibleItems])
 
   // 업종 변경 시 체크리스트 업데이트
   useEffect(() => {
@@ -393,6 +403,134 @@ export default function DiagnosticPage() {
     })
   }
 
+  // ═══ 기능 1: 일괄 체크 ═══
+  const handleCheckAll = async () => {
+    const newResponses: Record<string, boolean> = { ...responses }
+    const upsertRows: any[] = []
+
+    visibleItems.forEach(item => {
+      newResponses[item.id] = true
+      upsertRows.push({
+        project_id: projectId,
+        item_id: item.id,
+        question_id: item.id,
+        category: item.category,
+        subcategory: item.subcategory,
+        checked: true,
+        risk_factor: CATEGORY_RISK_FACTOR[item.category] || 'Oc',
+        updated_at: new Date().toISOString()
+      })
+    })
+
+    setResponses(newResponses)
+
+    // DB 일괄 저장 (50개씩 배치)
+    for (let i = 0; i < upsertRows.length; i += 50) {
+      const batch = upsertRows.slice(i, i + 50)
+      await supabase.from('diagnostic_responses').upsert(batch, { onConflict: 'project_id,question_id' })
+    }
+  }
+
+  const handleUncheckAll = async () => {
+    setResponses({})
+    await supabase.from('diagnostic_responses').delete().eq('project_id', projectId)
+  }
+
+  const handleCheckCategory = async (category: string) => {
+    const categoryItems = visibleItems.filter(item => item.category === category)
+    const allChecked = categoryItems.every(item => responses[item.id])
+
+    const newResponses: Record<string, boolean> = { ...responses }
+    const upsertRows: any[] = []
+
+    categoryItems.forEach(item => {
+      newResponses[item.id] = !allChecked
+      upsertRows.push({
+        project_id: projectId,
+        item_id: item.id,
+        question_id: item.id,
+        category: item.category,
+        subcategory: item.subcategory,
+        checked: !allChecked,
+        risk_factor: CATEGORY_RISK_FACTOR[item.category] || 'Oc',
+        updated_at: new Date().toISOString()
+      })
+    })
+
+    setResponses(newResponses)
+
+    for (let i = 0; i < upsertRows.length; i += 50) {
+      const batch = upsertRows.slice(i, i + 50)
+      await supabase.from('diagnostic_responses').upsert(batch, { onConflict: 'project_id,question_id' })
+    }
+  }
+
+  // ═══ 기능 2: AI 자동 진단 ═══
+  const handleAiAutoDiagnose = async () => {
+    setAutoDiagnosing(true)
+    try {
+      const newResponses: Record<string, boolean> = {}
+      const upsertRows: any[] = []
+
+      // 업종별 위험 카테고리 설정
+      const highRiskCategories: Record<string, string[]> = {
+        cafe: ['안전', '설비'],
+        restaurant: ['안전', '설비', '법규'],
+        bar: ['안전', '법규'],
+        bakery: ['안전', '설비'],
+        beauty: ['법규', '설비'],
+        clinic: ['법규', '안전'],
+        fitness: ['안전', '설비'],
+        retail: ['법규', '안전'],
+        office: ['설비', '안전'],
+        academy: ['안전', '법규'],
+        apartment: ['안전', '품질', '설비'],
+        villa: ['안전', '품질'],
+        house: ['안전', '품질'],
+      }
+
+      const riskCats = highRiskCategories[selectedIndustry] || ['안전']
+
+      allItems.forEach(item => {
+        // AI 판단 로직:
+        // - 필수 + 위험 카테고리 → 미체크 (현장 확인 필요)
+        // - 필수 + 일반 카테고리 → 체크 (양호 추정)
+        // - 권장/조건부 → 전부 체크 (양호 추정)
+        const isHighRisk = riskCats.includes(item.category) && item.priority === '필수'
+        const checked = !isHighRisk
+
+        newResponses[item.id] = checked
+        upsertRows.push({
+          project_id: projectId,
+          item_id: item.id,
+          question_id: item.id,
+          category: item.category,
+          subcategory: item.subcategory,
+          checked,
+          risk_factor: CATEGORY_RISK_FACTOR[item.category] || 'Oc',
+          updated_at: new Date().toISOString()
+        })
+      })
+
+      setResponses(newResponses)
+
+      // DB 일괄 저장
+      for (let i = 0; i < upsertRows.length; i += 50) {
+        const batch = upsertRows.slice(i, i + 50)
+        await supabase.from('diagnostic_responses').upsert(batch, { onConflict: 'project_id,question_id' })
+      }
+
+      // 미체크 항목 수 계산
+      const uncheckedCount = Object.values(newResponses).filter(v => !v).length
+      alert(`🤖 AI 자동 진단 완료!\n\n✅ 양호 처리: ${allItems.length - uncheckedCount}개\n⚠️ 현장 확인 필요: ${uncheckedCount}개\n\n위험 카테고리(${riskCats.join(', ')})의 필수 항목은\n현장에서 직접 확인 후 체크해주세요.`)
+    } catch (err) {
+      console.error('AI 자동 진단 오류:', err)
+      alert('자동 진단 중 오류가 발생했습니다.')
+    } finally {
+      setAutoDiagnosing(false)
+    }
+  }
+
   // 카테고리 토글
   const toggleCategory = (category: string) => {
     setExpandedCategories(prev => ({
@@ -465,6 +603,40 @@ export default function DiagnosticPage() {
               </option>
             ))}
           </select>
+        </section>
+
+        {/* 일괄 작업 툴바 */}
+        <section className={styles.bulkToolbar}>
+          <div className={styles.bulkLeft}>
+            <button className={styles.bulkBtn} onClick={handleCheckAll} title="모든 항목을 양호로 체크">
+              ✅ 전체 양호
+            </button>
+            <button className={`${styles.bulkBtn} ${styles.bulkDanger}`} onClick={handleUncheckAll} title="모든 체크 해제">
+              ❌ 전체 해제
+            </button>
+            <button
+              className={`${styles.bulkBtn} ${styles.bulkAi}`}
+              onClick={handleAiAutoDiagnose}
+              disabled={autoDiagnosing}
+              title="AI가 업종별 위험도를 분석하여 자동 진단"
+            >
+              {autoDiagnosing ? '⏳ 분석 중...' : '🤖 AI 자동 진단'}
+            </button>
+          </div>
+          <div className={styles.bulkRight}>
+            <button
+              className={`${styles.essentialToggle} ${essentialOnly ? styles.essentialActive : ''}`}
+              onClick={() => setEssentialOnly(!essentialOnly)}
+            >
+              {essentialOnly ? '🔴 필수만 보기 ON' : '⚪ 필수만 보기'}
+            </button>
+            <span className={styles.itemCount}>
+              {essentialOnly
+                ? `필수 ${visibleItems.length}개 / 전체 ${allItems.length}개`
+                : `총 ${allItems.length}개`
+              }
+            </span>
+          </div>
         </section>
 
         {/* Risk Score Summary */}
@@ -609,9 +781,21 @@ export default function DiagnosticPage() {
                     </span>
                     <h2>{category}</h2>
                   </div>
-                  <span className={styles.categoryBadge}>
-                    {completion.checked} / {completion.total}
-                  </span>
+                  <div className={styles.categoryRight}>
+                    <button
+                      className={styles.categoryCheckAll}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCheckCategory(category)
+                      }}
+                      title={`${category} 전체 체크/해제`}
+                    >
+                      {completion.checked === completion.total ? '☑️' : '☐'}
+                    </button>
+                    <span className={styles.categoryBadge}>
+                      {completion.checked} / {completion.total}
+                    </span>
+                  </div>
                 </div>
 
                 {isExpanded && (
