@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { VerificationCertificate, ScoreBreakdown } from '@/types/verification'
 import { GRADE_LABELS, GRADE_COLORS } from '@/types/verification'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function CertificatePage() {
@@ -98,6 +99,11 @@ export default function CertificatePage() {
   return (
     <div className={styles.container}>
       <div className={styles.main}>
+        <QuickActions compact actions={[
+          { icon: '🤖', label: 'AI 검증', description: 'AI 검증 점수 확인', message: 'AI 검증 점수 확인해줘' },
+          { icon: '📜', label: '인증서 발급', description: 'AI 인증서 발급', message: '인증서 발급해줘' },
+        ]} />
+
         {/* 발급 전: AI 검증 카드 */}
         {!certificate && (
           <div className={styles.issueCard}>

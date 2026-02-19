@@ -1,12 +1,12 @@
-.container { min-height: 100vh; background: #f8f9fa; }
+.container { min-height: 100vh; background: var(--color-bg); }
 
 // Loading
 .loading {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 50vh; gap: 1rem; color: #6b7280;
+  min-height: 50vh; gap: 1rem; color: var(--color-text-secondary);
 }
 .spinner {
-  width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #7c3aed;
+  width: 40px; height: 40px; border: 3px solid var(--color-border); border-top-color: var(--color-primary);
   border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -26,81 +26,75 @@
   @media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
 }
 .overviewCard {
-  background: white; border-radius: 16px; padding: 1.25rem;
+  background: var(--card-bg); border-radius: var(--card-radius); padding: 1.25rem;
   display: flex; align-items: center; gap: 1rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-  border: 1px solid rgba(0,0,0,0.03);
-  transition: all 0.25s;
-  &:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  box-shadow: var(--card-shadow);
+  border: var(--card-border);
+  transition: all var(--transition-normal);
+  &:hover { transform: translateY(-3px); box-shadow: var(--card-shadow-hover); }
 }
 .overviewIcon { font-size: 2rem; flex-shrink: 0; }
 .overviewInfo { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
-.overviewLabel { font-size: 0.8rem; color: #6b7280; }
-.overviewValue { font-size: 1.5rem; font-weight: 700; color: #1f2937;
-  &.delayed { color: #ef4444; }
+.overviewLabel { font-size: 0.8rem; color: var(--color-text-secondary); }
+.overviewValue { font-size: 1.5rem; font-weight: 700; color: var(--color-text);
+  &.delayed { color: var(--color-danger); }
 }
-.progressBar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
-.progressFill { height: 100%; background: linear-gradient(90deg, #7c3aed, #a78bfa); border-radius: 4px; transition: width 0.5s; }
+.progressBar { width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; overflow: hidden; }
+.progressFill { height: 100%; background: linear-gradient(90deg, var(--color-primary), #a78bfa); border-radius: 4px; transition: width 0.5s; }
 
 // Actions + View Toggle
 .actions {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
 }
 .viewToggle {
-  display: flex; background: white; border-radius: 10px; overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex; background: var(--card-bg); border-radius: var(--radius-md); overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 .viewBtn {
   padding: 0.6rem 1.25rem; border: none; background: transparent;
-  font-size: 0.85rem; font-weight: 500; color: #6b7280; cursor: pointer; transition: all 0.15s;
+  font-size: 0.85rem; font-weight: 500; color: var(--color-text-secondary); cursor: pointer; transition: all var(--transition-fast);
   &:hover { color: #4f46e5; }
-  &.active { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; font-weight: 600; }
+  &.active { background: linear-gradient(135deg, #4f46e5, var(--color-primary)); color: white; font-weight: 600; }
 }
-.actionBtns {
-  display: flex; gap: 0.75rem;
-}
+.actionBtns { display: flex; gap: 0.75rem; }
 .templateBtn {
-  padding: 0.75rem 1.5rem; background: white; border: 2px solid #e5e7eb;
-  border-radius: 10px; color: #374151; font-weight: 600; cursor: pointer; transition: all 0.2s;
-  &:hover { border-color: #7c3aed; color: #7c3aed; transform: translateY(-2px); }
+  padding: 0.75rem 1.5rem; background: var(--card-bg); border: 2px solid var(--color-border);
+  border-radius: var(--radius-md); color: var(--color-text); font-weight: var(--btn-font-weight); cursor: pointer; transition: all var(--transition-fast);
+  &:hover { border-color: var(--color-primary); color: var(--color-primary); transform: translateY(-2px); }
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 .addBtn {
-  padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; transition: all 0.2s;
-  &:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+  padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4f46e5, var(--color-primary));
+  border: none; border-radius: var(--radius-md); color: white; font-weight: var(--btn-font-weight); cursor: pointer; transition: all var(--transition-fast);
+  &:hover { transform: translateY(-2px); box-shadow: var(--shadow-purple); }
 }
 
 // Status Legend
-.statusLegend {
-  display: flex; gap: 1.25rem; margin-bottom: 1rem; flex-wrap: wrap;
-}
-.legendItem { display: flex; align-items: center; gap: 0.375rem; font-size: 0.8rem; color: #6b7280; }
+.statusLegend { display: flex; gap: 1.25rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.legendItem { display: flex; align-items: center; gap: 0.375rem; font-size: 0.8rem; color: var(--color-text-secondary); }
 .legendDot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
 // ===== GANTT CHART =====
 .ganttSection { margin-bottom: 1.5rem; }
 .ganttChart {
-  background: white; border-radius: 16px; overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-  border: 1px solid rgba(0,0,0,0.03);
+  background: var(--card-bg); border-radius: var(--card-radius); overflow: hidden;
+  box-shadow: var(--card-shadow);
+  border: var(--card-border);
 }
 
 .ganttHeader {
-  display: flex; background: #f9fafb; border-bottom: 1px solid #e5e7eb; font-size: 0.75rem; color: #6b7280;
+  display: flex; background: var(--color-bg); border-bottom: 1px solid var(--color-border); font-size: 0.75rem; color: var(--color-text-secondary);
 }
 .ganttLabelCol {
   width: 220px; flex-shrink: 0; padding: 0.75rem 1rem;
   display: flex; align-items: center; gap: 0.5rem;
-  font-weight: 600; border-right: 1px solid #e5e7eb;
+  font-weight: 600; border-right: 1px solid var(--color-border);
   @media (max-width: 768px) { width: 140px; }
 }
-.ganttTimelineCol {
-  flex: 1; position: relative; min-height: 36px; overflow: hidden;
-}
+.ganttTimelineCol { flex: 1; position: relative; min-height: 36px; overflow: hidden; }
 .ganttTick {
   position: absolute; top: 50%; transform: translateY(-50%);
-  font-size: 0.65rem; color: #9ca3af; white-space: nowrap;
+  font-size: 0.65rem; color: var(--color-text-muted); white-space: nowrap;
 }
 
 // Gantt Body
@@ -110,140 +104,130 @@
   &::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 2px; }
 }
 .ganttRow {
-  display: flex; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background 0.1s;
-  &:hover { background: #faf5ff; }
+  display: flex; border-bottom: 1px solid var(--color-border-light); cursor: pointer; transition: background var(--transition-fast);
+  &:hover { background: rgba(124,58,237,0.04); }
   &:last-child { border-bottom: none; }
 }
 .ganttIndex {
-  width: 24px; height: 24px; background: linear-gradient(135deg, #7c3aed, #a78bfa);
-  color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; background: linear-gradient(135deg, var(--color-primary), #a78bfa);
+  color: white; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;
   font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
 }
 .ganttName {
-  flex: 1; font-size: 0.8rem; font-weight: 500; color: #1f2937;
+  flex: 1; font-size: 0.8rem; font-weight: 500; color: var(--color-text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.ganttPct {
-  font-size: 0.7rem; font-weight: 600; color: #7c3aed; flex-shrink: 0;
-}
+.ganttPct { font-size: 0.7rem; font-weight: 600; color: var(--color-primary); flex-shrink: 0; }
 
 // Gantt Bar
 .ganttBar {
   position: absolute; top: 8px; height: 20px; border-radius: 4px;
-  min-width: 4px; opacity: 0.85; transition: opacity 0.15s;
+  min-width: 4px; opacity: 0.85; transition: opacity var(--transition-fast);
   .ganttRow:hover & { opacity: 1; }
 }
-.ganttBarProgress {
-  height: 100%; background: rgba(255,255,255,0.35); border-radius: 4px;
-}
+.ganttBarProgress { height: 100%; background: rgba(255,255,255,0.35); border-radius: 4px; }
 .ganttNoDate {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  font-size: 0.7rem; color: #d1d5db;
+  font-size: 0.7rem; color: var(--color-border);
 }
 
 // Gantt Grid + Today
-.ganttGridLine {
-  position: absolute; top: 0; bottom: 0; width: 1px; background: #f3f4f6;
-}
+.ganttGridLine { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--color-border-light); }
 .ganttToday {
   position: absolute; top: 0; bottom: 0; width: 0; z-index: 2;
-  border-left: 2px dashed #ef4444;
+  border-left: 2px dashed var(--color-danger);
 }
 .ganttRowDelayed {
   background: #fef2f2 !important;
-  border-left: 3px solid #ef4444;
+  border-left: 3px solid var(--color-danger);
   &:hover { background: #fee2e2 !important; }
 }
 
 // Gantt Footer
 .ganttFooter {
-  padding: 0.5rem 1rem; background: #f9fafb; border-top: 1px solid #e5e7eb;
-  font-size: 0.7rem; color: #6b7280;
+  padding: 0.5rem 1rem; background: var(--color-bg); border-top: 1px solid var(--color-border);
+  font-size: 0.7rem; color: var(--color-text-secondary);
 }
 .ganttTodayLabel { display: flex; align-items: center; gap: 0.375rem; }
-.ganttTodayDot {
-  width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;
-}
+.ganttTodayDot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-danger); display: inline-block; }
 
 // ===== LIST VIEW =====
 .processList { display: flex; flex-direction: column; gap: 0.75rem; }
 .processCard {
-  display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: white;
-  border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-  transition: all 0.2s;
-  &:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: var(--card-bg);
+  border-radius: var(--card-radius); box-shadow: var(--card-shadow); border: var(--card-border);
+  transition: all var(--transition-fast);
+  &:hover { transform: translateY(-1px); box-shadow: var(--card-shadow-hover); }
   @media (max-width: 768px) { flex-wrap: wrap; }
 }
-.processCardDelayed {
-  border: 2px solid #ef4444;
-  background: #fef2f2;
-}
+.processCardDelayed { border: 2px solid var(--color-danger); background: #fef2f2; }
 .processIndex {
-  width: 36px; height: 36px; background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  width: 36px; height: 36px; background: linear-gradient(135deg, var(--color-primary), #a78bfa);
   color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
   font-weight: 700; flex-shrink: 0;
 }
 .processInfo {
   flex: 1;
-  h3 { font-size: 1rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; }
-  p { font-size: 0.85rem; color: #6b7280; margin-bottom: 0.25rem; }
+  h3 { font-size: 1rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.25rem; }
+  p { font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 0.25rem; }
 }
-.processDates { display: flex; gap: 1rem; font-size: 0.75rem; color: #9ca3af; }
+.processDates { display: flex; gap: 1rem; font-size: 0.75rem; color: var(--color-text-muted); }
 .processProgress {
   display: flex; align-items: center; gap: 0.5rem; min-width: 120px;
-  span { font-size: 0.85rem; font-weight: 600; color: #7c3aed; min-width: 40px; text-align: right; }
+  span { font-size: 0.85rem; font-weight: 600; color: var(--color-primary); min-width: 40px; text-align: right; }
 }
-.progressBarSmall { flex: 1; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
-.progressFillSmall { height: 100%; background: linear-gradient(90deg, #7c3aed, #a78bfa); border-radius: 3px; transition: width 0.3s; }
+.progressBarSmall { flex: 1; height: 6px; background: var(--color-border); border-radius: 3px; overflow: hidden; }
+.progressFillSmall { height: 100%; background: linear-gradient(90deg, var(--color-primary), #a78bfa); border-radius: 3px; transition: width 0.3s; }
 .statusSelect {
-  padding: 0.5rem 0.75rem; border: none; border-radius: 20px;
+  padding: 0.5rem 0.75rem; border: none; border-radius: var(--radius-full);
   font-size: 0.75rem; font-weight: 600; cursor: pointer; min-width: 80px;
 }
 .processActions {
   display: flex; gap: 0.5rem;
   button {
-    padding: 0.5rem 1rem; border: none; border-radius: 8px; font-size: 0.8rem; cursor: pointer;
-    font-weight: 500; transition: all 0.15s;
-    &:first-child { background: #e0e7ff; color: #4f46e5; &:hover { background: #c7d2fe; } }
-    &:last-child { background: #fee2e2; color: #dc2626; &:hover { background: #fecaca; } }
+    padding: 0.5rem 1rem; border: none; border-radius: var(--radius-sm); font-size: 0.8rem; cursor: pointer;
+    font-weight: 500; transition: all var(--transition-fast);
+    &:first-child { background: var(--color-primary-light); color: #4f46e5; &:hover { background: rgba(124,58,237,0.15); } }
+    &:last-child { background: var(--color-danger-light); color: var(--color-danger-hover); &:hover { background: rgba(239,68,68,0.15); } }
   }
 }
 
 // Empty State
 .emptyState {
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  padding: 3rem 2rem; background: white; border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  h3 { font-size: 1.1rem; font-weight: 600; color: #374151; margin: 0.75rem 0 0.5rem; }
-  p { font-size: 0.85rem; color: #9ca3af; line-height: 1.6; margin-bottom: 1rem; }
+  padding: 3rem 2rem; background: var(--card-bg); border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow); border: var(--card-border);
+  h3 { font-size: 1.1rem; font-weight: 600; color: var(--color-text); margin: 0.75rem 0 0.5rem; }
+  p { font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 1rem; }
 }
 .emptyIcon { font-size: 3rem; display: block; }
 .emptyBtn {
-  padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  border: none; border-radius: 10px; color: white; font-weight: 600; font-size: 0.875rem;
-  cursor: pointer; transition: all 0.2s;
-  &:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+  padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4f46e5, var(--color-primary));
+  border: none; border-radius: var(--radius-md); color: white; font-weight: var(--btn-font-weight); font-size: 0.875rem;
+  cursor: pointer; transition: all var(--transition-fast);
+  &:hover { transform: translateY(-2px); box-shadow: var(--shadow-purple); }
 }
 
 // Modal
 .modalOverlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
   display: flex; align-items: center; justify-content: center;
   z-index: 1000; padding: 1rem; animation: fadeIn 0.2s;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .modal {
-  background: white; border-radius: 16px; width: 100%; max-width: 500px;
-  max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  background: var(--card-bg); border-radius: var(--card-radius); width: 100%; max-width: 500px;
+  max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg);
   animation: slideUp 0.25s ease;
 }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .modalHeader {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 1.5rem; border-bottom: 1px solid #e5e7eb;
+  padding: 1.5rem; border-bottom: 1px solid var(--color-border);
   h2 { font-size: 1.25rem; font-weight: 600; }
-  button { background: #f3f4f6; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
-    &:hover { background: #e5e7eb; }
+  button { background: var(--color-border-light); border: none; width: 32px; height: 32px; border-radius: var(--radius-sm); cursor: pointer;
+    transition: background var(--transition-fast);
+    &:hover { background: var(--color-border); }
   }
 }
 .modalForm { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
@@ -253,22 +237,23 @@
 }
 .formGroup {
   display: flex; flex-direction: column; gap: 0.5rem;
-  label { font-size: 0.875rem; font-weight: 600; color: #374151; }
+  label { font-size: 0.875rem; font-weight: 600; color: var(--color-text); }
   input, select, textarea {
-    padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 1rem;
-    transition: all 0.2s;
-    &:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+    padding: var(--input-padding); border: var(--input-border); border-radius: var(--input-radius); font-size: 1rem;
+    transition: all var(--transition-fast);
+    &:focus { outline: none; border-color: var(--color-primary); box-shadow: var(--input-focus-ring); }
   }
 }
 .modalActions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
 .cancelBtn {
-  flex: 1; padding: 0.875rem; background: #f3f4f6; border: none; border-radius: 10px;
-  font-weight: 600; cursor: pointer; &:hover { background: #e5e7eb; }
+  flex: 1; padding: 0.875rem; background: var(--color-border-light); border: none; border-radius: var(--btn-radius);
+  font-weight: var(--btn-font-weight); cursor: pointer; transition: background var(--transition-fast);
+  &:hover { background: var(--color-border); }
 }
 .submitBtn {
-  flex: 1; padding: 0.875rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer;
-  transition: all 0.2s;
-  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+  flex: 1; padding: 0.875rem; background: linear-gradient(135deg, #4f46e5, var(--color-primary));
+  border: none; border-radius: var(--btn-radius); color: white; font-weight: var(--btn-font-weight); cursor: pointer;
+  transition: all var(--transition-fast);
+  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-purple); }
   &:disabled { opacity: 0.7; cursor: not-allowed; }
 }

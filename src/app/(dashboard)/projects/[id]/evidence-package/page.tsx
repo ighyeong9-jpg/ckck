@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { EvidenceFile } from '@/types/evidenceFile'
 import { FILE_CATEGORIES } from '@/types/evidenceFile'
 import { getMerkleRoot, verifyEvidencePackage, type VerificationResult } from '@/lib/utils/merkleTree'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function EvidencePackagePage() {
@@ -284,6 +285,12 @@ export default function EvidencePackagePage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        {/* AI Quick Actions */}
+        <QuickActions compact actions={[
+          { icon: '📁', label: '증빙 현황', description: '증빙 패키지 현황 조회', message: '증빙 패키지 현황 조회해줘' },
+          { icon: '✅', label: '무결성 검증', description: '증빙 무결성 검증', message: '증빙 무결성 검증해줘' },
+        ]} />
+
         {/* Summary */}
         <section className={styles.summary}>
           <div className={styles.summaryCard}>

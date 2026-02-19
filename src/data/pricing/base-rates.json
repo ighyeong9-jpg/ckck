@@ -1,0 +1,42 @@
+{
+  "trades": {
+    "demolition": { "name": "철거", "unit": "pyeong", "economy": 150000, "standard": 200000, "premium": 250000, "luxury": 350000 },
+    "electrical": { "name": "전기", "unit": "pyeong", "economy": 200000, "standard": 280000, "premium": 380000, "luxury": 500000 },
+    "plumbing": { "name": "배관", "unit": "pyeong", "economy": 180000, "standard": 250000, "premium": 350000, "luxury": 450000 },
+    "waterproof": { "name": "방수", "unit": "pyeong", "economy": 80000, "standard": 120000, "premium": 180000, "luxury": 250000 },
+    "hvac": { "name": "냉난방", "unit": "set", "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 },
+    "woodwork": { "name": "목공", "unit": "pyeong", "economy": 300000, "standard": 450000, "premium": 650000, "luxury": 900000 },
+    "tiling": { "name": "타일", "unit": "pyeong", "economy": 200000, "standard": 300000, "premium": 500000, "luxury": 800000 },
+    "wallpaper": { "name": "도배", "unit": "pyeong", "economy": 80000, "standard": 120000, "premium": 200000, "luxury": 350000 },
+    "painting": { "name": "페인팅", "unit": "pyeong", "economy": 60000, "standard": 100000, "premium": 180000, "luxury": 300000 },
+    "flooring": { "name": "바닥재", "unit": "pyeong", "economy": 150000, "standard": 250000, "premium": 400000, "luxury": 700000 },
+    "door": { "name": "문", "unit": "ea", "economy": 200000, "standard": 350000, "premium": 600000, "luxury": 1000000 },
+    "window": { "name": "창호", "unit": "ea", "economy": 300000, "standard": 500000, "premium": 800000, "luxury": 1500000 },
+    "lighting": { "name": "조명", "unit": "pyeong", "economy": 100000, "standard": 180000, "premium": 300000, "luxury": 500000 },
+    "furniture": { "name": "가구", "unit": "set", "economy": 2000000, "standard": 5000000, "premium": 10000000, "luxury": 20000000 },
+    "signage": { "name": "간판", "unit": "set", "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 5000000 },
+    "fire_safety": { "name": "소방", "unit": "pyeong", "economy": 80000, "standard": 120000, "premium": 180000, "luxury": 250000 },
+    "cleaning": { "name": "입주청소", "unit": "pyeong", "economy": 30000, "standard": 50000, "premium": 80000, "luxury": 120000 },
+    "glass": { "name": "유리", "unit": "ea", "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 },
+    "metal": { "name": "금속/철물", "unit": "pyeong", "economy": 100000, "standard": 180000, "premium": 300000, "luxury": 500000 },
+    "curtain_wall": { "name": "커튼월", "unit": "sqm", "economy": 400000, "standard": 600000, "premium": 900000, "luxury": 1500000 },
+    "soundproof": { "name": "방음", "unit": "pyeong", "economy": 150000, "standard": 250000, "premium": 400000, "luxury": 600000 },
+    "ceiling": { "name": "천장", "unit": "pyeong", "economy": 80000, "standard": 150000, "premium": 250000, "luxury": 400000 },
+    "staircase": { "name": "계단", "unit": "set", "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 8000000 },
+    "elevator": { "name": "엘리베이터", "unit": "set", "economy": 15000000, "standard": 25000000, "premium": 40000000, "luxury": 70000000 }
+  },
+  "overhead": {
+    "waste_disposal": { "name": "폐기물처리", "rate": 0.03 },
+    "supervision": { "name": "감리비", "rate": 0.05 },
+    "insurance": { "name": "보험료", "rate": 0.02 },
+    "vat": { "name": "부가세", "rate": 0.10 },
+    "contingency": { "name": "예비비", "rate": 0.05 }
+  },
+  "location_multiplier": {
+    "seoul_gangnam": { "name": "서울 강남권", "multiplier": 1.3 },
+    "seoul": { "name": "서울", "multiplier": 1.15 },
+    "gyeonggi": { "name": "경기", "multiplier": 1.0 },
+    "metro": { "name": "광역시", "multiplier": 0.95 },
+    "rural": { "name": "지방", "multiplier": 0.85 }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "factory",
+  "name": "공장/제조시설",
+  "icon": "🏭",
+  "description": "공장/제조시설 인테리어 체크리스트",
+  "items": [
+    {"id": "factory-safety-001", "category": "안전", "subcategory": "소방", "item": "소화 설비 설치 확인 (위험물 대응)", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "factory-safety-002", "category": "안전", "subcategory": "소방", "item": "화재감지기 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "factory-safety-003", "category": "안전", "subcategory": "소방", "item": "비상구 확보 및 유도등 설치", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "factory-safety-004", "category": "안전", "subcategory": "소방", "item": "방화구획 설치 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "factory-safety-005", "category": "안전", "subcategory": "전기", "item": "누전차단기 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "factory-safety-006", "category": "안전", "subcategory": "전기", "item": "동력 전원 (3상) 설치 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "factory-safety-007", "category": "안전", "subcategory": "통로", "item": "안전통로 확보 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "factory-safety-008", "category": "안전", "subcategory": "위험물", "item": "위험물 보관소 설치 확인", "priority": "조건부", "method": "육안확인", "evidence": "사진"},
+    {"id": "factory-legal-001", "category": "법규", "subcategory": "산업안전", "item": "산업안전보건법 기준 충족 확인", "priority": "필수", "method": "육안확인", "evidence": "점검표"},
+    {"id": "factory-legal-002", "category": "법규", "subcategory": "환경", "item": "배출시설 허가 확인", "priority": "조건부", "method": "육안확인", "evidence": "점검표"},
+    {"id": "factory-legal-003", "category": "법규", "subcategory": "건축", "item": "건축물 용도 적합 확인", "priority": "필수", "method": "육안확인", "evidence": "점검표"},
+    {"id": "factory-quality-001", "category": "품질", "subcategory": "바닥", "item": "바닥 내하중 확인 (기계 무게)", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "factory-quality-002", "category": "품질", "subcategory": "바닥", "item": "바닥 내화학성 확인 (해당시)", "priority": "조건부", "method": "육안확인", "evidence": "점검표"},
+    {"id": "factory-quality-003", "category": "품질", "subcategory": "구조", "item": "구조 하중/진동 검토 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "factory-quality-004", "category": "품질", "subcategory": "소음", "item": "소음 차단 처리 확인", "priority": "권장", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "factory-equip-001", "category": "설비", "subcategory": "환기", "item": "유해가스/분진 배출 환기 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "factory-equip-002", "category": "설비", "subcategory": "전기", "item": "분전반 용량 확인 (동력/조명)", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "factory-equip-003", "category": "설비", "subcategory": "배수", "item": "산업폐수 배수 시스템 확인", "priority": "조건부", "method": "작동확인", "evidence": "점검표"},
+    {"id": "factory-equip-004", "category": "설비", "subcategory": "조명", "item": "작업장 조도 확인 (작업별 기준)", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "factory-equip-005", "category": "설비", "subcategory": "크레인", "item": "크레인 레일 설치 확인 (해당시)", "priority": "조건부", "method": "육안확인", "evidence": "사진"},
+    {"id": "factory-finish-001", "category": "마감", "subcategory": "바닥", "item": "바닥 에폭시/우레탄 마감 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "factory-finish-002", "category": "마감", "subcategory": "하역장", "item": "하역장 설치 확인", "priority": "권장", "method": "육안확인", "evidence": "사진"},
+    {"id": "factory-finish-003", "category": "마감", "subcategory": "사무실", "item": "사무실 마감 확인", "priority": "권장", "method": "육안확인", "evidence": "사진"},
+    {"id": "factory-finish-004", "category": "마감", "subcategory": "화장실", "item": "화장실 마감 및 위생시설 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "factory-finish-005", "category": "마감", "subcategory": "출입구", "item": "출입문/셔터 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"}
+  ]
+}

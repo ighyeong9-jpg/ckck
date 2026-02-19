@@ -1,201 +1,70 @@
-.container {
-  min-height: 100vh;
-  background: #f8f9fa;
-}
+.container { min-height: 100vh; background: var(--color-bg); }
 
 .loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  color: #6b7280;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 50vh; color: var(--color-text-secondary);
 }
 
 .header {
   background: linear-gradient(135deg, #6366f1, #818cf8);
-  padding: 2rem;
-  color: white;
+  padding: 2rem; color: white;
 }
+.title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+.subtitle { font-size: 0.875rem; opacity: 0.9; }
 
-.title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
+.main { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
 
-.subtitle {
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-.main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-
-.summary {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
+.summary { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
 .summaryCard {
-  flex: 1;
-  background: linear-gradient(135deg, #ffffff, #f0f0ff);
-  border-radius: 14px;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  flex: 1; background: linear-gradient(135deg, var(--card-bg), rgba(124,58,237,0.04));
+  border-radius: var(--card-radius); padding: var(--card-padding);
+  display: flex; align-items: center; gap: 1rem;
+  box-shadow: var(--card-shadow); border: var(--card-border);
 }
-
-.summaryIcon {
-  font-size: 2rem;
-}
-
-.summaryValue {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.summaryLabel {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
+.summaryIcon { font-size: 2rem; }
+.summaryValue { display: block; font-size: 1.5rem; font-weight: 700; color: var(--color-text); }
+.summaryLabel { font-size: 0.875rem; color: var(--color-text-secondary); }
 
 .reportsList {
-  background: white;
-  border-radius: 14px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-
-  h2 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
+  background: var(--card-bg); border-radius: var(--card-radius); padding: var(--card-padding);
+  box-shadow: var(--card-shadow); border: var(--card-border);
+  h2 { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; }
 }
 
 .emptyState {
-  text-align: center;
-  padding: 3rem;
-
-  span {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    color: #6b7280;
-    margin-bottom: 1rem;
-  }
-
+  text-align: center; padding: 3rem;
+  span { font-size: 3rem; display: block; margin-bottom: 1rem; }
+  p { color: var(--color-text-secondary); margin-bottom: 1rem; }
   button {
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-    }
+    padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4f46e5, var(--color-primary));
+    border: none; border-radius: var(--radius-sm); color: white; cursor: pointer;
+    transition: all var(--transition-fast);
+    &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-purple); }
   }
 }
 
 .reportsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;
 }
-
 .reportCard {
-  background: #f9fafb;
-  border-radius: 14px;
-  padding: 1.25rem;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
+  background: var(--color-bg); border-radius: var(--card-radius); padding: 1.25rem;
+  border: 1px solid var(--color-border); box-shadow: var(--card-shadow);
+  transition: all var(--transition-fast);
+  &:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
 }
-
-.reportHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.reportIcon {
-  font-size: 1.5rem;
-}
-
-.reportType {
-  font-size: 0.75rem;
-  color: #6366f1;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.reportCard h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-}
-
-.projectName {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 0.75rem;
-}
-
-.reportMeta {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin-bottom: 0.5rem;
-}
-
-.reportDate {
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin-bottom: 0.75rem;
-}
-
+.reportHeader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+.reportIcon { font-size: 1.5rem; }
+.reportType { font-size: 0.75rem; color: #6366f1; font-weight: 600; text-transform: uppercase; }
+.reportCard h3 { font-size: 1rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.25rem; }
+.projectName { font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.75rem; }
+.reportMeta { display: flex; gap: 1rem; font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 0.5rem; }
+.reportDate { font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 0.75rem; }
 .reportActions {
-  display: flex;
-  gap: 0.5rem;
-
+  display: flex; gap: 0.5rem;
   button {
-    flex: 1;
-    padding: 0.5rem;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    cursor: pointer;
-
-    &:first-child {
-      background: #e0e7ff;
-      color: #4f46e5;
-    }
-
-    &:last-child {
-      background: #fee2e2;
-      color: #dc2626;
-    }
+    flex: 1; padding: 0.5rem; border: none; border-radius: var(--radius-sm);
+    font-size: 0.875rem; cursor: pointer; transition: all var(--transition-fast);
+    &:first-child { background: var(--color-primary-light); color: #4f46e5; }
+    &:last-child { background: var(--color-danger-light); color: var(--color-danger-hover); }
   }
 }

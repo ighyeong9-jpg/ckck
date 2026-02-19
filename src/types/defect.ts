@@ -1,5 +1,5 @@
 export type DefectSeverity = 'low' | 'medium' | 'high' | 'critical'
-export type DefectStatus = 'reported' | 'reviewing' | 'repairing' | 'completed'
+export type DefectStatus = 'reported' | 'in_progress' | 'resolved' | 'closed'
 
 export interface Defect {
   id: string
@@ -27,7 +27,7 @@ export const DEFECT_SEVERITIES = [
 
 export const DEFECT_STATUSES = [
   { id: 'reported' as const, name: '요청됨', color: '#6b7280' },
-  { id: 'reviewing' as const, name: '확인 중', color: '#3b82f6' },
-  { id: 'repairing' as const, name: '수리 중', color: '#f59e0b' },
-  { id: 'completed' as const, name: '완료', color: '#10b981' },
+  { id: 'in_progress' as const, name: '처리 중', color: '#3b82f6' },
+  { id: 'resolved' as const, name: '해결됨', color: '#f59e0b' },
+  { id: 'closed' as const, name: '완료', color: '#10b981' },
 ]

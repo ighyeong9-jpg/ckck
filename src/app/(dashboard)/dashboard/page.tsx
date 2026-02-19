@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import dynamic from 'next/dynamic'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 const PieChart = dynamic(() => import('recharts').then(m => m.PieChart), { ssr: false })
@@ -475,6 +476,17 @@ export default function DashboardPage() {
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 0 1 0 4H8"/><path d="M12 18V6"/></svg>
           </div>
         </section>
+
+        {/* AI Quick Actions */}
+        <QuickActions
+          title="AI 체키 바로가기"
+          actions={[
+            { icon: '💰', label: 'AI 자동 견적', description: '업종별 표준 견적 자동 생성', message: '표준 견적 자동으로 생성해줘', color: '#7c3aed' },
+            { icon: '📈', label: '리스크 분석', description: '전체 프로젝트 리스크 현황', message: '전체 리스크 현황 분석해줘', color: '#ef4444' },
+            { icon: '📋', label: '오늘 할일', description: '오늘 해야 할 작업 확인', message: '오늘 해야 할 작업 알려줘', color: '#3b82f6' },
+            { icon: '📊', label: '대시보드 요약', description: 'AI가 현황을 종합 분석', message: '대시보드 요약해줘', color: '#10b981' },
+          ]}
+        />
 
         {/* Charts Row 1: Risk Donut + Risk Gauge */}
         <div className={styles.chartsRow}>

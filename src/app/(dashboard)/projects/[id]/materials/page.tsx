@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Material, MaterialStatus } from '@/types/material'
 import { MATERIAL_STATUS, MATERIAL_CATEGORIES } from '@/types/material'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function MaterialsPage() {
@@ -228,6 +229,12 @@ export default function MaterialsPage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <QuickActions compact actions={[
+          { icon: '📦', label: '재고 현황', description: '자재 재고 조회', message: '자재 재고 현황 알려줘' },
+          { icon: '💰', label: '자재비 분석', description: '자재비 현황 분석', message: '자재비 현황 알려줘' },
+          { icon: '🛒', label: '발주 안내', description: '부족 자재 발주', message: '부족한 자재 발주해줘' },
+        ]} />
+
         {/* Stats Overview */}
         <section className={styles.stats}>
           <div className={styles.statCard}>

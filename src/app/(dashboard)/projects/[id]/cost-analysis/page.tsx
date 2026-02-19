@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { COST_FACTORS } from '@/types/costAnalysis'
 import { calculateCost, formatKRW, type CostFactor } from '@/lib/utils/costCalculator'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function CostAnalysisPage() {
@@ -159,6 +160,12 @@ export default function CostAnalysisPage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <QuickActions compact actions={[
+          { icon: '💵', label: '적정가 분석', description: '비용 적정성 분석', message: '비용 적정성 분석해줘' },
+          { icon: '📉', label: '비용 예측', description: 'AI 비용 예측', message: '비용 예측해줘' },
+          { icon: '📊', label: '예산 대비', description: '예산 대비 실제 지출', message: '예산 대비 실제 지출 비교해줘' },
+        ]} />
+
         {/* Formula Card */}
         <section className={styles.formulaCard}>
           <div className={styles.formulaHeader}>

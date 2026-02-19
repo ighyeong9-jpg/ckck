@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--color-bg);
 }
 
 .loading {
@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 // Main
@@ -24,29 +24,29 @@
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  background: white;
+  background: var(--card-bg);
   padding: 1rem 1.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .industryLabel {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .industrySelect {
   flex: 1;
   max-width: 300px;
   padding: 0.75rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
-  color: #374151;
-  background: white;
+  color: var(--color-text);
+  background: var(--card-bg);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:focus {
     outline: none;
@@ -55,14 +55,14 @@
   }
 
   &:hover {
-    border-color: #9ca3af;
+    border-color: var(--color-text-muted);
   }
 }
 
 // Risk Summary
 .riskSummary {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -123,7 +123,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
 
   strong {
@@ -147,12 +147,12 @@
 
 .riskName {
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .riskBar {
   height: 8px;
-  background: #e5e7eb;
+  background: var(--color-border);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -160,25 +160,25 @@
 .riskFill {
   height: 100%;
   border-radius: 4px;
-  transition: width 0.3s ease;
+  transition: width var(--transition-slow) ease;
 
   &.riskLow {
-    background: #10b981;
+    background: var(--color-success);
   }
 
   &.riskMedium {
-    background: #f59e0b;
+    background: var(--color-warning);
   }
 
   &.riskHigh {
-    background: #ef4444;
+    background: var(--color-danger);
   }
 }
 
 .riskPercent {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text);
   text-align: right;
 }
 
@@ -188,9 +188,9 @@
   border: none;
   border-radius: 10px;
   color: white;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
   white-space: nowrap;
 
   &:hover:not(:disabled) {
@@ -207,10 +207,10 @@
 // GO/NO-GO Card - Premium style
 .gonogoCard {
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
-  padding: 1.75rem; border-radius: 20px; color: white; margin-bottom: 1.5rem;
+  padding: 1.75rem; border-radius: var(--radius-xl); color: white; margin-bottom: 1.5rem;
   box-shadow: 0 8px 32px rgba(79, 70, 229, 0.35);
   position: relative; overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
   &:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(79, 70, 229, 0.4); }
   &::before {
     content: ''; position: absolute; top: -30%; right: -10%;
@@ -243,8 +243,8 @@
   @media (max-width: 768px) { grid-template-columns: repeat(3, 1fr); }
 }
 .factor {
-  padding: 0.875rem; border-radius: 12px; text-align: center;
-  backdrop-filter: blur(4px); transition: transform 0.15s;
+  padding: 0.875rem; border-radius: var(--radius-md); text-align: center;
+  backdrop-filter: blur(4px); transition: transform var(--transition-fast);
   &:hover { transform: scale(1.03); }
   &.pass { background: rgba(16, 185, 129, 0.2); }
   &.warn { background: rgba(245, 158, 11, 0.2); }
@@ -269,14 +269,14 @@
 .addCustomBtn {
   width: 100%;
   padding: 1rem;
-  background: white;
+  background: var(--card-bg);
   border: 2px dashed #4f46e5;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: #4f46e5;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:hover {
     background: #f0f0ff;
@@ -292,8 +292,8 @@
 }
 
 .category {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -304,12 +304,12 @@
   align-items: center;
   padding: 1rem 1.5rem;
   background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background var(--transition-normal);
 
   &:hover {
-    background: #f3f4f6;
+    background: var(--color-border-light);
   }
 }
 
@@ -321,14 +321,14 @@
   h2 {
     font-size: 1rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-text);
     margin: 0;
   }
 }
 
 .expandIcon {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .categoryBadge {
@@ -336,7 +336,7 @@
   padding: 0.25rem 0.75rem;
   background: #e0e7ff;
   color: #4f46e5;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   font-weight: 600;
 }
 
@@ -357,10 +357,10 @@
 .subcategoryTitle {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   padding: 0.5rem 0;
   margin: 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border-light);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -376,8 +376,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #f3f4f6;
-  transition: all 0.2s;
+  border-bottom: 1px solid var(--color-border-light);
+  transition: all var(--transition-normal);
 
   &:last-child {
     border-bottom: none;
@@ -387,7 +387,7 @@
     background: #fafafa;
     margin: 0 -0.5rem;
     padding: 0.75rem 0.5rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
   }
 
   &.checked {
@@ -396,8 +396,8 @@
     }
 
     .checkbox {
-      background: #10b981;
-      border-color: #10b981;
+      background: var(--color-success);
+      border-color: var(--color-success);
     }
   }
 
@@ -405,12 +405,12 @@
     background: #fef3c7;
     margin: 0.25rem -0.5rem;
     padding: 0.75rem 0.5rem;
-    border-radius: 8px;
-    border: 1px dashed #f59e0b;
+    border-radius: var(--radius-sm);
+    border: 1px dashed var(--color-warning);
 
     &.checked {
       background: #d1fae5;
-      border-color: #10b981;
+      border-color: var(--color-success);
     }
   }
 }
@@ -437,14 +437,14 @@
   justify-content: center;
   font-size: 0.75rem;
   color: white;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
   flex-shrink: 0;
 }
 
 .itemText {
   flex: 1;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .itemMeta {
@@ -463,7 +463,7 @@
 
   &.priorityRequired {
     background: #fee2e2;
-    color: #dc2626;
+    color: var(--color-danger-hover);
   }
 
   &.priorityRecommended {
@@ -480,8 +480,8 @@
 .methodBadge {
   font-size: 0.7rem;
   padding: 0.2rem 0.5rem;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--color-border-light);
+  color: var(--color-text-secondary);
   border-radius: 4px;
 }
 
@@ -499,7 +499,7 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 }
 
 .editBtn {
@@ -513,7 +513,7 @@
 
 .deleteBtn {
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--color-danger-hover);
 
   &:hover {
     background: #fecaca;
@@ -536,8 +536,8 @@
 }
 
 .modal {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
   padding: 1.5rem;
   width: 100%;
   max-width: 480px;
@@ -549,7 +549,7 @@
 .modalTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text);
   margin: 0 0 1.5rem 0;
   text-align: center;
 }
@@ -561,7 +561,7 @@
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--color-text);
     margin-bottom: 0.5rem;
   }
 
@@ -569,12 +569,12 @@
   select {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
     font-size: 0.875rem;
-    color: #374151;
-    background: white;
-    transition: all 0.2s;
+    color: var(--color-text);
+    background: var(--card-bg);
+    transition: all var(--transition-normal);
 
     &:focus {
       outline: none;
@@ -583,7 +583,7 @@
     }
 
     &::placeholder {
-      color: #9ca3af;
+      color: var(--color-text-muted);
     }
   }
 
@@ -601,16 +601,16 @@
 .cancelBtn {
   flex: 1;
   padding: 0.75rem;
-  background: #f3f4f6;
+  background: var(--color-border-light);
   border: none;
-  border-radius: 8px;
-  color: #6b7280;
-  font-weight: 600;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:hover {
-    background: #e5e7eb;
+    background: var(--color-border);
   }
 }
 
@@ -619,11 +619,11 @@
   padding: 0.75rem;
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: white;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:hover {
     transform: translateY(-1px);
@@ -642,9 +642,9 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border-light);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:last-child {
     border-bottom: none;
@@ -675,14 +675,14 @@
 .questionText {
   flex: 1;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .riskBadge {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--color-danger-hover);
   border-radius: 4px;
   font-weight: 500;
 }

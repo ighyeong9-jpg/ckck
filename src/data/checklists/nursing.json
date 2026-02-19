@@ -1,0 +1,33 @@
+{
+  "id": "nursing",
+  "name": "요양원/요양병원",
+  "icon": "🏥",
+  "description": "요양원/요양병원 인테리어 체크리스트",
+  "items": [
+    {"id": "nursing-safety-001", "category": "안전", "subcategory": "소방", "item": "스프링클러 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-safety-002", "category": "안전", "subcategory": "소방", "item": "화재감지기 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-safety-003", "category": "안전", "subcategory": "소방", "item": "비상구 확보 및 피난동선 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "nursing-safety-004", "category": "안전", "subcategory": "소방", "item": "비상조명 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-safety-005", "category": "안전", "subcategory": "전기", "item": "누전차단기 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-safety-006", "category": "안전", "subcategory": "전기", "item": "비상전원 시스템 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-safety-007", "category": "안전", "subcategory": "미끄럼", "item": "전관 바닥 미끄럼 방지 처리 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "nursing-legal-001", "category": "법규", "subcategory": "노인복지", "item": "노인복지법 시설기준 충족 확인", "priority": "필수", "method": "육안확인", "evidence": "점검표"},
+    {"id": "nursing-legal-002", "category": "법규", "subcategory": "장애인", "item": "장애인 편의시설 전관 설치 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "nursing-legal-003", "category": "법규", "subcategory": "폐기물", "item": "의료폐기물 보관실 설치 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "nursing-quality-001", "category": "품질", "subcategory": "복도", "item": "복도 폭 기준 충족 확인 (1.8m 이상)", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "nursing-quality-002", "category": "품질", "subcategory": "복도", "item": "핸드레일 설치 확인 (양쪽)", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "nursing-quality-003", "category": "품질", "subcategory": "바닥", "item": "바닥 평탄도 확인 (휠체어 이동)", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "nursing-quality-004", "category": "품질", "subcategory": "벽체", "item": "벽체 위생 마감재 사용 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "nursing-equip-001", "category": "설비", "subcategory": "화장실", "item": "화장실 안전바 설치 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "nursing-equip-002", "category": "설비", "subcategory": "화장실", "item": "비상호출 버튼 설치 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-equip-003", "category": "설비", "subcategory": "엘리베이터", "item": "병상용 엘리베이터 설치 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-equip-004", "category": "설비", "subcategory": "환기", "item": "병실 환기 시스템 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-equip-005", "category": "설비", "subcategory": "냉난방", "item": "냉난방 시스템 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-equip-006", "category": "설비", "subcategory": "급수", "item": "급수/온수 설비 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "nursing-finish-001", "category": "마감", "subcategory": "병실", "item": "병실 마감 및 병상 간격 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "nursing-finish-002", "category": "마감", "subcategory": "간호", "item": "간호사 스테이션 설치 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "nursing-finish-003", "category": "마감", "subcategory": "급식", "item": "급식실 마감 및 위생설비 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "nursing-finish-004", "category": "마감", "subcategory": "프로그램", "item": "프로그램실 마감 확인", "priority": "권장", "method": "육안확인", "evidence": "사진"},
+    {"id": "nursing-finish-005", "category": "마감", "subcategory": "출입구", "item": "출입문 자동문/문턱 제거 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"}
+  ]
+}

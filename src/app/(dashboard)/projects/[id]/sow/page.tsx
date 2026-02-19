@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { QuoteLineItem, QuoteSummary } from '@/types/quote'
 import { QUOTE_CATEGORIES, UNITS } from '@/types/quote'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function SOWPage() {
@@ -270,6 +271,16 @@ export default function SOWPage() {
             ⚡ AI 표준 견적
           </button>
         </section>
+
+        {/* AI Quick Actions */}
+        <QuickActions
+          compact
+          actions={[
+            { icon: '💰', label: 'AI 자동 견적', description: '표준 견적 자동 생성', message: '표준 견적 자동으로 생성해줘' },
+            { icon: '📊', label: '등급별 비교', description: '이코노미/스탠다드/프리미엄', message: '이코노미/스탠다드/프리미엄 견적 비교해줘' },
+            { icon: '📄', label: 'PDF 내보내기', description: '견적서 PDF 다운로드', message: '견적서 PDF로 내보내줘' },
+          ]}
+        />
 
         {/* Items by Category */}
         <section className={styles.itemsSection}>

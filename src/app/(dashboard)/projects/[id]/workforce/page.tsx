@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Workforce, WorkStatus } from '@/types/workforce'
 import { WORKER_TYPES, ATTENDANCE_STATUS } from '@/types/workforce'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function WorkforcePage() {
@@ -216,6 +217,12 @@ export default function WorkforcePage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <QuickActions compact actions={[
+          { icon: '👷', label: '인력 현황', description: '인력 현황 조회', message: '인력 현황 알려줘' },
+          { icon: '📋', label: '자격증 확인', description: '작업자 자격증 확인', message: '작업자 자격증 확인해줘' },
+          { icon: '💵', label: '노무비 조회', description: '노무비 현황 확인', message: '노무비 현황 알려줘' },
+        ]} />
+
         {/* Date Selector */}
         <section className={styles.dateSection}>
           <input

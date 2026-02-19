@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { sha256 } from '@/lib/utils/merkleTree'
 import type { Defect, DefectSeverity, DefectStatus } from '@/types/defect'
 import { DEFECT_SEVERITIES, DEFECT_STATUSES } from '@/types/defect'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function DefectsPage() {
@@ -152,7 +153,7 @@ export default function DefectsPage() {
       const updates: any = {
         status: newStatus,
       }
-      if (newStatus === 'completed') {
+      if (newStatus === 'resolved' || newStatus === 'closed') {
         updates.resolved_at = new Date().toISOString()
       }
 
@@ -220,6 +221,12 @@ export default function DefectsPage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <QuickActions compact actions={[
+          { icon: '🔧', label: '하자 등록', description: '새 하자 등록', message: '새 하자 등록해줘' },
+          { icon: '📋', label: '하자 현황', description: '하자 목록 조회', message: '하자 목록 보여줘' },
+          { icon: '📊', label: '처리 이력', description: '하자 처리 현황', message: '하자 처리 이력 알려줘' },
+        ]} />
+
         {/* Overview Cards */}
         <section className={styles.overview}>
           <div className={styles.overviewCard}>
@@ -401,7 +408,7 @@ export default function DefectsPage() {
                   onClick={handleSubmit}
                   disabled={saving || !formData.title.trim()}
                 >
-                  {saving ? '저장 중...' : editingDefect ? '수정' : '신고'}
+                  {saving ? '저장 중...' : editingDefect ? '수정' : '요청'}
                 </button>
               </div>
             </div>

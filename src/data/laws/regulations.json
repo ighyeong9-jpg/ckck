@@ -1,0 +1,68 @@
+{
+  "fire_safety": {
+    "name": "소방안전",
+    "triggers": [
+      { "condition": "area >= 33", "areaUnit": "sqm", "requirement": "소화기 설치 필수 (바닥면적 33㎡ 이상)", "law": "소방시설법 제9조", "severity": "필수" },
+      { "condition": "area >= 200", "areaUnit": "sqm", "requirement": "스프링클러 설치 필수", "law": "소방시설법 시행령 별표5", "severity": "필수" },
+      { "condition": "area >= 150 && industry in food_service", "areaUnit": "sqm", "requirement": "비상구 2개소 이상", "law": "건축법 시행령 제39조", "severity": "필수" },
+      { "condition": "floor == basement", "requirement": "피난유도등 설치", "law": "소방시설법 시행령 별표5", "severity": "필수" },
+      { "condition": "area >= 400", "areaUnit": "sqm", "requirement": "자동화재탐지설비 설치", "law": "소방시설법 시행령 별표5", "severity": "필수" },
+      { "condition": "area >= 600", "areaUnit": "sqm", "requirement": "옥내소화전 설치", "law": "소방시설법 시행령 별표5", "severity": "필수" },
+      { "condition": "industry in food_service", "requirement": "주방 자동소화장치", "law": "소방시설법 시행령 별표5", "severity": "필수" },
+      { "condition": "floor >= 11", "requirement": "피난층 피난안전구역 설치", "law": "건축법 시행령 제34조", "severity": "필수" }
+    ]
+  },
+  "hygiene": {
+    "name": "위생/영업",
+    "triggers": [
+      { "condition": "industry in food_service", "requirement": "영업신고 필수 (보건소)", "law": "식품위생법 제37조", "severity": "필수" },
+      { "condition": "industry in food_service", "requirement": "그리스트랩 설치 필수", "law": "하수도법 시행규칙", "severity": "필수" },
+      { "condition": "industry in food_service", "requirement": "위생교육 이수 (6시간)", "law": "식품위생법 제41조", "severity": "필수" },
+      { "condition": "industry in medical", "requirement": "의료기관 개설 허가", "law": "의료법 제33조", "severity": "필수" },
+      { "condition": "industry in beauty", "requirement": "공중위생영업 신고", "law": "공중위생관리법 제3조", "severity": "필수" },
+      { "condition": "industry in fitness", "requirement": "체육시설업 등록/신고", "law": "체육시설법 제10조", "severity": "필수" },
+      { "condition": "industry in education", "requirement": "학원 등록/신고", "law": "학원법 제6조", "severity": "필수" },
+      { "condition": "industry in accommodation", "requirement": "숙박업 허가", "law": "공중위생관리법 제3조", "severity": "필수" }
+    ]
+  },
+  "permits": {
+    "name": "인허가",
+    "triggers": [
+      { "condition": "structural_change == true", "requirement": "건축신고 또는 건축허가 필요", "law": "건축법 제14조", "severity": "필수" },
+      { "condition": "use_change == true", "requirement": "용도변경 허가/신고 필요", "law": "건축법 제19조", "severity": "필수" },
+      { "condition": "signage_external == true", "requirement": "옥외광고물 허가/신고", "law": "옥외광고물법 제3조", "severity": "필수" },
+      { "condition": "area >= 200", "areaUnit": "sqm", "requirement": "건축물대장 용도 확인", "law": "건축법 제2조", "severity": "권장" },
+      { "condition": "always", "requirement": "임대차계약서상 인테리어 공사 동의 확인", "law": "상가건물임대차보호법", "severity": "권장" },
+      { "condition": "industry in food_service", "requirement": "영업장 면적 기준 충족 확인", "law": "식품위생법 시행규칙", "severity": "필수" }
+    ]
+  },
+  "safety": {
+    "name": "안전/환경",
+    "triggers": [
+      { "condition": "building_year < 2020", "requirement": "석면조사 필수 (2020년 이전 건물)", "law": "석면안전관리법 제21조", "severity": "필수" },
+      { "condition": "industry in childcare_education", "requirement": "실내공기질 측정 필수", "law": "실내공기질관리법 제12조", "severity": "필수" },
+      { "condition": "noise_work == true", "requirement": "소음작업 시간 제한 (08-18시, 주거지역)", "law": "소음진동관리법 제21조", "severity": "필수" },
+      { "condition": "area >= 500", "areaUnit": "sqm", "requirement": "건설폐기물 처리계획 신고", "law": "건설폐기물 재활용촉진에 관한 법률", "severity": "필수" },
+      { "condition": "always", "requirement": "산업안전보건법 준수 (안전모, 안전화 등)", "law": "산업안전보건법 제38조", "severity": "필수" },
+      { "condition": "area >= 1000", "areaUnit": "sqm", "requirement": "안전관리자 선임", "law": "산업안전보건법 제17조", "severity": "필수" }
+    ]
+  },
+  "accessibility": {
+    "name": "장애인 편의시설",
+    "triggers": [
+      { "condition": "area >= 500 || industry in public_facility", "areaUnit": "sqm", "requirement": "장애인 편의시설 설치 의무", "law": "장애인편의시설법 제7조", "severity": "필수" },
+      { "condition": "industry in medical", "requirement": "장애인 화장실 설치", "law": "장애인편의시설법 시행령", "severity": "필수" },
+      { "condition": "floor >= 2 && area >= 500", "areaUnit": "sqm", "requirement": "엘리베이터 또는 경사로 설치", "law": "장애인편의시설법 시행령", "severity": "필수" }
+    ]
+  },
+  "industry_groups": {
+    "food_service": ["cafe", "restaurant", "bar", "bakery", "buffet", "fast_food", "dessert", "brunch", "pub", "izakaya", "chicken", "korean_bbq", "chinese", "japanese", "western", "snack_bar", "food_court"],
+    "medical": ["hospital", "clinic", "dental", "oriental_medicine", "pharmacy", "veterinary"],
+    "beauty": ["beauty", "nail", "spa", "barber", "tattoo", "skincare"],
+    "fitness": ["fitness", "gym", "pilates", "yoga", "swimming", "sports_center", "dance"],
+    "education": ["academy", "study_cafe", "kids_cafe", "kindergarten", "daycare", "music_academy", "art_academy", "coding_academy"],
+    "accommodation": ["hotel", "motel", "pension", "guesthouse", "airbnb"],
+    "childcare_education": ["kindergarten", "daycare", "kids_cafe"],
+    "public_facility": ["hospital", "clinic", "library", "welfare_center", "community_center"]
+  }
+}

@@ -1,0 +1,621 @@
+{
+  "cafe": {
+    "name": "카페",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "soundproof"],
+    "special_items": [
+      { "name": "커피머신 급배수", "cost": { "economy": 300000, "standard": 500000, "premium": 800000, "luxury": 1200000 } },
+      { "name": "카운터 제작", "cost": { "economy": 2000000, "standard": 3500000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 150000, "standard": 300000, "premium": 500000, "luxury": 800000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 10, "max": 60, "unit": "pyeong" }
+  },
+  "restaurant": {
+    "name": "음식점",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "soundproof", "ceiling"],
+    "special_items": [
+      { "name": "주방 후드/급배기", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 500000, "standard": 800000, "premium": 1200000, "luxury": 2000000 } },
+      { "name": "주방설비 일체", "cost": { "economy": 5000000, "standard": 10000000, "premium": 20000000, "luxury": 35000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 15, "max": 80, "unit": "pyeong" }
+  },
+  "bar": {
+    "name": "술집/바",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "metal"],
+    "special_items": [
+      { "name": "바 카운터 제작", "cost": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 } },
+      { "name": "주류 냉장/디스플레이", "cost": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "음향설비", "cost": { "economy": 1500000, "standard": 3000000, "premium": 6000000, "luxury": 12000000 } },
+      { "name": "특수조명 (LED/네온)", "cost": { "economy": 800000, "standard": 1500000, "premium": 3000000, "luxury": 6000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 10, "max": 50, "unit": "pyeong" }
+  },
+  "bakery": {
+    "name": "베이커리",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling"],
+    "special_items": [
+      { "name": "오븐 전용 전기/가스 배관", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "쇼케이스/진열대", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "제빵 작업대", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "카운터 제작", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 150000, "standard": 300000, "premium": 500000, "luxury": 800000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 12, "max": 50, "unit": "pyeong" }
+  },
+  "buffet": {
+    "name": "뷔페",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling"],
+    "optional_trades": ["door", "window", "glass", "soundproof", "metal"],
+    "special_items": [
+      { "name": "뷔페 테이블/워머 설비", "cost": { "economy": 5000000, "standard": 10000000, "premium": 18000000, "luxury": 30000000 } },
+      { "name": "주방설비 일체 (대형)", "cost": { "economy": 10000000, "standard": 20000000, "premium": 35000000, "luxury": 60000000 } },
+      { "name": "주방 후드/급배기 (대형)", "cost": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 800000, "standard": 1200000, "premium": 2000000, "luxury": 3000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 40, "max": 150, "unit": "pyeong" }
+  },
+  "fast_food": {
+    "name": "패스트푸드",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling"],
+    "special_items": [
+      { "name": "주방설비 일체", "cost": { "economy": 5000000, "standard": 8000000, "premium": 15000000, "luxury": 25000000 } },
+      { "name": "주방 후드/급배기", "cost": { "economy": 1200000, "standard": 2500000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "주문 카운터/키오스크 배선", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "메뉴보드/디지털 사이니지", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 4000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 100000, "standard": 200000, "premium": 350000, "luxury": 600000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 15, "max": 50, "unit": "pyeong" }
+  },
+  "dessert": {
+    "name": "디저트카페",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "wallpaper"],
+    "special_items": [
+      { "name": "쇼케이스/냉장진열대", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "카운터 제작", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "디저트 제조 작업대", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 150000, "standard": 300000, "premium": 500000, "luxury": 800000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 8, "max": 40, "unit": "pyeong" }
+  },
+  "brunch": {
+    "name": "브런치카페",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "soundproof"],
+    "special_items": [
+      { "name": "주방설비 일체", "cost": { "economy": 4000000, "standard": 8000000, "premium": 15000000, "luxury": 25000000 } },
+      { "name": "주방 후드/급배기", "cost": { "economy": 1200000, "standard": 2500000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "카운터 제작", "cost": { "economy": 2000000, "standard": 3500000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 500000, "standard": 800000, "premium": 1200000, "luxury": 2000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 15, "max": 60, "unit": "pyeong" }
+  },
+  "pub": {
+    "name": "호프/펍",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "metal"],
+    "special_items": [
+      { "name": "생맥주 탭 설비/냉각기", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "바 카운터 제작", "cost": { "economy": 2500000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "음향설비", "cost": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 8000000 } },
+      { "name": "주방설비 (간이)", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 150000, "standard": 300000, "premium": 500000, "luxury": 900000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 15, "max": 60, "unit": "pyeong" }
+  },
+  "izakaya": {
+    "name": "이자카야",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "soundproof"],
+    "special_items": [
+      { "name": "주방설비 일체", "cost": { "economy": 4000000, "standard": 8000000, "premium": 15000000, "luxury": 25000000 } },
+      { "name": "주방 후드/급배기", "cost": { "economy": 1200000, "standard": 2500000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "바 카운터 제작 (원목)", "cost": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 } },
+      { "name": "칸막이/좌식 공간", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 500000, "standard": 800000, "premium": 1200000, "luxury": 2000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 12, "max": 50, "unit": "pyeong" }
+  },
+  "chicken": {
+    "name": "치킨집",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling"],
+    "special_items": [
+      { "name": "튀김기 전용 전기/가스 배관", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "주방 후드/급배기", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "주방설비 일체", "cost": { "economy": 3000000, "standard": 6000000, "premium": 10000000, "luxury": 18000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 500000, "standard": 800000, "premium": 1200000, "luxury": 2000000 } },
+      { "name": "카운터/포장대", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 120000, "standard": 250000, "premium": 400000, "luxury": 700000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 10, "max": 40, "unit": "pyeong" }
+  },
+  "korean_bbq": {
+    "name": "고깃집/삼겹살",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "soundproof"],
+    "special_items": [
+      { "name": "테이블별 로스터/배기 설비", "cost_per_unit": { "economy": 600000, "standard": 1000000, "premium": 1800000, "luxury": 3000000 }, "unit": "테이블" },
+      { "name": "중앙 급배기 덕트", "cost": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 } },
+      { "name": "주방설비 일체", "cost": { "economy": 4000000, "standard": 8000000, "premium": 15000000, "luxury": 25000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 500000, "standard": 800000, "premium": 1200000, "luxury": 2000000 } },
+      { "name": "냉장/숙성고", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "좌석/테이블 세트 (로스터 포함)", "cost_per_unit": { "economy": 350000, "standard": 600000, "premium": 1000000, "luxury": 1800000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 20, "max": 80, "unit": "pyeong" }
+  },
+  "chinese": {
+    "name": "중식당",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "soundproof"],
+    "special_items": [
+      { "name": "중화웍 전용 가스/화력 설비", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "주방 후드/급배기 (대형 화력)", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "주방설비 일체", "cost": { "economy": 5000000, "standard": 10000000, "premium": 18000000, "luxury": 30000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 500000, "standard": 800000, "premium": 1200000, "luxury": 2000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "석" },
+      { "name": "룸/칸막이 설치", "cost_per_unit": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 }, "unit": "개소" }
+    ],
+    "typical_area_range": { "min": 15, "max": 70, "unit": "pyeong" }
+  },
+  "japanese": {
+    "name": "일식당",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "soundproof"],
+    "special_items": [
+      { "name": "스시 카운터/냉장 쇼케이스", "cost": { "economy": 3000000, "standard": 5000000, "premium": 9000000, "luxury": 15000000 } },
+      { "name": "주방설비 일체", "cost": { "economy": 5000000, "standard": 10000000, "premium": 18000000, "luxury": 30000000 } },
+      { "name": "주방 후드/급배기", "cost": { "economy": 1200000, "standard": 2500000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "다다미/좌식 공간", "cost": { "economy": 1500000, "standard": 3000000, "premium": 6000000, "luxury": 10000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 500000, "standard": 800000, "premium": 1200000, "luxury": 2000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 12, "max": 60, "unit": "pyeong" }
+  },
+  "western": {
+    "name": "양식당",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "soundproof", "wallpaper"],
+    "special_items": [
+      { "name": "주방설비 일체 (양식)", "cost": { "economy": 5000000, "standard": 10000000, "premium": 20000000, "luxury": 35000000 } },
+      { "name": "주방 후드/급배기", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "와인셀러/저장고", "cost": { "economy": 1000000, "standard": 2500000, "premium": 5000000, "luxury": 10000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 500000, "standard": 800000, "premium": 1200000, "luxury": 2000000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 250000, "standard": 500000, "premium": 900000, "luxury": 1500000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 15, "max": 70, "unit": "pyeong" }
+  },
+  "snack_bar": {
+    "name": "분식점",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling"],
+    "special_items": [
+      { "name": "주방설비 일체", "cost": { "economy": 2500000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 } },
+      { "name": "주방 후드/급배기", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "카운터/포장대", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "그리스트랩", "cost": { "economy": 400000, "standard": 700000, "premium": 1000000, "luxury": 1500000 } },
+      { "name": "좌석/테이블 세트", "cost_per_unit": { "economy": 100000, "standard": 200000, "premium": 350000, "luxury": 600000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 8, "max": 30, "unit": "pyeong" }
+  },
+  "food_court": {
+    "name": "푸드코트",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling"],
+    "optional_trades": ["door", "window", "glass", "soundproof", "metal"],
+    "special_items": [
+      { "name": "매장별 주방 파티션", "cost_per_unit": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 }, "unit": "구획" },
+      { "name": "중앙 급배기 시스템", "cost": { "economy": 5000000, "standard": 10000000, "premium": 18000000, "luxury": 30000000 } },
+      { "name": "공용 좌석/테이블 세트", "cost_per_unit": { "economy": 100000, "standard": 200000, "premium": 350000, "luxury": 600000 }, "unit": "석" },
+      { "name": "그리스트랩 (대형)", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 5000000 } },
+      { "name": "안내 사이니지/메뉴보드", "cost": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 7000000 } }
+    ],
+    "typical_area_range": { "min": 50, "max": 200, "unit": "pyeong" }
+  },
+  "beauty": {
+    "name": "미용실",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "wallpaper", "soundproof"],
+    "special_items": [
+      { "name": "샴푸대 급배수", "cost_per_unit": { "economy": 300000, "standard": 500000, "premium": 800000, "luxury": 1500000 }, "unit": "개" },
+      { "name": "미러 월/조명 거울", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "면" },
+      { "name": "스타일링 스테이션", "cost_per_unit": { "economy": 300000, "standard": 600000, "premium": 1000000, "luxury": 1800000 }, "unit": "석" },
+      { "name": "리셉션 카운터", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "대기 공간 가구", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 4000000 } }
+    ],
+    "typical_area_range": { "min": 10, "max": 50, "unit": "pyeong" }
+  },
+  "nail": {
+    "name": "네일샵",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "wallpaper", "tiling"],
+    "special_items": [
+      { "name": "네일 데스크", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "석" },
+      { "name": "환기 시스템 (분진/냄새)", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } },
+      { "name": "리셉션 카운터", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "진열장/수납장", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } },
+      { "name": "페디 의자/풋배스", "cost_per_unit": { "economy": 300000, "standard": 600000, "premium": 1000000, "luxury": 2000000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 5, "max": 25, "unit": "pyeong" }
+  },
+  "spa": {
+    "name": "스파/마사지",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "wallpaper"],
+    "special_items": [
+      { "name": "개별 룸 파티션/방음", "cost_per_unit": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 }, "unit": "실" },
+      { "name": "샤워/탕 시설", "cost": { "economy": 3000000, "standard": 5000000, "premium": 9000000, "luxury": 15000000 } },
+      { "name": "마사지 베드", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 800000, "luxury": 1500000 }, "unit": "대" },
+      { "name": "리셉션 카운터", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "탈의/락커 시설", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "간접조명/무드 조명", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 4000000 } }
+    ],
+    "typical_area_range": { "min": 15, "max": 60, "unit": "pyeong" }
+  },
+  "clinic": {
+    "name": "병원/의원",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling"],
+    "optional_trades": ["door", "window", "glass", "soundproof", "wallpaper"],
+    "special_items": [
+      { "name": "진료실 파티션", "cost_per_unit": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 }, "unit": "실" },
+      { "name": "의료용 싱크/급배수", "cost_per_unit": { "economy": 500000, "standard": 800000, "premium": 1200000, "luxury": 2000000 }, "unit": "개소" },
+      { "name": "접수/수납 카운터", "cost": { "economy": 2000000, "standard": 3500000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "대기실 가구", "cost": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "의료기기 전용 전기 배선", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "방사선 차폐 (해당 시)", "cost": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 } }
+    ],
+    "typical_area_range": { "min": 15, "max": 80, "unit": "pyeong" }
+  },
+  "dental": {
+    "name": "치과",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "wallpaper"],
+    "special_items": [
+      { "name": "치과 유닛체어 배관/배선", "cost_per_unit": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 }, "unit": "대" },
+      { "name": "진료실 파티션", "cost_per_unit": { "economy": 1200000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 }, "unit": "실" },
+      { "name": "접수/수납 카운터", "cost": { "economy": 2000000, "standard": 3500000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "소독실 설비", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "방사선실 차폐 공사", "cost": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 } },
+      { "name": "대기실 가구", "cost": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "컴프레서/석션 배관", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3000000, "luxury": 5000000 } }
+    ],
+    "typical_area_range": { "min": 20, "max": 80, "unit": "pyeong" }
+  },
+  "pharmacy": {
+    "name": "약국",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "wallpaper"],
+    "special_items": [
+      { "name": "조제대/약품 선반", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "약품 냉장고 전용 전원", "cost": { "economy": 300000, "standard": 500000, "premium": 800000, "luxury": 1200000 } },
+      { "name": "접수/수납 카운터", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "대기 의자/공간", "cost": { "economy": 300000, "standard": 600000, "premium": 1000000, "luxury": 2000000 } },
+      { "name": "OTC 진열대", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } }
+    ],
+    "typical_area_range": { "min": 8, "max": 30, "unit": "pyeong" }
+  },
+  "academy": {
+    "name": "학원",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling"],
+    "optional_trades": ["door", "window", "glass", "soundproof", "wallpaper", "tiling"],
+    "special_items": [
+      { "name": "강의실 파티션", "cost_per_unit": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 }, "unit": "실" },
+      { "name": "책상/의자 세트", "cost_per_unit": { "economy": 100000, "standard": 200000, "premium": 350000, "luxury": 600000 }, "unit": "석" },
+      { "name": "화이트보드/전자칠판", "cost_per_unit": { "economy": 200000, "standard": 500000, "premium": 1000000, "luxury": 2000000 }, "unit": "대" },
+      { "name": "접수/상담 카운터", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "네트워크/CCTV 배선", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } }
+    ],
+    "typical_area_range": { "min": 15, "max": 80, "unit": "pyeong" }
+  },
+  "study_cafe": {
+    "name": "스터디카페",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "wallpaper", "tiling"],
+    "special_items": [
+      { "name": "1인 독서실 부스", "cost_per_unit": { "economy": 200000, "standard": 350000, "premium": 600000, "luxury": 1000000 }, "unit": "석" },
+      { "name": "그룹 스터디룸", "cost_per_unit": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 }, "unit": "실" },
+      { "name": "무인 키오스크/출입 시스템", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "음료 코너 (자판기/머신)", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } },
+      { "name": "네트워크/콘센트 배선", "cost_per_unit": { "economy": 30000, "standard": 50000, "premium": 80000, "luxury": 120000 }, "unit": "석" }
+    ],
+    "typical_area_range": { "min": 20, "max": 80, "unit": "pyeong" }
+  },
+  "kids_cafe": {
+    "name": "키즈카페",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "wallpaper"],
+    "special_items": [
+      { "name": "놀이기구/볼풀 설비", "cost": { "economy": 5000000, "standard": 10000000, "premium": 20000000, "luxury": 35000000 } },
+      { "name": "안전 매트/충격흡수 바닥", "cost_per_unit": { "economy": 50000, "standard": 80000, "premium": 120000, "luxury": 200000 }, "unit": "㎡" },
+      { "name": "보호자 카페 공간", "cost": { "economy": 2000000, "standard": 3500000, "premium": 6000000, "luxury": 10000000 } },
+      { "name": "CCTV/안전 시스템", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "파티룸", "cost_per_unit": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 }, "unit": "실" },
+      { "name": "유아용 화장실", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } }
+    ],
+    "typical_area_range": { "min": 30, "max": 100, "unit": "pyeong" }
+  },
+  "kindergarten": {
+    "name": "유치원",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "wallpaper"],
+    "special_items": [
+      { "name": "교실 가구 (유아용)", "cost_per_unit": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 }, "unit": "실" },
+      { "name": "유아용 화장실/세면대", "cost_per_unit": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 }, "unit": "개소" },
+      { "name": "안전 매트/충격흡수 바닥", "cost_per_unit": { "economy": 50000, "standard": 80000, "premium": 120000, "luxury": 200000 }, "unit": "㎡" },
+      { "name": "CCTV/안전 시스템", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "급식실 설비", "cost": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 } },
+      { "name": "놀이 공간 설비", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } }
+    ],
+    "typical_area_range": { "min": 30, "max": 100, "unit": "pyeong" }
+  },
+  "music_academy": {
+    "name": "음악학원",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "wallpaper", "tiling"],
+    "special_items": [
+      { "name": "방음 연습실", "cost_per_unit": { "economy": 2000000, "standard": 3500000, "premium": 6000000, "luxury": 10000000 }, "unit": "실" },
+      { "name": "합주실/레슨실 방음", "cost_per_unit": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 }, "unit": "실" },
+      { "name": "방음문 설치", "cost_per_unit": { "economy": 500000, "standard": 800000, "premium": 1500000, "luxury": 2500000 }, "unit": "개" },
+      { "name": "접수/상담 카운터", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "악기 수납장", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } }
+    ],
+    "typical_area_range": { "min": 15, "max": 60, "unit": "pyeong" }
+  },
+  "fitness": {
+    "name": "헬스장",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "wallpaper", "metal"],
+    "special_items": [
+      { "name": "충격흡수 바닥재 (고무매트)", "cost_per_unit": { "economy": 40000, "standard": 70000, "premium": 120000, "luxury": 200000 }, "unit": "㎡" },
+      { "name": "전면 거울 시공", "cost_per_unit": { "economy": 80000, "standard": 120000, "premium": 200000, "luxury": 350000 }, "unit": "㎡" },
+      { "name": "샤워실/탈의실", "cost": { "economy": 3000000, "standard": 5000000, "premium": 9000000, "luxury": 15000000 } },
+      { "name": "락커 설비", "cost_per_unit": { "economy": 50000, "standard": 80000, "premium": 130000, "luxury": 200000 }, "unit": "개" },
+      { "name": "리셉션 카운터", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "환기/공조 강화", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } }
+    ],
+    "typical_area_range": { "min": 30, "max": 120, "unit": "pyeong" }
+  },
+  "pilates": {
+    "name": "필라테스",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "wallpaper", "tiling"],
+    "special_items": [
+      { "name": "스프링 바닥/충격흡수 바닥재", "cost_per_unit": { "economy": 50000, "standard": 80000, "premium": 130000, "luxury": 220000 }, "unit": "㎡" },
+      { "name": "전면 거울 시공", "cost_per_unit": { "economy": 80000, "standard": 120000, "premium": 200000, "luxury": 350000 }, "unit": "㎡" },
+      { "name": "개인 레슨실 파티션", "cost_per_unit": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 }, "unit": "실" },
+      { "name": "탈의실/샤워실", "cost": { "economy": 2000000, "standard": 3500000, "premium": 6000000, "luxury": 10000000 } },
+      { "name": "리셉션 카운터", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "소도구 수납장", "cost": { "economy": 300000, "standard": 600000, "premium": 1000000, "luxury": 2000000 } }
+    ],
+    "typical_area_range": { "min": 15, "max": 60, "unit": "pyeong" }
+  },
+  "yoga": {
+    "name": "요가",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "wallpaper", "tiling"],
+    "special_items": [
+      { "name": "온열 바닥 (핫요가)", "cost_per_unit": { "economy": 60000, "standard": 100000, "premium": 170000, "luxury": 280000 }, "unit": "㎡" },
+      { "name": "전면 거울 시공", "cost_per_unit": { "economy": 80000, "standard": 120000, "premium": 200000, "luxury": 350000 }, "unit": "㎡" },
+      { "name": "탈의실/샤워실", "cost": { "economy": 2000000, "standard": 3500000, "premium": 6000000, "luxury": 10000000 } },
+      { "name": "간접조명/무드 조명", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 4000000 } },
+      { "name": "리셉션 카운터", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "소도구 수납장", "cost": { "economy": 300000, "standard": 600000, "premium": 1000000, "luxury": 2000000 } }
+    ],
+    "typical_area_range": { "min": 15, "max": 50, "unit": "pyeong" }
+  },
+  "dance": {
+    "name": "댄스학원",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "wallpaper", "tiling"],
+    "special_items": [
+      { "name": "마루/스프링 바닥재", "cost_per_unit": { "economy": 60000, "standard": 100000, "premium": 170000, "luxury": 280000 }, "unit": "㎡" },
+      { "name": "전면 거울 시공", "cost_per_unit": { "economy": 80000, "standard": 120000, "premium": 200000, "luxury": 350000 }, "unit": "㎡" },
+      { "name": "음향설비", "cost": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 8000000 } },
+      { "name": "탈의실/샤워실", "cost": { "economy": 2000000, "standard": 3500000, "premium": 6000000, "luxury": 10000000 } },
+      { "name": "리셉션 카운터", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "발레바 설치", "cost_per_unit": { "economy": 100000, "standard": 200000, "premium": 350000, "luxury": 600000 }, "unit": "m" }
+    ],
+    "typical_area_range": { "min": 20, "max": 60, "unit": "pyeong" }
+  },
+  "retail": {
+    "name": "소매점",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling"],
+    "optional_trades": ["door", "window", "glass", "tiling", "wallpaper", "metal"],
+    "special_items": [
+      { "name": "진열 선반/곤도라", "cost_per_unit": { "economy": 150000, "standard": 300000, "premium": 500000, "luxury": 900000 }, "unit": "대" },
+      { "name": "쇼윈도/전면 유리", "cost": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "POS/카운터", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "창고/수납 공간", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } },
+      { "name": "보안 시스템 (CCTV/EAS)", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 4000000 } }
+    ],
+    "typical_area_range": { "min": 10, "max": 60, "unit": "pyeong" }
+  },
+  "convenience": {
+    "name": "편의점",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "signage", "fire_safety", "cleaning", "ceiling"],
+    "optional_trades": ["door", "window", "glass", "furniture"],
+    "special_items": [
+      { "name": "냉장/냉동 진열대 전용 전원", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 5000000 } },
+      { "name": "곤도라/진열 선반", "cost_per_unit": { "economy": 100000, "standard": 200000, "premium": 350000, "luxury": 600000 }, "unit": "대" },
+      { "name": "POS 카운터", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "간이 조리대 (즉석식품)", "cost": { "economy": 500000, "standard": 1000000, "premium": 1500000, "luxury": 2500000 } },
+      { "name": "외부 간판/사이니지", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 5000000 } },
+      { "name": "CCTV 시스템", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } }
+    ],
+    "typical_area_range": { "min": 10, "max": 30, "unit": "pyeong" }
+  },
+  "laundry": {
+    "name": "세탁소",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "furniture"],
+    "special_items": [
+      { "name": "세탁기/건조기 전용 배관/전원", "cost_per_unit": { "economy": 300000, "standard": 500000, "premium": 800000, "luxury": 1200000 }, "unit": "대" },
+      { "name": "급수/배수 배관 공사", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "접수 카운터", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "의류 행거/수납 시스템", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } },
+      { "name": "환기 시스템 (열/습기)", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } }
+    ],
+    "typical_area_range": { "min": 8, "max": 30, "unit": "pyeong" }
+  },
+  "pet_shop": {
+    "name": "반려동물매장",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "soundproof"],
+    "special_items": [
+      { "name": "반려동물 케이지/전시 공간", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "미용/목욕 시설", "cost": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "특수 환기/탈취 시스템", "cost": { "economy": 800000, "standard": 1500000, "premium": 3000000, "luxury": 5000000 } },
+      { "name": "배수/방수 바닥 강화", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } },
+      { "name": "진열대/수납장", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } },
+      { "name": "접수 카운터", "cost": { "economy": 800000, "standard": 1500000, "premium": 2500000, "luxury": 4000000 } }
+    ],
+    "typical_area_range": { "min": 10, "max": 40, "unit": "pyeong" }
+  },
+  "flower": {
+    "name": "꽃집",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning"],
+    "optional_trades": ["door", "window", "glass", "ceiling", "tiling", "wallpaper"],
+    "special_items": [
+      { "name": "꽃 냉장고/냉장 쇼케이스", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "작업대/포장대", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } },
+      { "name": "급수 시설/싱크대", "cost": { "economy": 300000, "standard": 600000, "premium": 1000000, "luxury": 1800000 } },
+      { "name": "진열대/선반", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } },
+      { "name": "접수/POS 카운터", "cost": { "economy": 600000, "standard": 1200000, "premium": 2000000, "luxury": 3500000 } }
+    ],
+    "typical_area_range": { "min": 5, "max": 25, "unit": "pyeong" }
+  },
+  "phone_shop": {
+    "name": "휴대폰매장",
+    "required_trades": ["demolition", "electrical", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling"],
+    "optional_trades": ["door", "window", "glass", "plumbing", "tiling", "wallpaper"],
+    "special_items": [
+      { "name": "체험/진열 테이블", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "보안 디스플레이/도난방지", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 4000000 } },
+      { "name": "네트워크/데이터 배선", "cost": { "economy": 500000, "standard": 1000000, "premium": 1500000, "luxury": 2500000 } },
+      { "name": "접수/상담 카운터", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "악세서리 진열 월", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 3500000 } },
+      { "name": "디지털 사이니지", "cost": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 4000000 } }
+    ],
+    "typical_area_range": { "min": 8, "max": 25, "unit": "pyeong" }
+  },
+  "office": {
+    "name": "사무실",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "fire_safety", "cleaning", "ceiling"],
+    "optional_trades": ["door", "window", "glass", "tiling", "wallpaper", "soundproof", "signage"],
+    "special_items": [
+      { "name": "파티션/칸막이 시스템", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "면" },
+      { "name": "네트워크/LAN 배선", "cost_per_unit": { "economy": 30000, "standard": 50000, "premium": 80000, "luxury": 120000 }, "unit": "포트" },
+      { "name": "회의실", "cost_per_unit": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 }, "unit": "실" },
+      { "name": "탕비실/휴게공간", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "서버실/통신실", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "접수/리셉션", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } }
+    ],
+    "typical_area_range": { "min": 15, "max": 100, "unit": "pyeong" }
+  },
+  "coworking": {
+    "name": "코워킹스페이스",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof"],
+    "optional_trades": ["door", "window", "glass", "tiling", "wallpaper", "metal"],
+    "special_items": [
+      { "name": "개인 부스/핫데스크", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "석" },
+      { "name": "소회의실 (폰부스)", "cost_per_unit": { "economy": 1500000, "standard": 2500000, "premium": 4000000, "luxury": 7000000 }, "unit": "실" },
+      { "name": "대회의실", "cost_per_unit": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 }, "unit": "실" },
+      { "name": "네트워크/전원 인프라", "cost_per_unit": { "economy": 30000, "standard": 50000, "premium": 80000, "luxury": 120000 }, "unit": "석" },
+      { "name": "라운지/카페 공간", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "리셉션/접수", "cost": { "economy": 2000000, "standard": 3500000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "무인 출입 시스템", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } }
+    ],
+    "typical_area_range": { "min": 30, "max": 150, "unit": "pyeong" }
+  },
+  "showroom": {
+    "name": "쇼룸",
+    "required_trades": ["demolition", "electrical", "plumbing", "hvac", "woodwork", "painting", "flooring", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling"],
+    "optional_trades": ["door", "window", "glass", "tiling", "wallpaper", "metal", "soundproof"],
+    "special_items": [
+      { "name": "특수 조명/스팟 조명", "cost": { "economy": 1500000, "standard": 3000000, "premium": 6000000, "luxury": 12000000 } },
+      { "name": "전시 디스플레이/진열대", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "쇼윈도/전면 유리", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "상담 공간", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "AV/프로젝터 설비", "cost": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 8000000 } }
+    ],
+    "typical_area_range": { "min": 15, "max": 80, "unit": "pyeong" }
+  },
+  "warehouse": {
+    "name": "창고/물류",
+    "required_trades": ["demolition", "electrical", "plumbing", "painting", "flooring", "lighting", "fire_safety", "cleaning"],
+    "optional_trades": ["hvac", "door", "window", "signage", "ceiling", "metal", "tiling"],
+    "special_items": [
+      { "name": "산업용 선반/랙 시스템", "cost_per_unit": { "economy": 200000, "standard": 400000, "premium": 700000, "luxury": 1200000 }, "unit": "열" },
+      { "name": "화물용 도어/셔터", "cost_per_unit": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 }, "unit": "개" },
+      { "name": "바닥 에폭시/강화 코팅", "cost_per_unit": { "economy": 30000, "standard": 50000, "premium": 80000, "luxury": 130000 }, "unit": "㎡" },
+      { "name": "사무 공간 (관리실)", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "CCTV/보안 시스템", "cost": { "economy": 1000000, "standard": 2000000, "premium": 3500000, "luxury": 6000000 } },
+      { "name": "하역장 설비", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } }
+    ],
+    "typical_area_range": { "min": 30, "max": 300, "unit": "pyeong" }
+  },
+  "apartment": {
+    "name": "아파트",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "woodwork", "tiling", "wallpaper", "flooring", "door", "lighting", "cleaning"],
+    "optional_trades": ["hvac", "window", "painting", "furniture", "ceiling", "soundproof"],
+    "special_items": [
+      { "name": "시스템 에어컨", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "붙박이장", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 8000000 } },
+      { "name": "주방 싱크대/상부장", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "욕실 세트 (변기+세면대+샤워)", "cost_per_unit": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 8000000 }, "unit": "개소" }
+    ],
+    "typical_area_range": { "min": 18, "max": 60, "unit": "pyeong" }
+  },
+  "villa": {
+    "name": "빌라",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "woodwork", "tiling", "wallpaper", "flooring", "door", "lighting", "cleaning"],
+    "optional_trades": ["hvac", "window", "painting", "furniture", "ceiling", "soundproof"],
+    "special_items": [
+      { "name": "시스템 에어컨", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "붙박이장", "cost": { "economy": 1200000, "standard": 2500000, "premium": 4000000, "luxury": 7000000 } },
+      { "name": "주방 싱크대/상부장", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "욕실 세트 (변기+세면대+샤워)", "cost_per_unit": { "economy": 800000, "standard": 1500000, "premium": 3000000, "luxury": 6000000 }, "unit": "개소" },
+      { "name": "현관 중문", "cost": { "economy": 300000, "standard": 600000, "premium": 1000000, "luxury": 2000000 } }
+    ],
+    "typical_area_range": { "min": 12, "max": 40, "unit": "pyeong" }
+  },
+  "house": {
+    "name": "단독주택",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "woodwork", "tiling", "wallpaper", "flooring", "door", "window", "lighting", "cleaning"],
+    "optional_trades": ["hvac", "painting", "furniture", "ceiling", "soundproof", "staircase", "metal"],
+    "special_items": [
+      { "name": "시스템 에어컨", "cost": { "economy": 3000000, "standard": 5000000, "premium": 9000000, "luxury": 15000000 } },
+      { "name": "붙박이장", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "주방 싱크대/상부장", "cost": { "economy": 2500000, "standard": 5000000, "premium": 9000000, "luxury": 15000000 } },
+      { "name": "욕실 세트 (변기+세면대+샤워)", "cost_per_unit": { "economy": 1000000, "standard": 2000000, "premium": 4000000, "luxury": 8000000 }, "unit": "개소" },
+      { "name": "외부 데크/마당 공사", "cost": { "economy": 2000000, "standard": 4000000, "premium": 7000000, "luxury": 12000000 } },
+      { "name": "계단 리모델링", "cost": { "economy": 1500000, "standard": 3000000, "premium": 5000000, "luxury": 9000000 } },
+      { "name": "현관 중문", "cost": { "economy": 400000, "standard": 800000, "premium": 1500000, "luxury": 2500000 } }
+    ],
+    "typical_area_range": { "min": 20, "max": 80, "unit": "pyeong" }
+  },
+  "hotel": {
+    "name": "호텔/숙박",
+    "required_trades": ["demolition", "electrical", "plumbing", "waterproof", "hvac", "woodwork", "tiling", "wallpaper", "painting", "flooring", "door", "window", "lighting", "furniture", "signage", "fire_safety", "cleaning", "ceiling", "soundproof", "elevator"],
+    "optional_trades": ["glass", "metal", "curtain_wall", "staircase"],
+    "special_items": [
+      { "name": "객실 인테리어", "cost_per_unit": { "economy": 5000000, "standard": 10000000, "premium": 20000000, "luxury": 40000000 }, "unit": "실" },
+      { "name": "객실 욕실 (유닛바스)", "cost_per_unit": { "economy": 2000000, "standard": 4000000, "premium": 8000000, "luxury": 15000000 }, "unit": "실" },
+      { "name": "프론트 데스크/로비", "cost": { "economy": 5000000, "standard": 10000000, "premium": 20000000, "luxury": 40000000 } },
+      { "name": "복도/공용부 마감", "cost_per_unit": { "economy": 500000, "standard": 1000000, "premium": 2000000, "luxury": 4000000 }, "unit": "층" },
+      { "name": "조식당/식음 시설", "cost": { "economy": 8000000, "standard": 15000000, "premium": 30000000, "luxury": 50000000 } },
+      { "name": "세탁/린넨실", "cost": { "economy": 3000000, "standard": 5000000, "premium": 8000000, "luxury": 15000000 } },
+      { "name": "카드키/출입 시스템", "cost_per_unit": { "economy": 100000, "standard": 200000, "premium": 400000, "luxury": 800000 }, "unit": "실" }
+    ],
+    "typical_area_range": { "min": 50, "max": 500, "unit": "pyeong" }
+  }
+}

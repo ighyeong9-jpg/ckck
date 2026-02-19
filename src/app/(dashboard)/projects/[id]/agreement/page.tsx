@@ -7,6 +7,7 @@ import type { AgreementStatus } from '@/types/agreement'
 import { PARTIES } from '@/types/agreement'
 import SignaturePad from '@/components/signature/SignaturePad'
 import { sha256 } from '@/lib/utils/merkleTree'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function AgreementPage() {
@@ -221,6 +222,11 @@ export default function AgreementPage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        {/* AI Quick Actions */}
+        <QuickActions compact actions={[
+          { icon: '🤝', label: '합의서 생성', description: '3자 합의서 자동 생성', message: '3자 합의서 생성해줘' },
+        ]} />
+
         {/* Status Card */}
         <section className={styles.statusCard}>
           <div className={styles.statusInfo}>

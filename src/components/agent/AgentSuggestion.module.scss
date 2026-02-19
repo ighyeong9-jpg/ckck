@@ -1,7 +1,7 @@
 .suggestion {
-  background: linear-gradient(135deg, #ede9fe, #e0e7ff);
-  border: 1px solid #c4b5fd;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(79,70,229,0.08));
+  border: 1px solid rgba(124,58,237,0.2);
+  border-radius: var(--radius-md);
   padding: 0.875rem 1.25rem;
   display: flex;
   align-items: center;
@@ -34,27 +34,27 @@
 
 .suggestionText {
   font-size: 0.875rem;
-  color: #4338ca;
+  color: var(--color-primary-hover);
   font-weight: 500;
   line-height: 1.4;
 }
 
 .suggestionBtn {
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: white;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
   flex-shrink: 0;
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+    box-shadow: var(--shadow-purple);
   }
 }
 
@@ -63,7 +63,7 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0.125rem 0.5rem;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
   border-radius: 6px;
   color: white;
   font-size: 0.65rem;

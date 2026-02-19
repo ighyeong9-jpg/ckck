@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Report } from '@/types/report'
 import { REPORT_TYPES } from '@/types/report'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 interface ProjectData {
@@ -264,6 +265,12 @@ export default function ReportPage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <QuickActions compact actions={[
+          { icon: '📄', label: '일일보고서', description: '오늘 보고서 자동 생성', message: '오늘 일일보고서 자동 생성해줘' },
+          { icon: '📊', label: '주간보고서', description: '주간 보고서 생성', message: '주간보고서 자동 생성해줘' },
+          { icon: '📋', label: '최종보고서', description: '최종 보고서 생성', message: '최종 보고서 생성해줘' },
+        ]} />
+
         {/* Current Data Summary */}
         <section className={styles.dataSummary}>
           <h2 className={styles.sectionTitle}>현재 프로젝트 데이터</h2>

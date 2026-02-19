@@ -21,26 +21,32 @@ const PAGE_SUGGESTIONS: Record<string, SuggestionChip[]> = {
   '/projects': [
     { icon: '🏗️', label: '프로젝트 생성', message: '카페 20평 프로젝트 만들어줘' },
     { icon: '📊', label: '현황 요약', message: '전체 프로젝트 현황 알려줘' },
+    { icon: '💰', label: '가견적', message: '카페 20평 견적 뽑아줘' },
   ],
   '/dashboard': [
     { icon: '📈', label: '리스크 분석', message: '전체 리스크 현황 분석해줘' },
     { icon: '📋', label: '오늘 할일', message: '오늘 해야 할 작업 알려줘' },
+    { icon: '📊', label: '통계 요약', message: '대시보드 요약해줘' },
   ],
   'diagnostic': [
-    { icon: '🔍', label: '리스크 분석', message: '리스크 분석해줘' },
-    { icon: '📋', label: '체크리스트 점검', message: '체크리스트 분석해줘' },
+    { icon: '🔍', label: '리스크 진단', message: '전체 리스크 종합 진단해줘' },
+    { icon: '📋', label: '체크리스트 분석', message: '체크리스트 분석해줘' },
+    { icon: '⚠️', label: '안전 점검', message: '안전 리스크 분석해줘' },
   ],
   'sow': [
-    { icon: '💰', label: '견적 생성', message: '표준 견적 생성해줘' },
-    { icon: '📊', label: '단가 비교', message: '견적 단가 분석해줘' },
+    { icon: '💰', label: 'AI 자동 견적', message: '표준 견적 자동으로 생성해줘' },
+    { icon: '📊', label: '등급별 비교', message: '이코노미/스탠다드/프리미엄 견적 비교해줘' },
+    { icon: '📄', label: 'PDF 내보내기', message: '견적서 PDF로 내보내줘' },
   ],
   'cost-analysis': [
-    { icon: '💵', label: '적정가 분석', message: '적정가 분석해줘' },
-    { icon: '📉', label: '비용 최적화', message: '비용 절감 방안 분석해줘' },
+    { icon: '💵', label: '적정가 분석', message: '비용 적정성 분석해줘' },
+    { icon: '📉', label: '비용 예측', message: '비용 예측해줘' },
+    { icon: '📊', label: '예산 대비', message: '예산 대비 실제 지출 비교해줘' },
   ],
   'report': [
-    { icon: '📄', label: '리포트 생성', message: '리포트 생성해줘' },
-    { icon: '📊', label: '요약 보기', message: '프로젝트 요약해줘' },
+    { icon: '📄', label: '일일보고서', message: '오늘 일일보고서 자동 생성해줘' },
+    { icon: '📊', label: '주간보고서', message: '주간보고서 자동 생성해줘' },
+    { icon: '📋', label: '최종보고서', message: '최종 보고서 생성해줘' },
   ],
   'changes': [
     { icon: '🔄', label: '변경 등록', message: '변경사항 등록해줘' },
@@ -49,6 +55,37 @@ const PAGE_SUGGESTIONS: Record<string, SuggestionChip[]> = {
   'certificate': [
     { icon: '🤖', label: 'AI 검증', message: 'AI 검증 점수 확인해줘' },
     { icon: '📜', label: '인증서 발급', message: '인증서 발급해줘' },
+  ],
+  'process': [
+    { icon: '📅', label: 'AI 공정표 생성', message: '공정표 자동으로 만들어줘' },
+    { icon: '⏰', label: '지연 감지', message: '지연 공정 확인해줘' },
+    { icon: '📊', label: '간트 차트', message: '간트 차트 보여줘' },
+  ],
+  'workforce': [
+    { icon: '👷', label: '인력 현황', message: '인력 현황 알려줘' },
+    { icon: '📋', label: '자격증 확인', message: '작업자 자격증 확인해줘' },
+    { icon: '💵', label: '노무비 조회', message: '노무비 현황 알려줘' },
+  ],
+  'materials': [
+    { icon: '📦', label: '재고 현황', message: '자재 재고 현황 알려줘' },
+    { icon: '💰', label: '자재비 분석', message: '자재비 현황 알려줘' },
+    { icon: '🛒', label: '발주 안내', message: '부족한 자재 발주해줘' },
+  ],
+  'gallery': [
+    { icon: '📷', label: '사진 분석', message: '현장 사진 분석해줘' },
+    { icon: '🔄', label: '전후 비교', message: '시공 전후 비교해줘' },
+  ],
+  'defects': [
+    { icon: '🔧', label: '하자 등록', message: '새 하자 등록해줘' },
+    { icon: '📋', label: '하자 현황', message: '하자 목록 보여줘' },
+    { icon: '📊', label: '처리 이력', message: '하자 처리 이력 알려줘' },
+  ],
+  'evidence-package': [
+    { icon: '📁', label: '증빙 현황', message: '증빙 패키지 현황 조회해줘' },
+    { icon: '✅', label: '무결성 검증', message: '증빙 무결성 검증해줘' },
+  ],
+  'agreement': [
+    { icon: '🤝', label: '합의서 생성', message: '3자 합의서 생성해줘' },
   ],
 }
 
@@ -86,6 +123,19 @@ export default function AgentChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
+
+  // 외부에서 메시지를 보내는 이벤트 리스너 (QuickActions 연동)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail
+      if (detail?.message) {
+        setOpen(true)
+        setTimeout(() => sendMessage(detail.message), 300)
+      }
+    }
+    window.addEventListener('cheki-send', handler)
+    return () => window.removeEventListener('cheki-send', handler)
+  }, [loading])
 
   const sendMessage = async (msgText?: string) => {
     const userMsg = (msgText || input).trim()
@@ -155,6 +205,25 @@ export default function AgentChat() {
     schedule_check: '일정 점검 완료',
     verify_score: 'AI 검증 완료',
     get_project_summary: '현황 조회 완료',
+    estimate: '가견적 생성 완료',
+    auto_quote_generate: 'AI 자동 견적 완료',
+    auto_quote_compare: '견적 비교 완료',
+    auto_schedule_generate: 'AI 공정표 생성 완료',
+    auto_report_daily: '일일보고서 생성 완료',
+    auto_report_weekly: '주간보고서 생성 완료',
+    auto_report_completion: '완료보고서 생성 완료',
+    auto_law_check: '법규 체크 완료',
+    design_generate: '디자인 컨셉 생성 완료',
+    design_layout_suggest: '레이아웃 제안 완료',
+    floorplan_generate: '도면 생성 완료',
+    floorplan_from_description: '도면 자동 생성 완료',
+    risk_full_diagnosis: '종합 리스크 진단 완료',
+    certificate_generate: '인증서 발급 완료',
+    schedule_gantt: '간트 차트 생성 완료',
+    defect_create: '하자 등록 완료',
+    worker_add: '작업자 등록 완료',
+    material_add: '자재 등록 완료',
+    export_pdf: 'PDF 내보내기 완료',
   }
 
   return (

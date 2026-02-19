@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16/10;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   cursor: ew-resize;
   user-select: none;
@@ -55,13 +55,13 @@
   width: 36px;
   height: 36px;
   background: white;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: var(--shadow-md);
   font-size: 0.65rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .labelBefore, .labelAfter {

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { ChangeOrder, ChangeOrderStatus, ChangeOrderType } from '@/types/changeOrder'
 import { CHANGE_TYPES, CHANGE_STATUSES } from '@/types/changeOrder'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function ChangesPage() {
@@ -232,6 +233,11 @@ export default function ChangesPage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <QuickActions compact actions={[
+          { icon: '🔄', label: '변경 등록', description: '변경사항 등록', message: '변경사항 등록해줘' },
+          { icon: '📋', label: '변경 이력', description: '변경 이력 분석', message: '변경 이력 분석해줘' },
+        ]} />
+
         {/* Summary */}
         <section className={styles.summary}>
           <div className={styles.summaryCard}>

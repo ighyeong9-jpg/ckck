@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--color-bg);
 }
 
 .loading {
@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .main {
@@ -30,8 +30,8 @@
 }
 
 .summaryCard {
-  background: white;
-  border-radius: 12px;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
   padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -41,7 +41,7 @@
 
 .summaryLabel {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .summaryValue {
@@ -56,8 +56,8 @@
 }
 
 .uploadCard {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -78,7 +78,7 @@
 
 .categorySelect {
   padding: 0.75rem 1rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   border-radius: 10px;
   font-size: 1rem;
   cursor: pointer;
@@ -104,9 +104,9 @@
   border: none;
   border-radius: 10px;
   color: white;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:hover {
     transform: translateY(-2px);
@@ -117,7 +117,7 @@
 .uploadHint {
   text-align: center;
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   margin-top: 0.75rem;
 }
 
@@ -134,12 +134,12 @@
   align-items: center;
   justify-content: center;
   padding: 4rem 2rem;
-  background: white;
-  border-radius: 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  box-shadow: var(--card-shadow);
   border: 1px solid rgba(0,0,0,0.03);
-  h3 { font-size: 1.1rem; font-weight: 700; color: #374151; margin: 0.5rem 0 0.5rem; }
+  h3 { font-size: 1.1rem; font-weight: 700; color: var(--color-text); margin: 0.5rem 0 0.5rem; }
 }
 
 .emptyIcon {
@@ -149,7 +149,7 @@
 }
 
 .emptyState p {
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   margin-bottom: 1.5rem;
   line-height: 1.6;
@@ -161,14 +161,14 @@
   border: none;
   border-radius: 10px;
   color: white;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
 }
 
 // Category Group
 .categoryGroup {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -179,12 +179,12 @@
   align-items: center;
   padding: 1rem 1.5rem;
   background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 
   h2 {
     font-size: 1rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-text);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -193,10 +193,10 @@
 
 .fileCount {
   font-size: 0.875rem;
-  color: #6b7280;
-  background: #e5e7eb;
+  color: var(--color-text-secondary);
+  background: var(--color-border);
   padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
 }
 
 .filesList {
@@ -209,7 +209,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border-light);
 
   &:last-child {
     border-bottom: none;
@@ -234,28 +234,28 @@
 
 .fileName {
   font-weight: 500;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .fileMeta {
   display: flex;
   gap: 0.5rem;
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .hash {
   font-family: monospace;
   font-size: 0.75rem;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: var(--color-text-secondary);
+  background: var(--color-border-light);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:hover {
-    background: #e5e7eb;
+    background: var(--color-border);
     color: #0ea5e9;
   }
 }
@@ -285,7 +285,7 @@
   background: #fee2e2;
   border: none;
   border-radius: 6px;
-  color: #dc2626;
+  color: var(--color-danger-hover);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -297,8 +297,8 @@
 
 // Merkle Tree Section
 .merkleSection {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -313,7 +313,7 @@
   h2 {
     font-size: 1rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-text);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -333,12 +333,12 @@
   padding: 0.5rem 1rem;
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: white;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
@@ -355,12 +355,12 @@
   padding: 0.5rem 1rem;
   background: #e0e7ff;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: #4f46e5;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:hover:not(:disabled) {
     background: #c7d2fe;
@@ -377,15 +377,15 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1rem;
-  background: #f8fafc;
-  border-radius: 8px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
   margin-bottom: 1rem;
 }
 
 .merkleLabel {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text);
   white-space: nowrap;
 }
 
@@ -399,7 +399,7 @@
   border-radius: 4px;
   cursor: pointer;
   word-break: break-all;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:hover {
     background: #c7d2fe;
@@ -408,17 +408,17 @@
 
 .verificationResult {
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   border-left: 4px solid;
 
   &.valid {
     background: #f0fdf4;
-    border-color: #10b981;
+    border-color: var(--color-success);
   }
 
   &.invalid {
     background: #fef2f2;
-    border-color: #ef4444;
+    border-color: var(--color-danger);
   }
 }
 
@@ -435,14 +435,14 @@
 
 .statusText {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .verificationDetails {
   display: flex;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
 }
 
@@ -455,14 +455,14 @@
 .failedLabel {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #dc2626;
+  color: var(--color-danger-hover);
 }
 
 .failedFiles ul {
   margin-top: 0.5rem;
   padding-left: 1.5rem;
   font-size: 0.875rem;
-  color: #ef4444;
+  color: var(--color-danger);
 
   li {
     margin-bottom: 0.25rem;

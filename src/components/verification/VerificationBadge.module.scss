@@ -9,7 +9,7 @@
 .badge {
   display: inline-flex; align-items: center; gap: 0.5rem;
   padding: 0.375rem 0.75rem 0.375rem 0.375rem;
-  border: 2px solid; border-radius: 10px; background: white;
+  border: 2px solid; border-radius: var(--radius-md); background: var(--card-bg);
 }
 .badgeGrade {
   width: 28px; height: 28px; border-radius: 7px;
@@ -19,5 +19,5 @@
 .badgeInfo {
   display: flex; flex-direction: column;
 }
-.badgeTitle { font-size: 0.7rem; font-weight: 600; color: #374151; }
-.badgeScore { font-size: 0.65rem; color: #6b7280; }
+.badgeTitle { font-size: 0.7rem; font-weight: 600; color: var(--color-text); }
+.badgeScore { font-size: 0.65rem; color: var(--color-text-secondary); }

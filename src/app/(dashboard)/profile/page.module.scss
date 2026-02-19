@@ -1,25 +1,22 @@
-.container { min-height: 100vh; background: #f8f9fa; }
+.container { min-height: 100vh; background: var(--color-bg); }
 
 .loading {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 50vh; gap: 1rem; color: #6b7280;
+  min-height: 50vh; gap: 1rem; color: var(--color-text-secondary);
 }
 .spinner {
-  width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #7c3aed;
+  width: 40px; height: 40px; border: 3px solid var(--color-border); border-top-color: var(--color-primary);
   border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .header {
-  padding: 2rem 1.5rem 1rem;
-  max-width: 900px; margin: 0 auto;
-  h1 { font-size: 1.75rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
-  p { font-size: 0.875rem; color: #6b7280; }
+  padding: 2rem 1.5rem 1rem; max-width: 900px; margin: 0 auto;
+  h1 { font-size: 1.75rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem; }
+  p { font-size: 0.875rem; color: var(--color-text-secondary); }
 }
 
-.main {
-  max-width: 900px; margin: 0 auto; padding: 0 1.5rem 3rem;
-}
+.main { max-width: 900px; margin: 0 auto; padding: 0 1.5rem 3rem; }
 
 // Stats
 .statsRow {
@@ -27,20 +24,20 @@
   @media (max-width: 600px) { grid-template-columns: 1fr; }
 }
 .statCard {
-  background: white; border-radius: 14px; padding: 1.25rem;
+  background: var(--card-bg); border-radius: var(--card-radius); padding: 1.25rem;
   display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  box-shadow: var(--card-shadow); border: var(--card-border);
 }
 .statIcon { font-size: 1.5rem; }
-.statValue { font-size: 1.5rem; font-weight: 700; color: #7c3aed; }
-.statLabel { font-size: 0.75rem; color: #6b7280; }
+.statValue { font-size: 1.5rem; font-weight: 700; color: var(--color-primary); }
+.statLabel { font-size: 0.75rem; color: var(--color-text-secondary); }
 
 // Section
 .section {
-  background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  background: var(--card-bg); border-radius: var(--card-radius); padding: var(--card-padding); margin-bottom: 1.5rem;
+  box-shadow: var(--card-shadow); border: var(--card-border);
 }
-.sectionTitle { font-size: 1.1rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; }
+.sectionTitle { font-size: 1.1rem; font-weight: 600; color: var(--color-text); margin-bottom: 1rem; }
 
 // Form
 .formGrid {
@@ -49,37 +46,39 @@
 }
 .formGroup {
   display: flex; flex-direction: column; gap: 0.5rem;
-  label { font-size: 0.85rem; font-weight: 600; color: #374151; }
+  label { font-size: 0.85rem; font-weight: 600; color: var(--color-text); }
   input, textarea {
-    padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem;
-    &:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+    padding: var(--input-padding); border: var(--input-border); border-radius: var(--input-radius); font-size: 0.95rem;
+    transition: all var(--transition-fast);
+    &:focus { outline: none; border-color: var(--color-primary); box-shadow: var(--input-focus-ring); }
   }
 }
 
 // Logo
 .logoUpload { display: flex; align-items: center; gap: 1.5rem; }
 .logoPreview {
-  width: 80px; height: 80px; object-fit: cover; border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius-md);
+  border: 2px solid var(--color-border);
 }
 .logoPlaceholder {
-  width: 80px; height: 80px; background: #f3f4f6; border-radius: 12px;
+  width: 80px; height: 80px; background: var(--color-border-light); border-radius: var(--radius-md);
   display: flex; align-items: center; justify-content: center; font-size: 2rem;
 }
 .uploadBtn {
-  padding: 0.625rem 1.25rem; background: #f3f4f6; border-radius: 8px;
-  font-size: 0.85rem; cursor: pointer; font-weight: 500; color: #374151;
-  &:hover { background: #e5e7eb; }
+  padding: 0.625rem 1.25rem; background: var(--color-border-light); border-radius: var(--radius-sm);
+  font-size: 0.85rem; cursor: pointer; font-weight: 500; color: var(--color-text);
+  transition: background var(--transition-fast);
+  &:hover { background: var(--color-border); }
 }
 
 // Tags
 .tagGrid { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .tagChip {
-  padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 20px;
-  background: white; font-size: 0.85rem; cursor: pointer; transition: all 0.15s;
-  &:hover { border-color: #7c3aed; }
+  padding: 0.5rem 1rem; border: 2px solid var(--color-border); border-radius: var(--radius-full);
+  background: var(--card-bg); font-size: 0.85rem; cursor: pointer; transition: all var(--transition-fast);
+  &:hover { border-color: var(--color-primary); }
   &.tagActive {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, #4f46e5, var(--color-primary));
     color: white; border-color: transparent;
   }
 }
@@ -90,45 +89,45 @@
 }
 .portfolioItem {
   position: relative; aspect-ratio: 1;
-  img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+  img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-md); }
 }
 .removeBtn {
   position: absolute; top: 4px; right: 4px;
-  width: 24px; height: 24px; background: #ef4444; color: white;
+  width: 24px; height: 24px; background: var(--color-danger); color: white;
   border: none; border-radius: 50%; font-size: 0.7rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
 }
 .portfolioAddBtn {
-  aspect-ratio: 1; border: 2px dashed #d1d5db; border-radius: 10px;
+  aspect-ratio: 1; border: 2px dashed var(--color-border); border-radius: var(--radius-md);
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 0.85rem; color: #9ca3af;
-  &:hover { border-color: #7c3aed; color: #7c3aed; }
+  cursor: pointer; font-size: 0.85rem; color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+  &:hover { border-color: var(--color-primary); color: var(--color-primary); }
 }
 
 // Public Link
-.publicLink {
-  display: flex; gap: 0.75rem; align-items: center;
-}
+.publicLink { display: flex; gap: 0.75rem; align-items: center; }
 .linkUrl {
-  flex: 1; padding: 0.75rem; background: #f9fafb; border-radius: 8px;
-  font-size: 0.85rem; color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 1; padding: 0.75rem; background: var(--color-bg); border-radius: var(--radius-sm);
+  font-size: 0.85rem; color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .copyBtn {
   padding: 0.75rem 1.25rem; background: #4f46e5; color: white;
-  border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+  border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;
   &:hover { background: #4338ca; }
 }
 .generateBtn {
-  padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer;
-  &:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+  padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #4f46e5, var(--color-primary));
+  border: none; border-radius: var(--btn-radius); color: white; font-weight: var(--btn-font-weight); cursor: pointer;
+  transition: all var(--transition-fast);
+  &:hover { transform: translateY(-2px); box-shadow: var(--shadow-purple); }
 }
 
 // Save
 .saveBtn {
-  width: 100%; padding: 1rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  border: none; border-radius: 12px; color: white; font-weight: 700; font-size: 1rem;
-  cursor: pointer; transition: all 0.2s;
-  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.3); }
+  width: 100%; padding: 1rem; background: linear-gradient(135deg, #4f46e5, var(--color-primary));
+  border: none; border-radius: var(--btn-radius); color: white; font-weight: 700; font-size: 1rem;
+  cursor: pointer; transition: all var(--transition-fast);
+  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-purple); }
   &:disabled { opacity: 0.7; cursor: not-allowed; }
 }

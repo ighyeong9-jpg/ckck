@@ -1,11 +1,12 @@
 import './globals.css'
 import Script from 'next/script'
+import Providers from '@/components/ui/Providers'
 
 export const metadata = {
   title: 'Check-In',
   description: '기록의 편 - 인테리어 프로젝트 관리 플랫폼',
   manifest: '/manifest.json',
-  themeColor: '#4f46e5',
+  themeColor: '#7c3aed',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -32,10 +33,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Check-In" />
-        <meta name="theme-color" content="#4f46e5" />
+        <meta name="theme-color" content="#7c3aed" />
       </head>
       <body>
-        {children}
+        <Providers>{children}</Providers>
         <Script id="sw-register" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {

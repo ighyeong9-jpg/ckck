@@ -1,0 +1,33 @@
+{
+  "id": "oneroom",
+  "name": "원룸/투룸",
+  "icon": "🚪",
+  "description": "원룸/투룸 인테리어 체크리스트",
+  "items": [
+    {"id": "oneroom-safety-001", "category": "안전", "subcategory": "소방", "item": "화재감지기 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "oneroom-safety-002", "category": "안전", "subcategory": "소방", "item": "소화기 비치 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-safety-003", "category": "안전", "subcategory": "전기", "item": "누전차단기 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "oneroom-safety-004", "category": "안전", "subcategory": "전기", "item": "분전반 용량 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "oneroom-safety-005", "category": "안전", "subcategory": "전기", "item": "콘센트 배치 및 접지 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "oneroom-safety-006", "category": "안전", "subcategory": "가스", "item": "가스 배관 및 차단밸브 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "oneroom-legal-001", "category": "법규", "subcategory": "건축", "item": "구조 변경 허가 확인", "priority": "필수", "method": "육안확인", "evidence": "점검표"},
+    {"id": "oneroom-quality-001", "category": "품질", "subcategory": "방수", "item": "욕실 방수 시공 상태 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "oneroom-quality-002", "category": "품질", "subcategory": "바닥", "item": "바닥 수평도 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "oneroom-quality-003", "category": "품질", "subcategory": "벽체", "item": "벽체 마감 상태 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-quality-004", "category": "품질", "subcategory": "방음", "item": "벽체/바닥 방음 상태 확인", "priority": "권장", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-equip-001", "category": "설비", "subcategory": "급수", "item": "급수 배관 설치 확인 (주방/욕실)", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "oneroom-equip-002", "category": "설비", "subcategory": "배수", "item": "배수 배관 원활성 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "oneroom-equip-003", "category": "설비", "subcategory": "난방", "item": "보일러 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "oneroom-equip-004", "category": "설비", "subcategory": "환기", "item": "환풍기 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "oneroom-equip-005", "category": "설비", "subcategory": "냉난방", "item": "에어컨 설치 위치 및 배관 확인", "priority": "권장", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-finish-001", "category": "마감", "subcategory": "바닥", "item": "바닥재 (장판/마루) 시공 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-finish-002", "category": "마감", "subcategory": "벽체", "item": "도배/페인트 마감 상태 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-finish-003", "category": "마감", "subcategory": "천장", "item": "천장 마감 상태 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-finish-004", "category": "마감", "subcategory": "창호", "item": "창호 기밀성 및 방음 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-finish-005", "category": "마감", "subcategory": "주방", "item": "싱크대 설치 상태 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-finish-006", "category": "마감", "subcategory": "욕실", "item": "욕실 타일 및 위생도기 설치", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-finish-007", "category": "마감", "subcategory": "현관", "item": "현관문 도어락 설치 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "oneroom-finish-008", "category": "마감", "subcategory": "수납", "item": "수납 공간 설치 확인", "priority": "권장", "method": "육안확인", "evidence": "사진"},
+    {"id": "oneroom-finish-009", "category": "마감", "subcategory": "조명", "item": "조명 배치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"}
+  ]
+}

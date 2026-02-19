@@ -1,320 +1,117 @@
-.container {
-  min-height: 100vh;
-  background: #f8f9fa;
-}
+.container { min-height: 100vh; background: var(--color-bg); }
 
 .loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  color: #6b7280;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 50vh; color: var(--color-text-secondary);
 }
 
 .header {
-  background: linear-gradient(135deg, #7c3aed, #a78bfa);
-  padding: 2rem;
-  color: white;
-  text-align: center;
+  background: linear-gradient(135deg, var(--color-primary), #a78bfa);
+  padding: 2rem; color: white; text-align: center;
 }
+.title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+.subtitle { font-size: 0.875rem; opacity: 0.9; }
 
-.title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.subtitle {
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-.main {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
+.main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
 
 .billingToggle {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  background: white;
-  padding: 0.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  max-width: 360px;
-  margin-left: auto;
-  margin-right: auto;
+  display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem;
+  background: var(--card-bg); padding: 0.5rem; border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm); max-width: 360px; margin-left: auto; margin-right: auto;
 }
-
 .toggleBtn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #6b7280;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-
-  &.active {
-    background: #7c3aed;
-    color: white;
-  }
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.75rem 1rem; border: none; border-radius: var(--radius-sm); background: transparent;
+  color: var(--color-text-secondary); font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  transition: all var(--transition-fast);
+  &:hover { background: var(--color-border-light); }
+  &.active { background: var(--color-primary); color: white; }
 }
-
 .discount {
-  background: #fef3c7;
-  color: #b45309;
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: var(--color-warning-light); color: #b45309;
+  padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
 }
 
 .plansGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem; margin-bottom: 2rem;
 }
-
 .planCard {
-  position: relative;
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 2px solid transparent;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  }
-
-  &.recommended {
-    border-color: #7c3aed;
-  }
-
-  &.current {
-    background: #faf5ff;
-  }
+  position: relative; background: var(--card-bg); border-radius: var(--card-radius); padding: var(--card-padding);
+  box-shadow: var(--card-shadow); border: 2px solid transparent;
+  transition: all var(--transition-normal);
+  &:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  &.recommended { border-color: var(--color-primary); }
+  &.current { background: rgba(124,58,237,0.04); }
 }
-
 .recommendedBadge {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #7c3aed, #a78bfa);
-  color: white;
-  padding: 0.25rem 1rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--color-primary), #a78bfa);
+  color: white; padding: 0.25rem 1rem; border-radius: var(--radius-full);
+  font-size: 0.75rem; font-weight: 600;
 }
-
 .currentBadge {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: #dcfce7;
-  color: #166534;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  position: absolute; top: 1rem; right: 1rem;
+  background: var(--color-success-light); color: #166534;
+  padding: 0.25rem 0.75rem; border-radius: var(--radius-full);
+  font-size: 0.75rem; font-weight: 600;
 }
-
-.planName {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.planPrice {
-  margin-bottom: 1.5rem;
-}
-
-.price {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #7c3aed;
-}
-
-.originalPrice {
-  display: block;
-  font-size: 0.875rem;
-  color: #9ca3af;
-  text-decoration: line-through;
-  margin-top: 0.25rem;
-}
-
+.planName { font-size: 1.25rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem; margin-top: 0.5rem; }
+.planPrice { margin-bottom: 1.5rem; }
+.price { font-size: 1.75rem; font-weight: 700; color: var(--color-primary); }
+.originalPrice { display: block; font-size: 0.875rem; color: var(--color-text-muted); text-decoration: line-through; margin-top: 0.25rem; }
 .features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem 0;
-
+  list-style: none; padding: 0; margin: 0 0 1.5rem 0;
   li {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0;
-    font-size: 0.875rem;
-    color: #4b5563;
-    border-bottom: 1px solid #f3f4f6;
-
-    &:last-child {
-      border-bottom: none;
-    }
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;
+    font-size: 0.875rem; color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border-light);
+    &:last-child { border-bottom: none; }
   }
 }
-
-.checkIcon {
-  color: #10b981;
-  font-weight: 700;
-}
-
+.checkIcon { color: var(--color-success); font-weight: 700; }
 .selectBtn {
-  width: 100%;
-  padding: 0.875rem;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: linear-gradient(135deg, #7c3aed, #a78bfa);
-  color: white;
-
-  &:hover:not(:disabled) {
-    transform: scale(1.02);
-  }
-
-  &:disabled {
-    background: #e5e7eb;
-    color: #9ca3af;
-    cursor: default;
-  }
+  width: 100%; padding: 0.875rem; border: none; border-radius: var(--btn-radius);
+  font-size: 1rem; font-weight: var(--btn-font-weight); cursor: pointer; transition: all var(--transition-fast);
+  background: linear-gradient(135deg, var(--color-primary), #a78bfa); color: white;
+  &:hover:not(:disabled) { transform: scale(1.02); }
+  &:disabled { background: var(--color-border); color: var(--color-text-muted); cursor: default; }
 }
 
-.section {
-  margin-bottom: 1.5rem;
-}
-
-.sectionTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 1rem;
-}
-
+.section { margin-bottom: 1.5rem; }
+.sectionTitle { font-size: 1.125rem; font-weight: 600; color: var(--color-text); margin-bottom: 1rem; }
 .card {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: var(--card-bg); border-radius: var(--card-radius); padding: var(--card-padding);
+  box-shadow: var(--card-shadow); border: var(--card-border);
 }
 
 .emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  color: #6b7280;
-  text-align: center;
+  display: flex; flex-direction: column; align-items: center; padding: 2rem;
+  color: var(--color-text-secondary); text-align: center;
 }
-
-.emptyIcon {
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
-}
-
+.emptyIcon { font-size: 2.5rem; margin-bottom: 0.75rem; }
 .addCardBtn {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
-  background: transparent;
-  color: #6b7280;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    border-color: #7c3aed;
-    color: #7c3aed;
-  }
+  margin-top: 1rem; padding: 0.75rem 1.5rem; border: 2px dashed var(--color-border);
+  border-radius: var(--radius-sm); background: transparent;
+  color: var(--color-text-secondary); font-size: 0.875rem; font-weight: 600;
+  cursor: pointer; transition: all var(--transition-fast);
+  &:hover { border-color: var(--color-primary); color: var(--color-primary); }
 }
 
-.contactSection {
-  margin-top: 2rem;
-}
-
+.contactSection { margin-top: 2rem; }
 .contactCard {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
-  border-radius: 16px;
-  padding: 1.5rem;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    text-align: center;
-  }
+  display: flex; align-items: center; gap: 1rem;
+  background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(124,58,237,0.1));
+  border-radius: var(--card-radius); padding: var(--card-padding);
+  @media (max-width: 600px) { flex-direction: column; text-align: center; }
 }
-
-.contactIcon {
-  font-size: 2rem;
-}
-
-.contactCard h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-}
-
-.contactCard p {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
+.contactIcon { font-size: 2rem; }
+.contactCard h3 { font-size: 1rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.25rem; }
+.contactCard p { font-size: 0.875rem; color: var(--color-text-secondary); }
 .contactBtn {
-  margin-left: auto;
-  padding: 0.75rem 1.5rem;
-  background: #7c3aed;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-
-  &:hover {
-    background: #6d28d9;
-  }
-
-  @media (max-width: 600px) {
-    margin-left: 0;
-    margin-top: 1rem;
-  }
+  margin-left: auto; padding: 0.75rem 1.5rem; background: var(--color-primary);
+  border: none; border-radius: var(--radius-sm); color: white;
+  font-size: 0.875rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+  transition: background var(--transition-fast);
+  &:hover { background: var(--color-primary-hover); }
+  @media (max-width: 600px) { margin-left: 0; margin-top: 1rem; }
 }

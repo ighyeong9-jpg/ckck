@@ -8,8 +8,8 @@
 }
 
 .card {
-  background: white;
-  border-radius: 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
   padding: 2.5rem;
   width: 100%;
   max-width: 400px;
@@ -36,21 +36,21 @@
 .logoText {
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .tagline {
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
 }
 
 .tabs {
   display: flex;
-  background: #f3f4f6;
-  border-radius: 12px;
+  background: var(--color-border-light);
+  border-radius: var(--radius-md);
   padding: 4px;
   margin-bottom: 1.5rem;
 }
@@ -60,17 +60,17 @@
   padding: 0.75rem;
   border: none;
   background: transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 
   &.active {
-    background: white;
-    color: #7c3aed;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: var(--card-bg);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
   }
 }
 
@@ -88,61 +88,61 @@
   label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--color-text);
   }
 
   input {
     padding: 0.875rem 1rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
+    border: var(--input-border);
+    border-radius: var(--input-radius);
     font-size: 1rem;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 
     &:focus {
       outline: none;
-      border-color: #7c3aed;
-      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+      border-color: var(--color-primary);
+      box-shadow: var(--input-focus-ring);
     }
 
     &::placeholder {
-      color: #9ca3af;
+      color: var(--color-text-muted);
     }
   }
 }
 
 .error {
   padding: 0.75rem 1rem;
-  background: #fee2e2;
-  color: #dc2626;
-  border-radius: 10px;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
   text-align: center;
 }
 
 .success {
   padding: 0.75rem 1rem;
-  background: #d1fae5;
-  color: #059669;
-  border-radius: 10px;
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
   text-align: center;
 }
 
 .submitBtn {
   padding: 1rem;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
   border: none;
-  border-radius: 12px;
+  border-radius: var(--btn-radius);
   color: white;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
   margin-top: 0.5rem;
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+    box-shadow: var(--shadow-purple);
   }
 
   &:disabled {
@@ -156,7 +156,7 @@
   text-align: center;
 
   p {
-    color: #6b7280;
+    color: var(--color-text-secondary);
     font-size: 0.875rem;
   }
 }
@@ -164,7 +164,7 @@
 .switchBtn {
   background: none;
   border: none;
-  color: #7c3aed;
+  color: var(--color-primary);
   font-weight: 600;
   cursor: pointer;
   margin-left: 0.25rem;

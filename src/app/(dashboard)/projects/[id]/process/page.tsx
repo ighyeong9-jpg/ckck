@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Process, ProcessStatus } from '@/types/process'
 import { PROCESS_STATUS, DEFAULT_PROCESSES } from '@/types/process'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 type ViewMode = 'list' | 'gantt'
@@ -360,6 +361,12 @@ export default function ProcessPage() {
             </button>
           </div>
         </div>
+
+        <QuickActions compact actions={[
+          { icon: '📅', label: 'AI 공정표 생성', description: '자동 공정표 만들기', message: '공정표 자동으로 만들어줘' },
+          { icon: '⏰', label: '지연 감지', description: '지연 공정 확인', message: '지연 공정 확인해줘' },
+          { icon: '📊', label: '간트 차트', description: '간트 차트 보기', message: '간트 차트 보여줘' },
+        ]} />
 
         {/* Status Legend */}
         <div className={styles.statusLegend}>

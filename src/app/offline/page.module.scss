@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f8f9fa, #ede9fe);
+  background: linear-gradient(135deg, var(--color-bg), rgba(124,58,237,0.06));
   padding: 2rem;
 }
 
@@ -29,12 +29,12 @@
 .title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .description {
   font-size: 0.95rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   line-height: 1.6;
 }
 
@@ -48,8 +48,8 @@
 .logoIcon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  border-radius: 10px;
+  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +61,7 @@
 .logoText {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -69,5 +69,5 @@
 
 .tagline {
   font-size: 0.85rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }

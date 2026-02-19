@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--color-bg);
 }
 
 .loading {
@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .main {
@@ -30,8 +30,8 @@
 }
 
 .summaryCard {
-  background: white;
-  border-radius: 12px;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
   padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -50,7 +50,7 @@
 
 .summaryLabel {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .summaryValue {
@@ -69,9 +69,9 @@
   border: none;
   border-radius: 10px;
   color: white;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
 
   &:hover {
     transform: translateY(-2px);
@@ -92,12 +92,12 @@
   align-items: center;
   justify-content: center;
   padding: 4rem 2rem;
-  background: white;
-  border-radius: 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  box-shadow: var(--card-shadow);
   border: 1px solid rgba(0,0,0,0.03);
-  h3 { font-size: 1.1rem; font-weight: 700; color: #374151; margin: 0.5rem 0 0.5rem; }
+  h3 { font-size: 1.1rem; font-weight: 700; color: var(--color-text); margin: 0.5rem 0 0.5rem; }
 }
 
 .emptyIcon {
@@ -107,7 +107,7 @@
 }
 
 .emptyState p {
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   margin-bottom: 1.5rem;
   line-height: 1.6;
@@ -119,14 +119,14 @@
   border: none;
   border-radius: 10px;
   color: white;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   cursor: pointer;
 }
 
 // Order Card
 .orderCard {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -150,12 +150,12 @@
 
 .typeName {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .statusBadge {
   padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   font-size: 0.75rem;
   font-weight: 600;
   color: white;
@@ -164,13 +164,13 @@
 .orderTitle {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text);
   margin-bottom: 0.5rem;
 }
 
 .orderReason {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   margin-bottom: 1rem;
   line-height: 1.5;
 }
@@ -180,23 +180,23 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--color-border-light);
   margin-bottom: 1rem;
 }
 
 .costChange {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #ef4444;
+  color: var(--color-danger);
 
   &[data-positive="true"] {
-    color: #10b981;
+    color: var(--color-success);
   }
 }
 
 .date {
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .orderActions {
@@ -225,7 +225,7 @@
   background: #fee2e2;
   border: none;
   border-radius: 6px;
-  color: #dc2626;
+  color: var(--color-danger-hover);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -252,16 +252,16 @@
 
 .deleteBtn {
   padding: 0.5rem 1rem;
-  background: #f3f4f6;
+  background: var(--color-border-light);
   border: none;
   border-radius: 6px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
 
   &:hover {
-    background: #e5e7eb;
+    background: var(--color-border);
   }
 }
 
@@ -278,8 +278,8 @@
 }
 
 .modal {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
@@ -291,7 +291,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 
   h2 {
     font-size: 1.25rem;
@@ -305,13 +305,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
+  background: var(--color-border-light);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
 
   &:hover {
-    background: #e5e7eb;
+    background: var(--color-border);
   }
 }
 
@@ -330,12 +330,12 @@
   label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--color-text);
   }
 
   input, select, textarea {
     padding: 0.75rem 1rem;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--color-border);
     border-radius: 10px;
     font-size: 1rem;
 
@@ -352,7 +352,7 @@
 
 .hint {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .modalActions {
@@ -364,15 +364,15 @@
 .cancelBtn {
   flex: 1;
   padding: 0.875rem;
-  background: #f3f4f6;
+  background: var(--color-border-light);
   border: none;
   border-radius: 10px;
-  font-weight: 600;
-  color: #6b7280;
+  font-weight: var(--btn-font-weight);
+  color: var(--color-text-secondary);
   cursor: pointer;
 
   &:hover {
-    background: #e5e7eb;
+    background: var(--color-border);
   }
 }
 
@@ -382,7 +382,7 @@
   background: linear-gradient(135deg, #8b5cf6, #a78bfa);
   border: none;
   border-radius: 10px;
-  font-weight: 600;
+  font-weight: var(--btn-font-weight);
   color: white;
   cursor: pointer;
 

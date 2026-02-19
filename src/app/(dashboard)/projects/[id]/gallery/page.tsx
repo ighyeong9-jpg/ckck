@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import PhotoGallery from '@/components/gallery/PhotoGallery'
 import BeforeAfterSlider from '@/components/gallery/BeforeAfterSlider'
 import type { GalleryPhoto } from '@/types/photoGallery'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 export default function GalleryPage() {
@@ -25,7 +26,7 @@ export default function GalleryPage() {
 
   const loadPhotos = async () => {
     try {
-      // Load from evidence_files table
+      // Load from files table
       const { data, error } = await supabase
         .from('files')
         .select('*')
@@ -117,6 +118,11 @@ export default function GalleryPage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <QuickActions compact actions={[
+          { icon: '📷', label: '사진 분석', description: '현장 사진 AI 분석', message: '현장 사진 분석해줘' },
+          { icon: '🔄', label: '전후 비교', description: '시공 전후 비교', message: '시공 전후 비교해줘' },
+        ]} />
+
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.viewToggle}>

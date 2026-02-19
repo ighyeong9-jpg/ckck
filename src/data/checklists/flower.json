@@ -1,0 +1,30 @@
+{
+  "id": "flower",
+  "name": "꽃집/플라워샵",
+  "icon": "💐",
+  "description": "꽃집/플라워샵 인테리어 체크리스트",
+  "items": [
+    {"id": "flower-safety-001", "category": "안전", "subcategory": "소방", "item": "소화기 비치 위치 및 수량 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "flower-safety-002", "category": "안전", "subcategory": "소방", "item": "화재감지기 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "flower-safety-003", "category": "안전", "subcategory": "전기", "item": "누전차단기 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "flower-safety-004", "category": "안전", "subcategory": "전기", "item": "접지 상태 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "flower-legal-001", "category": "법규", "subcategory": "건축", "item": "용도변경 허가 여부 확인", "priority": "필수", "method": "육안확인", "evidence": "점검표"},
+    {"id": "flower-quality-001", "category": "품질", "subcategory": "방수", "item": "바닥 방수 처리 상태 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "flower-quality-002", "category": "품질", "subcategory": "바닥", "item": "바닥 배수 경사 및 배수구 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "flower-quality-003", "category": "품질", "subcategory": "벽체", "item": "벽체 방습 처리 확인", "priority": "권장", "method": "육안확인", "evidence": "사진"},
+    {"id": "flower-equip-001", "category": "설비", "subcategory": "냉장", "item": "꽃 냉장고 전용 전원 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "flower-equip-002", "category": "설비", "subcategory": "냉장", "item": "꽃 냉장고 온도 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "flower-equip-003", "category": "설비", "subcategory": "급수", "item": "작업대 급수 배관 연결 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "flower-equip-004", "category": "설비", "subcategory": "배수", "item": "작업대 배수 트랩 설치 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "flower-equip-005", "category": "설비", "subcategory": "환기", "item": "환기 시설 설치 (습도 조절)", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "flower-equip-006", "category": "설비", "subcategory": "조명", "item": "매장 조명 조도 확인", "priority": "필수", "method": "측정확인", "evidence": "측정기록"},
+    {"id": "flower-equip-007", "category": "설비", "subcategory": "온습도", "item": "온습도 제어 시스템 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "flower-equip-008", "category": "설비", "subcategory": "냉난방", "item": "에어컨 설치 및 작동 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "flower-finish-001", "category": "마감", "subcategory": "진열", "item": "진열대/선반 설치 상태 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "flower-finish-002", "category": "마감", "subcategory": "작업대", "item": "꽃꽂이 작업대 설치 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "flower-finish-003", "category": "마감", "subcategory": "카운터", "item": "접수/포장 카운터 설치 확인", "priority": "필수", "method": "육안확인", "evidence": "사진"},
+    {"id": "flower-finish-004", "category": "마감", "subcategory": "출입구", "item": "출입문 개폐 상태 확인", "priority": "필수", "method": "작동확인", "evidence": "점검표"},
+    {"id": "flower-finish-005", "category": "마감", "subcategory": "간판", "item": "외부 간판 설치 상태 확인", "priority": "권장", "method": "육안확인", "evidence": "사진"},
+    {"id": "flower-finish-006", "category": "마감", "subcategory": "창호", "item": "창문/쇼윈도 유리 마감 확인", "priority": "권장", "method": "육안확인", "evidence": "사진"}
+  ]
+}

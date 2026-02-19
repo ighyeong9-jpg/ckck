@@ -24,6 +24,7 @@ import {
   PRIORITY_RISK_SCORE
 } from '@/types/diagnostic'
 import RiskGauge from '@/components/risk/RiskGauge'
+import QuickActions from '@/components/ui/QuickActions'
 import styles from './page.module.scss'
 
 interface CustomItem extends ChecklistItem {
@@ -444,6 +445,12 @@ export default function DiagnosticPage() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <QuickActions compact actions={[
+          { icon: '🔍', label: '리스크 진단', description: '전체 리스크 종합 진단', message: '전체 리스크 종합 진단해줘' },
+          { icon: '📋', label: '체크리스트 분석', description: 'AI 체크리스트 분석', message: '체크리스트 분석해줘' },
+          { icon: '⚠️', label: '안전 점검', description: '안전 리스크 분석', message: '안전 리스크 분석해줘' },
+        ]} />
+
         {/* Industry Selector */}
         <section className={styles.industrySection}>
           <label className={styles.industryLabel}>업종 선택</label>
