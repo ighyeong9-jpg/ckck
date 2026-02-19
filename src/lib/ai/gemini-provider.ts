@@ -596,7 +596,9 @@ export interface GeminiResponse {
 // 모델 폴백 체인: 할당량 초과 시 자동 전환
 // gemini-2.5-flash: 20 RPD (무료) - 더 똑똑함
 // gemini-2.0-flash: 1,500 RPD (무료) - 안정적
-const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash'] as const
+// 모델 폴백 체인 (할당량 초과 시 다음 모델로 자동 전환)
+// 2.0-flash(1500RPD) → 2.5-flash-lite(별도할당) → 2.5-flash(20RPD)
+const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-flash'] as const
 
 function isRateLimitError(error: any): boolean {
   const msg = error?.message || ''
@@ -710,21 +712,25 @@ export async function callGemini(
 
   const genAI = new GoogleGenerativeAI(apiKey)
 
-  // 모델 폴백 체인: 2.5-flash → 2.0-flash
+  // 모델 폴백 체인: 2.0-flash → 1.5-flash → 2.5-flash
+  let lastError: any = null
   for (let i = 0; i < GEMINI_MODELS.length; i++) {
     const modelName = GEMINI_MODELS[i]
     try {
+      console.log(`[체키] ${modelName} 시도 중...`)
       const result = await callGeminiWithModel(genAI, modelName, userMessage, ctx, conversationHistory)
-      console.log(`[체키] ${modelName} 응답 성공`)
+      console.log(`[체키] ${modelName} 응답 성공 ✓`)
       return result
     } catch (error: any) {
+      lastError = error
+      console.error(`[체키] ${modelName} 실패:`, error?.message?.substring(0, 200))
       if (isRateLimitError(error) && i < GEMINI_MODELS.length - 1) {
-        console.warn(`[체키] ${modelName} 할당량 초과 → ${GEMINI_MODELS[i + 1]}로 자동 전환`)
+        console.warn(`[체키] → ${GEMINI_MODELS[i + 1]}로 자동 전환`)
         continue
       }
       throw error
     }
   }
 
-  throw new Error('모든 Gemini 모델의 할당량이 초과되었습니다.')
+  throw lastError || new Error('모든 Gemini 모델의 할당량이 초과되었습니다.')
 }
