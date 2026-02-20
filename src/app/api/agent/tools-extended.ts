@@ -24,7 +24,11 @@ function noAuth(): ToolResult {
 }
 
 function noProjectId(tool: string): ToolResult {
-  return { tool, success: false, message: '프로젝트 ID가 필요합니다. 프로젝트를 선택하거나 ID를 알려주세요.' }
+  return {
+    tool,
+    success: false,
+    message: '프로젝트가 선택되지 않았습니다. project_list 도구를 먼저 호출해서 프로젝트 목록을 확인한 후, 고객명 또는 프로젝트명으로 매칭해 작업을 진행하세요.',
+  }
 }
 
 function dbError(tool: string, error: any): ToolResult {
@@ -52,13 +56,14 @@ export async function projectList(): Promise<ToolResult> {
 
   const list = projects.map((p: any) => {
     const info = industryInfo[p.industry as keyof typeof industryInfo]
-    return `  • ${info?.icon || '🏗️'} ${p.name} (${p.status === 'completed' ? '완료' : p.status === 'in_progress' ? '진행중' : '계획'} | 진행률 ${p.progress || 0}%)`
+    const status = p.status === 'completed' ? '완료' : p.status === 'in_progress' ? '진행중' : '계획'
+    return `  • ${info?.icon || '🏗️'} [ID:${p.id}] ${p.name} | 고객: ${p.client_name || '-'} | ${status} | 진행률 ${p.progress || 0}% | 리스크 ${p.risk_score || 0}점`
   }).join('\n')
 
   return {
     tool: 'project_list',
     success: true,
-    message: `📁 프로젝트 목록 (${projects.length}개)\n\n${list}`,
+    message: `📁 프로젝트 목록 (${projects.length}개)\n\n${list}\n\n※ 고객명·프로젝트명으로 원하는 프로젝트를 찾아 [ID:xxx] 값을 사용하세요.`,
     data: { projects, count: projects.length },
   }
 }
