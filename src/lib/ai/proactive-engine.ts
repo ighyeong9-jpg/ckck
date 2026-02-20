@@ -382,6 +382,37 @@ export async function runProactiveEngine(userId: string): Promise<ProactiveSumma
 }
 
 // ═══════════════════════════════════════════════════════════
+// DB 저장 (Cron용)
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * 프로액티브 알림을 proactive_notifications 테이블에 저장한다.
+ * Vercel Cron POST 핸들러에서 호출.
+ */
+export async function saveNotificationsToDb(
+  userId: string,
+  notifications: ProactiveNotification[],
+  supabase: any,
+): Promise<void> {
+  if (notifications.length === 0) return
+
+  const rows = notifications.map(n => ({
+    user_id: userId,
+    project_id: n.projectId,
+    trigger_type: n.triggerType,
+    severity: n.severity,
+    title: n.title,
+    message: n.message,
+    action_url: n.actionUrl,
+    action_label: n.actionLabel,
+    metadata: n.metadata,
+    read: false,
+  }))
+
+  await supabase.from('proactive_notifications').insert(rows)
+}
+
+// ═══════════════════════════════════════════════════════════
 // 브리핑 텍스트 생성 (AI 없이, 규칙 기반)
 // ═══════════════════════════════════════════════════════════
 

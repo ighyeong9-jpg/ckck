@@ -118,12 +118,13 @@ async function callClaude(
   prompt: string,
   systemPrompt?: string,
   conversationHistory?: Array<{ role: string; content: string }>,
+  imageData?: { base64: string; mimeType: string },
 ): Promise<string> {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY가 설정되지 않았습니다.')
 
   // 대화 히스토리를 Claude 메시지 형식으로 변환 (user/assistant 교대, user로 시작해야 함)
-  const messages: Array<{ role: string; content: string }> = []
+  const messages: Array<{ role: string; content: any }> = []
   if (conversationHistory && conversationHistory.length > 0) {
     // user로 시작하도록 앞의 assistant 메시지 제거
     let start = 0
@@ -133,7 +134,19 @@ async function callClaude(
       messages.push({ role, content: conversationHistory[i].content })
     }
   }
-  messages.push({ role: 'user', content: prompt })
+
+  // 마지막 사용자 메시지 (이미지 포함 시 vision 형식)
+  if (imageData?.base64) {
+    messages.push({
+      role: 'user',
+      content: [
+        { type: 'image', source: { type: 'base64', media_type: imageData.mimeType || 'image/jpeg', data: imageData.base64 } },
+        { type: 'text', text: prompt },
+      ],
+    })
+  } else {
+    messages.push({ role: 'user', content: prompt })
+  }
 
   const body: Record<string, unknown> = {
     model: 'claude-sonnet-4-6',
@@ -203,7 +216,7 @@ async function callWithFallback(
   }
 
   console.log(`[Brain] Claude fallback 실행 (task=${task})`)
-  const text = await callClaude(prompt, systemPrompt ?? CHEKI_SYSTEM_PROMPT, conversationHistory)
+  const text = await callClaude(prompt, systemPrompt ?? CHEKI_SYSTEM_PROMPT, conversationHistory, imageData)
   return { text: appendLegalDisclaimer(text), model: 'claude' }
 }
 

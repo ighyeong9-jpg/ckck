@@ -7,10 +7,50 @@ import type { Notification, NotificationType } from '@/types/notification'
 import { NOTIFICATION_ICONS } from '@/types/notification'
 import styles from './NotificationCenter.module.scss'
 
+// proactive_notifications 행을 공통 표시용 타입으로 매핑
+interface DisplayNotification {
+  id: string
+  title: string
+  message: string | null
+  link: string | null
+  is_read: boolean
+  created_at: string
+  icon: string
+  source: 'notifications' | 'proactive'
+}
+
+function toDisplay(n: Notification): DisplayNotification {
+  return {
+    id: n.id,
+    title: n.title,
+    message: n.message ?? null,
+    link: n.link ?? null,
+    is_read: n.is_read,
+    created_at: n.created_at,
+    icon: NOTIFICATION_ICONS[n.notification_type as NotificationType] || '📢',
+    source: 'notifications',
+  }
+}
+
+function proactiveToDisplay(p: any): DisplayNotification {
+  const severityIcon =
+    p.severity === 'CRITICAL' ? '🚨' : p.severity === 'WARNING' ? '⚠️' : '🤖'
+  return {
+    id: `proactive-${p.id}`,
+    title: p.title,
+    message: p.message ?? null,
+    link: p.action_url ?? null,
+    is_read: p.read ?? false,
+    created_at: p.created_at,
+    icon: severityIcon,
+    source: 'proactive',
+  }
+}
+
 export default function NotificationCenter() {
   const router = useRouter()
   const supabase = createClient()
-  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [items, setItems] = useState<DisplayNotification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -27,40 +67,72 @@ export default function NotificationCenter() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Load unread count
+  // Load unread count (both tables)
   const loadUnreadCount = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { count } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const todayStart = today.toISOString()
 
-      setUnreadCount(count || 0)
-    } catch (err) {
+      const [notifRes, proactiveRes] = await Promise.all([
+        supabase
+          .from('notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('is_read', false),
+        supabase
+          .from('proactive_notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('read', false)
+          .gte('created_at', todayStart),
+      ])
+
+      setUnreadCount((notifRes.count || 0) + (proactiveRes.count || 0))
+    } catch {
       // Silent
     }
   }
 
-  // Load notifications
+  // Load notifications (both tables)
   const loadNotifications = async () => {
     setLoading(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { data } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(20)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const todayStart = today.toISOString()
 
-      if (data) setNotifications(data)
-    } catch (err) {
+      const [notifRes, proactiveRes] = await Promise.all([
+        supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(15),
+        supabase
+          .from('proactive_notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('created_at', todayStart)
+          .order('created_at', { ascending: false })
+          .limit(5),
+      ])
+
+      const notifItems = (notifRes.data ?? []).map(toDisplay)
+      const proactiveItems = (proactiveRes.data ?? []).map(proactiveToDisplay)
+
+      // proactive를 앞에, 이후 일반 알림
+      const merged = [...proactiveItems, ...notifItems]
+      merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+      setItems(merged)
+    } catch {
       // Silent
     } finally {
       setLoading(false)
@@ -81,23 +153,28 @@ export default function NotificationCenter() {
     }
   }
 
-  const handleClick = async (notification: Notification) => {
-    // Mark as read
-    if (!notification.is_read) {
-      await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', notification.id)
+  const handleClick = async (item: DisplayNotification) => {
+    if (!item.is_read) {
+      if (item.source === 'notifications') {
+        await supabase
+          .from('notifications')
+          .update({ is_read: true })
+          .eq('id', item.id)
+      } else {
+        // proactive — id에서 proactive- prefix 제거
+        const realId = item.id.replace(/^proactive-/, '')
+        await supabase
+          .from('proactive_notifications')
+          .update({ read: true })
+          .eq('id', realId)
+      }
 
-      setNotifications(prev =>
-        prev.map(n => n.id === notification.id ? { ...n, is_read: true } : n)
-      )
+      setItems(prev => prev.map(n => n.id === item.id ? { ...n, is_read: true } : n))
       setUnreadCount(prev => Math.max(0, prev - 1))
     }
 
-    // Navigate
-    if (notification.link) {
-      router.push(notification.link)
+    if (item.link) {
+      router.push(item.link)
       setIsOpen(false)
     }
   }
@@ -107,15 +184,27 @@ export default function NotificationCenter() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const todayStart = today.toISOString()
 
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
+      await Promise.all([
+        supabase
+          .from('notifications')
+          .update({ is_read: true })
+          .eq('user_id', user.id)
+          .eq('is_read', false),
+        supabase
+          .from('proactive_notifications')
+          .update({ read: true })
+          .eq('user_id', user.id)
+          .eq('read', false)
+          .gte('created_at', todayStart),
+      ])
+
+      setItems(prev => prev.map(n => ({ ...n, is_read: true })))
       setUnreadCount(0)
-    } catch (err) {
+    } catch {
       // Silent
     }
   }
@@ -131,12 +220,12 @@ export default function NotificationCenter() {
   }
 
   // Group by date
-  const grouped = notifications.reduce((acc, n) => {
+  const grouped = items.reduce((acc, n) => {
     const date = new Date(n.created_at).toLocaleDateString('ko-KR')
     if (!acc[date]) acc[date] = []
     acc[date].push(n)
     return acc
-  }, {} as Record<string, Notification[]>)
+  }, {} as Record<string, DisplayNotification[]>)
 
   return (
     <div className={styles.container} ref={ref}>
@@ -166,21 +255,19 @@ export default function NotificationCenter() {
           <div className={styles.dropdownBody}>
             {loading ? (
               <div className={styles.loadingText}>로딩 중...</div>
-            ) : notifications.length === 0 ? (
+            ) : items.length === 0 ? (
               <div className={styles.emptyText}>알림이 없습니다</div>
             ) : (
-              Object.entries(grouped).map(([date, items]) => (
+              Object.entries(grouped).map(([date, dateItems]) => (
                 <div key={date} className={styles.dateGroup}>
                   <div className={styles.dateLabel}>{date}</div>
-                  {items.map(n => (
+                  {dateItems.map(n => (
                     <div
                       key={n.id}
                       className={`${styles.notifItem} ${!n.is_read ? styles.unread : ''}`}
                       onClick={() => handleClick(n)}
                     >
-                      <span className={styles.notifIcon}>
-                        {NOTIFICATION_ICONS[n.notification_type as NotificationType] || '📢'}
-                      </span>
+                      <span className={styles.notifIcon}>{n.icon}</span>
                       <div className={styles.notifContent}>
                         <span className={styles.notifTitle}>{n.title}</span>
                         {n.message && <span className={styles.notifMessage}>{n.message}</span>}

@@ -69,12 +69,16 @@ export default function ProjectsPage() {
     setOpenMenuId(null)
     if (!confirm(`"${projectName}" 현장을 삭제하시겠습니까?\n\n삭제하면 모든 데이터가 영구적으로 사라져요.`)) return
     try {
+      // site_issues FK가 CASCADE 없음 → 먼저 삭제
+      await supabase.from('site_issues').delete().eq('project_id', projectId)
+
       const { error } = await supabase.from('projects').delete().eq('id', projectId)
       if (error) throw error
       setProjects(prev => prev.filter(p => p.id !== projectId))
       toast.success(`"${projectName}" 현장이 삭제되었어요.`)
     } catch (err: any) {
-      toast.error('삭제 중 오류가 발생했어요.')
+      console.error('[삭제 오류]', err)
+      toast.error('삭제 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.')
     }
   }
 

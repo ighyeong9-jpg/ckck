@@ -122,6 +122,14 @@ export default function AgentChat() {
   const inputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // 드래그 위치 상태
+  const [btnPos, setBtnPos] = useState({ bottom: 24, right: 24 })
+  const btnPosRef = useRef({ bottom: 24, right: 24 })
+  const dragRef = useRef({
+    dragging: false, hasMoved: false,
+    startX: 0, startY: 0, startBottom: 24, startRight: 24,
+  })
+
   // 현재 프로젝트 ID 추출
   const projectIdMatch = pathname.match(/\/projects\/([^/]+)/)
   const projectId = projectIdMatch ? projectIdMatch[1] : undefined
@@ -184,6 +192,21 @@ export default function AgentChat() {
     return () => window.removeEventListener('keydown', handleKeyboard)
   }, [])
 
+  // 버튼 위치 localStorage에서 로드
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('cheki-btn-pos')
+      if (saved) {
+        const pos = JSON.parse(saved)
+        setBtnPos(pos)
+        btnPosRef.current = pos
+      }
+    } catch {}
+  }, [])
+
+  // btnPosRef 동기화
+  useEffect(() => { btnPosRef.current = btnPos }, [btnPos])
+
   // 외부에서 메시지를 보내는 이벤트 리스너 (QuickActions 연동, 안정된 deps)
   useEffect(() => {
     const handler = (e: Event) => {
@@ -232,6 +255,43 @@ export default function AgentChat() {
   const removeImage = () => {
     setImagePreview(null)
     setImageBase64(null)
+  }
+
+  // 드래그 핸들러
+  const handleDragStart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    dragRef.current = {
+      dragging: true, hasMoved: false,
+      startX: e.clientX, startY: e.clientY,
+      startBottom: btnPosRef.current.bottom,
+      startRight: btnPosRef.current.right,
+    }
+
+    const onMove = (ev: MouseEvent) => {
+      if (!dragRef.current.dragging) return
+      const dx = ev.clientX - dragRef.current.startX
+      const dy = ev.clientY - dragRef.current.startY
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dragRef.current.hasMoved = true
+      if (dragRef.current.hasMoved) {
+        const newRight = Math.max(8, Math.min(window.innerWidth - 64, dragRef.current.startRight - dx))
+        const newBottom = Math.max(8, Math.min(window.innerHeight - 64, dragRef.current.startBottom + dy))
+        setBtnPos({ bottom: newBottom, right: newRight })
+      }
+    }
+
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+      if (!dragRef.current.hasMoved) {
+        setOpen(prev => !prev)
+      } else {
+        try { localStorage.setItem('cheki-btn-pos', JSON.stringify(btnPosRef.current)) } catch {}
+      }
+      dragRef.current.dragging = false
+    }
+
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
   }
 
   const sendMessage = useCallback(async (msgText?: string) => {
@@ -361,10 +421,11 @@ export default function AgentChat() {
     <>
       {/* Floating Button */}
       <button
-        className={`${styles.floatingBtn} ${open ? styles.hasPanel : ''}`}
-        onClick={() => setOpen(!open)}
+        className={styles.floatingBtn}
+        onMouseDown={handleDragStart}
         aria-label="AI 비서 체키"
-        title="체키 AI 비서 (Ctrl+K)"
+        title="체키 AI 비서 (Ctrl+K) — 드래그로 이동"
+        style={{ bottom: btnPos.bottom, right: btnPos.right }}
       >
         {open ? '✕' : '🤖'}
         {!open && <span className={styles.shortcutHint}>Ctrl+K</span>}
@@ -372,7 +433,10 @@ export default function AgentChat() {
 
       {/* Chat Panel */}
       {open && (
-        <div className={styles.panel}>
+        <div
+          className={styles.panel}
+          style={{ bottom: btnPos.bottom + 68, right: btnPos.right }}
+        >
           <div className={styles.header}>
             <div className={styles.headerTitle}>
               <span className={styles.headerIcon}>🤖</span>

@@ -18,16 +18,16 @@
   align-items: center;
   justify-content: center;
 
+  cursor: grab;
+
   &:hover {
     transform: scale(1.1);
     box-shadow: 0 6px 28px rgba(124, 58, 237, 0.5);
   }
 
-  &.hasPanel {
-    bottom: 580px;
-    @media (max-height: 700px) {
-      bottom: calc(100vh - 80px);
-    }
+  &:active {
+    cursor: grabbing;
+    transform: scale(0.97);
   }
 
   // 맥박 애니메이션
@@ -71,7 +71,7 @@
 // Chat Panel
 .panel {
   position: fixed;
-  bottom: 24px;
+  bottom: 92px;
   right: 24px;
   width: 400px;
   height: 560px;
