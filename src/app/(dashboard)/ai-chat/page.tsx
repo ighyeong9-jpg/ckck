@@ -105,8 +105,7 @@ export default function AiChatPage() {
     if (!text || loading) return
 
     const userMsg: ChatMessage = { role: 'user', content: text }
-    // index 0은 페르소나 인사말(UI 전용)이므로 제외.
-    // Gemini/Claude API는 history가 반드시 user 메시지로 시작해야 함.
+    // index 0은 페르소나 인사말(UI 전용)이므로 제외
     const history = messages.slice(1).map(m => ({ role: m.role, content: m.content }))
 
     setMessages(prev => [...prev, userMsg])
@@ -114,14 +113,22 @@ export default function AiChatPage() {
     setLoading(true)
 
     try {
-      const res = await fetch('/api/ai/chat', {
+      // 페르소나 힌트를 메시지 앞에 주입
+      const personaHint = selectedPersona !== 'customer'
+        ? `[역할 컨텍스트: ${persona.name}(${persona.description}) 관점으로 답변해주세요]\n`
+        : ''
+      const messageWithPersona = personaHint + text
+
+      // /api/agent (Function Calling 완전 지원) 호출
+      const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: text,
-          persona: selectedPersona,
+          messages: [
+            ...history,
+            { role: 'user', content: messageWithPersona },
+          ],
           projectId: contextDismissed ? undefined : contextProjectId,
-          history,
         }),
       })
 
@@ -134,8 +141,8 @@ export default function AiChatPage() {
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: data.message,
-        sources: data.sources?.length ? data.sources : undefined,
-        model: data.model,
+        sources: undefined,
+        model: data.provider,
       }])
     } catch (err: any) {
       setMessages(prev => [...prev, {

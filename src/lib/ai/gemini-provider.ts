@@ -401,7 +401,7 @@ async function executeTool(
       case 'cost_forecast': return ext.costForecast({ projectId })
 
       // ─── 자동 견적 ───
-      case 'auto_quote_generate': return auto.autoQuoteGenerate(args as any)
+      case 'auto_quote_generate': return auto.autoQuoteGenerate({ ...(args as any), projectId: (args as any).projectId ?? projectId ?? undefined })
       case 'auto_quote_detail': return auto.autoQuoteDetail(args as any)
       case 'auto_quote_compare': return auto.autoQuoteCompare(args as any)
 
@@ -413,7 +413,7 @@ async function executeTool(
       case 'schedule_delay_alert': return ext.scheduleDelayAlert({ projectId })
       case 'schedule_gantt': return ext.scheduleGantt({ projectId })
       case 'schedule_today': return ext.scheduleToday({ projectId })
-      case 'auto_schedule_generate': return auto.autoScheduleGenerate(args as any)
+      case 'auto_schedule_generate': return auto.autoScheduleGenerate({ ...(args as any), projectId: (args as any).projectId ?? projectId ?? undefined })
 
       // ─── 사진 ───
       case 'photo_list': return ext.photoList({ projectId })

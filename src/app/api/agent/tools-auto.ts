@@ -44,6 +44,7 @@ export async function autoQuoteGenerate(params: {
   grade: string
   requirements?: string
   location?: string
+  projectId?: string
 }): Promise<ToolResult> {
   const grade = (params.grade || 'standard') as Grade
   const areaPyeong = params.areaUnit === 'sqm' ? sqmToPyeong(params.area) : params.area
@@ -156,10 +157,44 @@ export async function autoQuoteGenerate(params: {
     `⚠️ 시장 평균 기준이며 실제 현장 상황에 따라 달라질 수 있습니다.\n` +
     `평당 단가: ${formatKRW(Math.round(grandTotal / areaPyeong))}/평`
 
+  // ── projectId 있으면 DB에 실제 저장 ──
+  let savedToProject = false
+  if (params.projectId) {
+    try {
+      const { supabase, user } = await getUser()
+      if (user) {
+        // 공종 키 → quote_line_items category 매핑
+        const catMap: Record<string, string> = {
+          demolition: 'demolition', electrical: 'electrical', plumbing: 'plumbing',
+          woodwork: 'carpentry', tile: 'tile', painting: 'paint',
+          wallpaper: 'wallpaper', flooring: 'flooring', furniture: 'furniture',
+          hvac: 'plumbing', signage: 'other', waterproofing: 'other', concrete: 'other',
+        }
+        const insertItems = items.map((item, idx) => ({
+          project_id: params.projectId,
+          category: catMap[item.name] ?? 'other',
+          item_name: item.nameKr,
+          specification: `${gradeNames[grade]} 자동 견적`,
+          unit: item.unit,
+          quantity: item.quantity,
+          unit_price: item.unitPrice,
+          total_price: item.amount,
+          sort_order: idx,
+        }))
+        const { error } = await supabase.from('quote_line_items').insert(insertItems)
+        if (!error) savedToProject = true
+      }
+    } catch { /* 저장 실패해도 결과는 반환 */ }
+  }
+
+  const savedNote = savedToProject
+    ? `\n✅ 견적서가 프로젝트에 자동 저장되었습니다. [견적서 페이지](/projects/${params.projectId}/sow)에서 확인하세요.`
+    : ''
+
   return {
     tool: 'auto_quote_generate',
     success: true,
-    message,
+    message: message + savedNote,
     data: {
       industryType: params.industryType,
       industryName: preset.name,
@@ -173,6 +208,7 @@ export async function autoQuoteGenerate(params: {
       locationMultiplier,
       grandTotal,
       pricePerPyeong: Math.round(grandTotal / areaPyeong),
+      savedToProject,
     },
   }
 }
@@ -556,7 +592,7 @@ export async function floorplanExport(params: {
 
 export async function autoScheduleGenerate(params: {
   industryType: string; area: number; startDate: string;
-  grade?: string; workingDays?: string
+  grade?: string; workingDays?: string; projectId?: string
 }): Promise<ToolResult> {
   const grade = (params.grade || 'standard') as Grade
   const preset = (industryPresets as any)[params.industryType]
@@ -632,6 +668,38 @@ export async function autoScheduleGenerate(params: {
     return `  ${s.tradeName.padEnd(8)} ${s.startDate} ~ ${s.endDate} (${s.duration}일) ${bar}`
   }).join('\n')
 
+  // ── projectId 있으면 processes 테이블에 실제 저장 ──
+  let savedToProject = false
+  if (params.projectId) {
+    try {
+      const { supabase, user } = await getUser()
+      if (user) {
+        const processInserts = schedule.map((s, idx) => ({
+          project_id: params.projectId,
+          name: s.tradeName,
+          description: `자동 생성 공정표 (${gradeNames[grade]})`,
+          status: 'pending',
+          progress: 0,
+          start_date: s.startDate,
+          end_date: s.endDate,
+          order_index: idx,
+        }))
+        const { error: insertError } = await supabase.from('processes').insert(processInserts)
+        if (!insertError) {
+          // 프로젝트 종료일도 업데이트
+          await supabase.from('projects')
+            .update({ end_date: endDate.toISOString().split('T')[0] })
+            .eq('id', params.projectId)
+          savedToProject = true
+        }
+      }
+    } catch { /* 저장 실패해도 결과는 반환 */ }
+  }
+
+  const savedNote = savedToProject
+    ? `\n✅ 공정표가 프로젝트에 자동 저장되었습니다. [공정관리 페이지](/projects/${params.projectId}/process)에서 확인하세요.`
+    : ''
+
   return {
     tool: 'auto_schedule_generate',
     success: true,
@@ -641,8 +709,8 @@ export async function autoScheduleGenerate(params: {
       `총 공사기간: ${totalDays}일 (약 ${totalWeeks}주)\n\n` +
       `━━━ 공정별 일정 ━━━\n${scheduleLines}\n\n` +
       `📌 병행 가능 공종은 같은 페이즈에서 동시 진행됩니다.\n` +
-      `⚠️ 예상 일정이며 현장 상황에 따라 변동될 수 있습니다.`,
-    data: { schedule, totalDays, totalWeeks, startDate: params.startDate, endDate: endDate.toISOString().split('T')[0] },
+      `⚠️ 예상 일정이며 현장 상황에 따라 변동될 수 있습니다.` + savedNote,
+    data: { schedule, totalDays, totalWeeks, startDate: params.startDate, endDate: endDate.toISOString().split('T')[0], savedToProject },
   }
 }
 
