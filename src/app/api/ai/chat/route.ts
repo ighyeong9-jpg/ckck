@@ -53,8 +53,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 })
     }
 
+    // 프로젝트 ID 자동 해석: projectId 없으면 메시지에서 프로젝트 이름 매칭
+    let resolvedProjectId = projectId
+    if (!resolvedProjectId) {
+      const { data: userProjects } = await supabase
+        .from('projects')
+        .select('id, name')
+        .order('updated_at', { ascending: false })
+        .limit(30)
+      if (userProjects && userProjects.length > 0) {
+        // 메시지에 프로젝트 이름이 포함되어 있으면 자동 매칭
+        const matched = userProjects.find((p: any) => message.includes(p.name))
+        if (matched) {
+          resolvedProjectId = matched.id
+        } else if (userProjects.length === 1) {
+          // 프로젝트가 하나뿐이면 자동 선택
+          resolvedProjectId = userProjects[0].id
+        }
+      }
+    }
+
     // 프로젝트 컨텍스트 (선택)
-    const projectCtx = projectId ? await loadProjectContext(projectId) : null
+    const projectCtx = resolvedProjectId ? await loadProjectContext(resolvedProjectId) : null
 
     // Brain 호출
     const result = await brain({
@@ -62,7 +82,7 @@ export async function POST(req: NextRequest) {
       persona,
       context: {
         userMessage: message,
-        projectId,
+        projectId: resolvedProjectId,
         userId: user.id,
         projectCtx,
         conversationHistory: history.slice(-10),   // 최근 10개
