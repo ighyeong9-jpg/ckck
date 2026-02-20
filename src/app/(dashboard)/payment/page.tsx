@@ -18,7 +18,7 @@ const PLANS: Plan[] = [
     name: 'Free',
     price: 0,
     features: [
-      '프로젝트 3개',
+      '현장 3개',
       '기본 진단 기능',
       '견적서 생성',
       '이메일 지원',
@@ -30,7 +30,7 @@ const PLANS: Plan[] = [
     price: 29000,
     recommended: true,
     features: [
-      '프로젝트 무제한',
+      '현장 무제한',
       '고급 비용분석',
       '변경관리 기능',
       '증빙 패키지 생성',

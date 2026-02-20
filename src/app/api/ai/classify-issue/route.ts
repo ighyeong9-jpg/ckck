@@ -27,6 +27,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '이슈 내용을 5자 이상 입력해주세요.' }, { status: 400 })
     }
 
+    if (issueText.length > 2000) {
+      return NextResponse.json({ error: '이슈 내용은 2000자 이하로 입력해주세요.' }, { status: 400 })
+    }
+
+    if (reporterNote && reporterNote.length > 2000) {
+      return NextResponse.json({ error: '추가 메모는 2000자 이하로 입력해주세요.' }, { status: 400 })
+    }
+
     // 프로젝트명 조회 (선택)
     let projectName: string | undefined
     if (projectId) {
@@ -75,7 +83,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error('[API /ai/classify-issue] 오류:', err)
     return NextResponse.json(
-      { error: err?.message || '이슈 분류 중 오류가 발생했습니다.' },
+      { error: '이슈 분류 중 오류가 발생했습니다.' },
       { status: 500 }
     )
   }

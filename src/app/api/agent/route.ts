@@ -12,12 +12,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { loadProjectContext } from './context'
 import { routeMessage } from './mockRouter'
 import { callGemini } from '@/lib/ai/gemini-provider'
 
 export async function POST(request: NextRequest) {
   try {
+    // 인증 확인
+    const supabase = createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { messages, projectId, pageContext, image } = body
 
@@ -29,6 +37,10 @@ export async function POST(request: NextRequest) {
     const userMessage = typeof lastMessage === 'string'
       ? lastMessage
       : lastMessage?.content || ''
+
+    if (userMessage.length > 2000) {
+      return NextResponse.json({ error: '메시지는 2000자 이하로 입력해주세요.' }, { status: 400 })
+    }
 
     // 프로젝트 컨텍스트 로드
     const ctx = projectId ? await loadProjectContext(projectId) : null
@@ -88,7 +100,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Agent API 오류:', error)
     return NextResponse.json(
-      { success: false, message: `오류가 발생했습니다: ${error?.message || '알 수 없는 오류'}` },
+      { success: false, message: '서버 오류가 발생했습니다.' },
       { status: 500 }
     )
   }

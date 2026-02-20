@@ -37,6 +37,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '메시지를 입력해주세요.' }, { status: 400 })
     }
 
+    if (message.length > 2000) {
+      return NextResponse.json({ error: '메시지는 2000자 이하로 입력해주세요.' }, { status: 400 })
+    }
+
     // 페르소나 유효성 확인
     if (!PERSONAS[persona]) {
       return NextResponse.json({ error: '유효하지 않은 역할입니다.' }, { status: 400 })
@@ -74,7 +78,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error('[API /ai/chat] 오류:', err)
     return NextResponse.json(
-      { error: err?.message || 'AI 응답 중 오류가 발생했습니다.' },
+      { error: 'AI 응답 중 오류가 발생했습니다.' },
       { status: 500 }
     )
   }

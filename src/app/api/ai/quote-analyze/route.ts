@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error('[API /ai/quote-analyze] 오류:', err)
     return NextResponse.json(
-      { error: err?.message || '견적 분석 중 오류가 발생했습니다.' },
+      { error: '견적 분석 중 오류가 발생했습니다.' },
       { status: 500 },
     )
   }

@@ -50,6 +50,7 @@ export async function POST(request: Request) {
       expires_at: data.expires_at,
     })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[API /share] 오류:', err)
+    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 })
   }
 }

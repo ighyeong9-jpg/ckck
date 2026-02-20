@@ -52,7 +52,7 @@ export async function GET() {
   } catch (err: any) {
     console.error('[API /ai/proactive] 오류:', err)
     return NextResponse.json(
-      { error: err?.message || '프로액티브 분석 중 오류가 발생했습니다.' },
+      { error: '프로액티브 분석 중 오류가 발생했습니다.' },
       { status: 500 }
     )
   }

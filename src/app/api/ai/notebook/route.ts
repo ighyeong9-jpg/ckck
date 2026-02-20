@@ -74,6 +74,22 @@ export async function POST(req: NextRequest) {
       projectId = body.projectId
     }
 
+    // userNote 길이 제한 (프롬프트 인젝션 방지)
+    if (userNote && userNote.length > 2000) {
+      return NextResponse.json(
+        { error: '메모는 2000자 이하로 입력해주세요.' },
+        { status: 400 },
+      )
+    }
+
+    // textContent 길이 제한 (JSON 경로에서만 적용, 파일 업로드는 별도 크기 제한)
+    if (textContent && !contentType.includes('multipart/form-data') && textContent.length > 50000) {
+      return NextResponse.json(
+        { error: '텍스트 내용이 너무 큽니다. 50,000자 이하로 입력해주세요.' },
+        { status: 400 },
+      )
+    }
+
     // 파일 크기 제한: base64는 약 10MB 원본 기준
     if (base64Data && base64Data.length > 14_000_000) {
       return NextResponse.json(
@@ -96,7 +112,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error('[API /ai/notebook] 오류:', err)
     return NextResponse.json(
-      { error: err?.message || '문서 분석 중 오류가 발생했습니다.' },
+      { error: '문서 분석 중 오류가 발생했습니다.' },
       { status: 500 },
     )
   }

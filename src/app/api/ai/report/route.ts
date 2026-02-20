@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error('[API /ai/report] 오류:', err)
     return NextResponse.json(
-      { error: err?.message || '일보 생성 중 오류가 발생했습니다.' },
+      { error: '일보 생성 중 오류가 발생했습니다.' },
       { status: 500 }
     )
   }

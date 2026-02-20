@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error('[API /ai/budget-guide] 오류:', err)
     return NextResponse.json(
-      { error: err?.message || 'AI 예산 가이드 생성 중 오류가 발생했습니다.' },
+      { error: 'AI 예산 가이드 생성 중 오류가 발생했습니다.' },
       { status: 500 }
     )
   }
