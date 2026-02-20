@@ -11,6 +11,38 @@ import { callGemini } from '@/lib/ai/gemini-provider'
 import type { BudgetGuideResult, SpaceType, MaterialGradeOption, ScheduleOption } from './quote-chat'
 
 // ═══════════════════════════════════════════════════════════
+// Claude fallback (Gemini 할당량 초과 시)
+// ═══════════════════════════════════════════════════════════
+
+async function callClaudeForBudget(prompt: string): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY가 설정되지 않았습니다.')
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 2048,
+      system: BUDGET_GUIDE_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Claude API 오류 (${res.status}): ${err.substring(0, 200)}`)
+  }
+
+  const data = await res.json()
+  return data.content?.[0]?.text ?? ''
+}
+
+// ═══════════════════════════════════════════════════════════
 // System Prompt
 // ═══════════════════════════════════════════════════════════
 
@@ -102,15 +134,14 @@ export async function generateBudgetGuide(
 }
 `.trim()
 
-  const result = await callGemini(
-    prompt,
-    null,
-    undefined,
-    undefined,
-  )
-
-  // JSON 파싱
-  const text = result.message
+  let text: string
+  try {
+    const result = await callGemini(prompt, null, undefined, undefined)
+    text = result.message
+  } catch (geminiError: any) {
+    console.warn('[budget-guide] Gemini 실패, Claude로 폴백:', geminiError?.message?.substring(0, 100))
+    text = await callClaudeForBudget(prompt)
+  }
   const jsonMatch = text.match(/\{[\s\S]+\}/)
   if (!jsonMatch) {
     throw new Error('AI 응답에서 JSON을 파싱할 수 없습니다.')

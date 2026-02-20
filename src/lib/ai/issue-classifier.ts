@@ -11,6 +11,38 @@
 import { callGemini } from '@/lib/ai/gemini-provider'
 import type { IssueClassifyResult } from './issue-types'
 
+// ═══════════════════════════════════════════════════════════
+// Claude fallback (Gemini 할당량 초과 시)
+// ═══════════════════════════════════════════════════════════
+
+async function callClaudeForIssueClassify(prompt: string): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY가 설정되지 않았습니다.')
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      system: ISSUE_CLASSIFIER_PROMPT,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Claude API 오류 (${res.status}): ${err.substring(0, 200)}`)
+  }
+
+  const data = await res.json()
+  return data.content?.[0]?.text ?? ''
+}
+
 // 타입·상수 re-export (서버 측 코드 편의용)
 export type {
   IssueSeverity,
@@ -76,9 +108,15 @@ ${issueText}
 }
 `.trim()
 
-  const result = await callGemini(prompt, null, undefined, undefined)
-  const text = result.message
-  const jsonMatch = text.match(/\{[\s\S]+\}/)
+  let text: string
+  try {
+    const result = await callGemini(prompt, null, undefined, undefined)
+    text = result.message
+  } catch (geminiError: any) {
+    console.warn('[issue-classifier] Gemini 실패, Claude로 폴백:', geminiError?.message?.substring(0, 100))
+    text = await callClaudeForIssueClassify(prompt)
+  }
+  const jsonMatch = text.match(/\{[\s\S]+?\}/s)
   if (!jsonMatch) {
     throw new Error('이슈 분류 AI 응답 파싱 실패')
   }

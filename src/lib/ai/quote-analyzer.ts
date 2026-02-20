@@ -13,6 +13,35 @@ import { createClient } from '@supabase/supabase-js'
 import { callGemini } from '@/lib/ai/gemini-provider'
 import { loadChunksByCategory } from '@/lib/knowledge/loader'
 
+// ─── Claude fallback (Gemini 할당량 초과 시) ─────────────
+
+async function callClaudeForQuoteAnalysis(prompt: string): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY가 설정되지 않았습니다.')
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 2048,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Claude API 오류 (${res.status}): ${err.substring(0, 200)}`)
+  }
+
+  const data = await res.json()
+  return data.content?.[0]?.text ?? ''
+}
+
 // ─── 타입 ─────────────────────────────────────────────────
 
 export interface OverchargeItem {
@@ -145,7 +174,14 @@ ${itemsText}
   }
 
   try {
-    const { message } = await callGemini(prompt, null)
+    let message: string
+    try {
+      const result = await callGemini(prompt, null)
+      message = result.message
+    } catch (geminiError: any) {
+      console.warn('[QuoteAnalyzer] Gemini 실패, Claude로 폴백:', geminiError?.message?.substring(0, 100))
+      message = await callClaudeForQuoteAnalysis(prompt)
+    }
     const jsonMatch = message.match(/\{[\s\S]*\}/)
     if (jsonMatch) {
       const raw = JSON.parse(jsonMatch[0])
