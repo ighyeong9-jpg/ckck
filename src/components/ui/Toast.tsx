@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, createContext, useContext } from 'react'
+import { useState, useEffect, useCallback, useMemo, createContext, useContext } from 'react'
 
 type ToastType = 'success' | 'error' | 'warning' | 'info'
 
@@ -59,13 +59,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => removeToast(id), 3000)
   }, [removeToast])
 
-  const value: ToastContextType = {
+  const value = useMemo<ToastContextType>(() => ({
     toast: addToast,
     success: (msg) => addToast(msg, 'success'),
     error: (msg) => addToast(msg, 'error'),
     warning: (msg) => addToast(msg, 'warning'),
     info: (msg) => addToast(msg, 'info'),
-  }
+  }), [addToast])
 
   return (
     <ToastContext.Provider value={value}>

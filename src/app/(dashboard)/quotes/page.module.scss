@@ -1,0 +1,208 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.newBtn {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+// 배너
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: linear-gradient(135deg, #f5f3ff 0%, #faf5ff 100%);
+  border: 1px solid #c4b5fd;
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.bannerIcon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.bannerTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4f46e5;
+  margin: 0 0 4px;
+}
+
+.bannerDesc {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+// 로딩
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+// 빈 상태
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  gap: 12px;
+}
+
+.emptyIcon {
+  font-size: 48px;
+}
+
+.emptyTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.emptyDesc {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.emptyBtn {
+  margin-top: 8px;
+  padding: 12px 24px;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: #4338ca;
+  }
+}
+
+// 목록
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: #a5b4fc;
+  }
+}
+
+.cardLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.cardEmoji {
+  font-size: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 4px;
+}
+
+.cardRange {
+  font-size: 13px;
+  color: #4f46e5;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.cardComment {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.cardRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.cardDate {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.cardBadge {
+  font-size: 11px;
+  color: #7c3aed;
+  background: #f5f3ff;
+  border: 1px solid #c4b5fd;
+  border-radius: 10px;
+  padding: 2px 8px;
+}

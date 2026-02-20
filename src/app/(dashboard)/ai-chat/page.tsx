@@ -105,7 +105,9 @@ export default function AiChatPage() {
     if (!text || loading) return
 
     const userMsg: ChatMessage = { role: 'user', content: text }
-    const history = messages.map(m => ({ role: m.role, content: m.content }))
+    // index 0은 페르소나 인사말(UI 전용)이므로 제외.
+    // Gemini/Claude API는 history가 반드시 user 메시지로 시작해야 함.
+    const history = messages.slice(1).map(m => ({ role: m.role, content: m.content }))
 
     setMessages(prev => [...prev, userMsg])
     setInput('')

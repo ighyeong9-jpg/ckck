@@ -662,6 +662,41 @@ export async function routeMessage(
     return answerGeneralQuestion(message, industry, area)
   }
 
+  // DIY/셀프 시공 관련 질문
+  if (matchKeywords(msg, ['셀프', '직접', 'diy', '혼자', '스스로', '셀프시공', '셀프인테리어'])) {
+    return {
+      tool: 'general_answer',
+      success: true,
+      message: `🔨 셀프 시공 난이도 안내\n\n` +
+        `공종별 셀프 가능 여부 (현장 경험 기준):\n\n` +
+        `✅ 비교적 쉬운 편 (초보 가능)\n` +
+        `  • 도배: 유튜브 보고 연습하면 가능, 풀칠기 대여 권장\n` +
+        `  • 페인트: 롤러 작업은 쉬움, 마스킹 테이프 꼼꼼히\n` +
+        `  • 조명 교체: 기존 배선 그대로면 가능\n` +
+        `  • 방부목 스테인: 붓/롤러로 가능, 2회 도포 필수\n\n` +
+        `⚠️ 주의 필요 (어느 정도 경험 필요)\n` +
+        `  • 타일: 줄눈·수평 맞추기 어려움, 화장실 방수는 전문가 권장\n` +
+        `  • 강마루: 장판보다 어렵고 실수 시 비용 손실\n` +
+        `  • 석고보드 목공: 공구 필요, 수직·수평 중요\n\n` +
+        `❌ 전문가 필수\n` +
+        `  • 전기 배선·분전반: 법적으로 자격자만 가능\n` +
+        `  • 가스 배관: 가스 자격자 의무\n` +
+        `  • 방수 공사: 하자 시 피해 크고 법적 책임 문제\n` +
+        `  • 에어컨 냉매 작업: 냉매 자격 필요\n\n` +
+        `💡 방부목 스테인 셀프라면:\n` +
+        `  표면 샌딩 → 이물질 제거 → 오일스테인 1차 도포 → 건조(12~24h) → 2차 도포\n` +
+        `  붓보다 넓은 스펀지 롤러 추천, 결 방향으로만 바르기\n\n` +
+        `⚠️ 셀프 시 꼭 지킬 것: 사진 기록 남기기! 하자 발생 시 책임 소재 명확해야 합니다.`,
+    }
+  }
+
+  // 어렵다/쉽다/가능하다 등 가능성 판단 질문
+  if (matchKeywords(msg, ['힘들', '어렵', '쉬울', '가능', '할 수 있', '될까', '되나요', '할만'])) {
+    const industry = extractIndustry(message) || ''
+    const area = extractArea(message)
+    return answerGeneralQuestion(message + ' 주의사항 팁', industry, area)
+  }
+
   // 인사/현황
   if (matchKeywords(msg, ['안녕', '현황', '상태', '요약', '도움', 'hello', 'hi', '뭐', '체키'])) {
     return getProjectSummary(ctx || { project: null, diagnosticCount: 0, quoteItems: [], costAnalysis: null, changeOrders: [], evidenceFiles: [], agreements: [], reports: [], processes: [], workforce: [], materials: [] })
@@ -737,15 +772,14 @@ async function fallbackToGemini(message: string): Promise<ToolResult> {
       return {
         tool: 'general_answer',
         success: true,
-        message: `🤖 안녕하세요! 체키입니다.\n\n` +
-          `죄송합니다. 지금 AI 엔진에 일시적인 문제가 있습니다.\n잠시 후 다시 시도해주세요.\n\n` +
-          `💬 인테리어 관련은 키워드를 포함해서 질문하시면 바로 답변됩니다:\n` +
-          `  • 견적, 비용, 얼마 → 비용 관련\n` +
-          `  • 체크리스트, 점검 → 점검 관련\n` +
-          `  • 공정, 순서, 절차 → 공정 관련\n` +
-          `  • 하자, 누수, 곰팡이 → 하자 관련\n` +
-          `  • 소방, 법, 허가 → 법규 관련\n\n` +
-          `그 외 일반 질문은 AI 엔진 복구 후 답변 가능합니다.`,
+        message: `오늘 AI 응답 횟수를 모두 사용했습니다. (무료 플랜 기준 1일 제한)\n\n` +
+          `내일 자정 이후 다시 이용하시거나, 아래 키워드로 물어보시면 즉시 답변됩니다:\n\n` +
+          `  • "카페 30평 견적" → 공종별 비용 산출\n` +
+          `  • "방부목 스테인 순서" → 공정/자재 안내\n` +
+          `  • "셀프 시공 가능해?" → 공종별 난이도\n` +
+          `  • "소방법 기준" → 법규 안내\n` +
+          `  • "공사 기간 얼마나?" → 업종별 일수\n` +
+          `  • "하자 대처법" → 분쟁 예방 가이드`,
       }
     }
   }

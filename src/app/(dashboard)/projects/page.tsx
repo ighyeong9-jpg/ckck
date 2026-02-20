@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { Project, ProjectStatus, CreateProjectInput } from '@/types/project'
@@ -27,6 +27,8 @@ export default function ProjectsPage() {
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const [formData, setFormData] = useState<CreateProjectInput>({
     name: '', client_name: '', status: 'planning', start_date: '', end_date: '',
@@ -52,11 +54,35 @@ export default function ProjectsPage() {
 
   useEffect(() => { fetchProjects() }, [])
 
+  // 외부 클릭 시 케밥 메뉴 닫기
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const handleDeleteProject = async (projectId: string, projectName: string) => {
+    setOpenMenuId(null)
+    if (!confirm(`"${projectName}" 현장을 삭제하시겠습니까?\n\n삭제하면 모든 데이터가 영구적으로 사라져요.`)) return
+    try {
+      const { error } = await supabase.from('projects').delete().eq('id', projectId)
+      if (error) throw error
+      setProjects(prev => prev.filter(p => p.id !== projectId))
+      toast.success(`"${projectName}" 현장이 삭제되었어요.`)
+    } catch (err: any) {
+      toast.error('삭제 중 오류가 발생했어요.')
+    }
+  }
+
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault()
     // 폼 유효성 검사
     const errs: Record<string, string> = {}
-    if (!formData.name.trim()) errs.name = '프로젝트명을 입력해주세요.'
+    if (!formData.name.trim()) errs.name = '현장명을 입력해주세요.'
     if (!formData.client_name.trim()) errs.client_name = '고객명을 입력해주세요.'
     if (formData.start_date && formData.end_date && formData.end_date < formData.start_date) {
       errs.end_date = '종료일은 시작일 이후여야 합니다.'
@@ -104,9 +130,9 @@ export default function ProjectsPage() {
       setProjects(prev => [data, ...prev])
       setFormData({ name: '', client_name: '', status: 'planning', start_date: '', end_date: '' })
       setShowModal(false)
-      toast.success(`"${data.name}" 프로젝트가 생성되었어요! 기본 공정 ${DEFAULT_PROCESSES.length}개도 자동으로 추가했습니다.`)
+      toast.success(`"${data.name}" 현장이 등록됐어요! 기본 공정 ${DEFAULT_PROCESSES.length}개도 자동으로 추가했습니다.`)
     } catch (err: any) {
-      const msg = err?.message?.includes('duplicate') ? '이미 같은 이름의 프로젝트가 있어요.' : (err.message || '생성 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.')
+      const msg = err?.message?.includes('duplicate') ? '이미 같은 이름의 현장이 있어요.' : (err.message || '등록 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.')
       setError(msg)
       toast.error(msg)
     } finally {
@@ -208,11 +234,11 @@ export default function ProjectsPage() {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div>
-            <h1 className={styles.title}>프로젝트</h1>
-            <p className={styles.subtitle}>진행 중인 모든 프로젝트를 관리하세요</p>
+            <h1 className={styles.title}>현장 관리</h1>
+            <p className={styles.subtitle}>진행 중인 모든 현장을 관리하세요</p>
           </div>
           <button type="button" className={styles.newProjectBtn} onClick={() => setShowModal(true)}>
-            + 새 프로젝트
+            + 새 현장
           </button>
           <button type="button" className={styles.newProjectBtn} style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }} onClick={() => {
             const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
@@ -270,11 +296,11 @@ export default function ProjectsPage() {
                   <polyline points="9 22 9 12 15 12 15 22"/>
                 </svg>
               </div>
-              <h3>첫 프로젝트를 만들어보세요!</h3>
-              <p>프로젝트를 생성하면 진단부터 리포트까지<br/>모든 과정을 체계적으로 관리할 수 있습니다</p>
+              <h3>첫 현장을 등록해보세요!</h3>
+              <p>현장을 등록하면 진단부터 리포트까지<br/>모든 과정을 체계적으로 관리할 수 있습니다</p>
               <div className={styles.emptyActions}>
                 <button type="button" className={styles.emptyBtn} onClick={() => setShowModal(true)}>
-                  + 새 프로젝트 만들기
+                  + 새 현장 등록
                 </button>
                 <button type="button" className={styles.emptyBtnAlt} onClick={() => setShowQuickStart(true)}>
                   ⚡ 퀵스타트로 시작
@@ -302,8 +328,26 @@ export default function ProjectsPage() {
                 return `${Math.floor(hours / 24)}일 전`
               })()
               return (
+                <div key={project.id} className={styles.cardWrap} ref={openMenuId === project.id ? menuRef : null}>
+                  {/* 케밥 메뉴 */}
+                  <div className={styles.kebabWrap}>
+                    <button
+                      className={styles.kebabBtn}
+                      onClick={e => { e.preventDefault(); e.stopPropagation(); setOpenMenuId(openMenuId === project.id ? null : project.id) }}
+                      aria-label="현장 메뉴"
+                    >⋯</button>
+                    {openMenuId === project.id && (
+                      <div className={styles.kebabMenu}>
+                        <button
+                          className={`${styles.kebabItem} ${styles.danger}`}
+                          onClick={e => { e.stopPropagation(); handleDeleteProject(project.id, project.name) }}
+                        >
+                          🗑️ 현장 삭제
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 <Link
-                  key={project.id}
                   href={`/projects/${project.id}/diagnostic`}
                   className={`${styles.projectCard} ${isHighRisk ? styles.highRisk : ''}`}
                 >
@@ -373,6 +417,7 @@ export default function ProjectsPage() {
                     </div>
                   </div>
                 </Link>
+                </div>
               )
             })
           )}
@@ -384,12 +429,12 @@ export default function ProjectsPage() {
         <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2>새 프로젝트</h2>
+              <h2>새 현장 등록</h2>
               <button type="button" className={styles.modalClose} onClick={() => setShowModal(false)}>✕</button>
             </div>
             <form onSubmit={handleCreateProject} className={styles.modalForm}>
               <div className={styles.formGroup}>
-                <label htmlFor="name">프로젝트명 <span className={styles.required}>*</span></label>
+                <label htmlFor="name">현장명 <span className={styles.required}>*</span></label>
                 <input id="name" type="text" value={formData.name}
                   onChange={e => { setFormData(prev => ({ ...prev, name: e.target.value })); setFieldErrors(prev => ({ ...prev, name: '' })) }}
                   placeholder="예: 강남 오피스텔 리모델링"
@@ -432,7 +477,7 @@ export default function ProjectsPage() {
               <div className={styles.modalActions}>
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>취소</button>
                 <button type="submit" className={styles.submitBtn} disabled={creating}>
-                  {creating ? '생성 중...' : '프로젝트 생성'}
+                  {creating ? '등록 중...' : '현장 등록'}
                 </button>
               </div>
             </form>

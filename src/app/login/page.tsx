@@ -70,7 +70,7 @@ export default function LoginPage() {
             <span className={styles.logoIcon}>📋</span>
             <span className={styles.logoText}>Check-In</span>
           </div>
-          <p className={styles.tagline}>기록의 편</p>
+          <p className={styles.tagline}>나만의 AI 인테리어 비서</p>
         </div>
 
         <div className={styles.tabs}>

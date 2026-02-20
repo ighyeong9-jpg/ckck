@@ -43,10 +43,8 @@ async function embedQuery(query: string): Promise<number[]> {
 
   const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({ model: EMBEDDING_MODEL })
-  // gemini-embedding-001은 Matryoshka 모델: 앞 768차원이 최적 부분집합
   const result = await model.embedContent(query)
-  const values = result.embedding.values
-  return values.slice(0, 768)
+  return result.embedding.values  // 768-dim (DB vector(768) 기준)
 }
 
 // ─── pgvector 검색 ─────────────────────────────────────────

@@ -1,0 +1,215 @@
+$navy: #0A1628;
+$surface: #111E35;
+$accent: #FF6B2B;
+$success: #00D084;
+$text: #FFFFFF;
+$muted: #8B9BB4;
+$border: #1E2F4A;
+
+.section {
+  background: $surface;
+  padding: 6rem 2rem;
+  border-top: 1px solid $border;
+  border-bottom: 1px solid $border;
+}
+
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-block;
+  color: $accent;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  color: $text;
+  letter-spacing: -0.03em;
+  margin: 0 0 2.5rem;
+}
+
+.accent { color: $accent; }
+
+// ─── 탭 ──────────────────────────────────────────────────
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: $navy;
+  border: 1px solid $border;
+  color: $muted;
+  padding: 0.55rem 1.1rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: rgba(255,107,43,0.3);
+    color: $text;
+  }
+}
+
+.activeTab {
+  background: rgba(255,107,43,0.12);
+  border-color: $accent;
+  color: $accent;
+}
+
+.tabIcon { font-size: 1rem; }
+.tabTitle { @media (max-width: 480px) { display: none; } }
+
+// ─── 상세 ────────────────────────────────────────────────
+.detail {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  align-items: start;
+  text-align: left;
+  background: $navy;
+  border: 1px solid $border;
+  border-radius: 20px;
+  padding: 2.5rem;
+  animation: fadeSlide 0.25s ease;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    padding: 1.75rem;
+  }
+}
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.detailLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.painBubble {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255,59,92,0.06);
+  border: 1px solid rgba(255,59,92,0.2);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  color: #fca5a5;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.painIcon { font-size: 1.4rem; flex-shrink: 0; }
+
+.arrowDown {
+  color: $accent;
+  font-size: 1.4rem;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.solutionBubble {
+  background: rgba(0,208,132,0.05);
+  border: 1px solid rgba(0,208,132,0.2);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+}
+
+.solveLabel {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $success;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.92rem;
+    color: $text;
+    font-weight: 500;
+  }
+}
+
+.check {
+  color: $success;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.detailRight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  min-width: 140px;
+
+  @media (max-width: 640px) {
+    flex-direction: row;
+    justify-content: space-between;
+    min-width: unset;
+  }
+}
+
+.roleIcon { font-size: 3rem; }
+
+.roleTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $muted;
+  text-align: center;
+}
+
+.roleCtaBtn {
+  display: inline-block;
+  background: $accent;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(255,107,43,0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,107,43,0.4);
+  }
+}

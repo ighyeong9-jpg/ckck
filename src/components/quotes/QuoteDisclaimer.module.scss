@@ -1,0 +1,50 @@
+.disclaimer {
+  background: #fffbeb;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.icon {
+  font-size: 16px;
+}
+
+.title {
+  font-size: 14px;
+  color: #92400e;
+}
+
+.list {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+
+  li {
+    font-size: 13px;
+    color: #78350f;
+    line-height: 1.7;
+  }
+}
+
+// 컴팩트 버전
+.compact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.compactText {
+  font-size: 11px;
+  color: #92400e;
+}

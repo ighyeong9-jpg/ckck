@@ -1,0 +1,226 @@
+// AIBriefing.module.scss — 체키 프로액티브 브리핑 카드
+
+.briefing {
+  border-radius: 14px;
+  border: 1px solid;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  transition: all 0.2s ease;
+
+  @media (max-width: 640px) {
+    padding: 0.875rem 1rem;
+  }
+}
+
+.normal {
+  background: rgba(79, 70, 229, 0.04);
+  border-color: rgba(79, 70, 229, 0.2);
+}
+
+.urgent {
+  background: rgba(255, 59, 92, 0.04);
+  border-color: rgba(255, 59, 92, 0.25);
+  animation: urgentPulse 3s ease-in-out infinite;
+}
+
+@keyframes urgentPulse {
+  0%, 100% { border-color: rgba(255, 59, 92, 0.25); }
+  50% { border-color: rgba(255, 59, 92, 0.5); }
+}
+
+// ─── 헤더 ──────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.botIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.subtitle {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  padding: 0.1rem 0.5rem;
+  border-radius: 20px;
+  line-height: 1.5;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.toggleBtn,
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  padding: 0.25rem 0.375rem;
+  border-radius: 6px;
+  line-height: 1;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--color-border);
+  }
+}
+
+// ─── 브리핑 요약 ───────────────────────────────────────────
+
+.summary {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+
+  strong { color: var(--color-text); font-weight: 600; }
+}
+
+// ─── 알림 목록 ─────────────────────────────────────────────
+
+.notificationList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.75rem;
+}
+
+.notificationItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--color-bg);
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.notifIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.notifContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.notifHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.notifProject {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+  truncate: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.notifTag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.notifMessage {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.625rem;
+  border-radius: 6px;
+  border: 1px solid;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  width: fit-content;
+
+  &:hover { opacity: 0.75; }
+}
+
+.moreCount {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 0.25rem 0;
+}
+
+// ─── 빠른 이동 버튼 ───────────────────────────────────────
+
+.quickAction {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.625rem;
+}
+
+.urgentBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #FF3B5C, #FF6B2B);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.85; }
+}

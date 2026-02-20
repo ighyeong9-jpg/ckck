@@ -1,0 +1,97 @@
+// SwipeCard — 원탭 스와이프 처리 카드
+
+.wrapper {
+  position: relative;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255,107,43,0.12), rgba(16,185,129,0.12));
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.bgLabel {
+  position: absolute;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.card {
+  position: relative;
+  background: var(--card-bg, #fff);
+  border: 1.5px solid var(--color-border, #e5e7eb);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  will-change: transform;
+
+  &.dragging {
+    cursor: grabbing;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+}
+
+.label {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.sublabel {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.hint {
+  margin-top: 0.4rem;
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+// 완료/거절 상태
+.doneComplete,
+.doneReject {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.doneComplete {
+  background: rgba(16,185,129,0.08);
+  border: 1.5px solid rgba(16,185,129,0.3);
+}
+
+.doneReject {
+  background: rgba(255,107,43,0.08);
+  border: 1.5px solid rgba(255,107,43,0.3);
+}
+
+.doneIcon { font-size: 1.2rem; }
+
+.doneText {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}

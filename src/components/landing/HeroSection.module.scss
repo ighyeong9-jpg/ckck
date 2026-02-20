@@ -1,0 +1,418 @@
+// HeroSection — 딥 네이비 + 오렌지 포인트
+$navy: #0A1628;
+$surface: #111E35;
+$accent: #FF6B2B;
+$accent-light: #FF8C55;
+$success: #00D084;
+$danger: #FF3B5C;
+$warning: #FFB800;
+$text: #FFFFFF;
+$muted: #8B9BB4;
+$border: #1E2F4A;
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  background: $navy;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// 배경 그리드
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,107,43,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,107,43,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+// 배경 글로우
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255,107,43,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  left: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0,208,132,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8rem 2rem 4rem;
+  width: 100%;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    padding: 6rem 1.5rem 3rem;
+    gap: 3rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 5rem 1rem 2.5rem;
+    gap: 2rem;
+  }
+}
+
+// ─── 카피 ────────────────────────────────────────────────
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,107,43,0.12);
+  border: 1px solid rgba(255,107,43,0.3);
+  color: $accent-light;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  width: fit-content;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $accent;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.headline {
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  font-size: clamp(2.2rem, 5.5vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: $text;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.accent {
+  color: $accent;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: $accent;
+    opacity: 0.3;
+    border-radius: 2px;
+  }
+}
+
+.sub {
+  font-size: 1.15rem;
+  color: $muted;
+  line-height: 1.7;
+  margin: 0;
+
+  strong {
+    color: $text;
+    font-weight: 700;
+  }
+}
+
+.ctas {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  background: $accent;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 0.9rem 2rem;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: -0.01em;
+  box-shadow: 0 4px 24px rgba(255,107,43,0.35);
+
+  &:hover {
+    background: $accent-light;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(255,107,43,0.45);
+  }
+}
+
+.ctaGhost {
+  color: $muted;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover { color: $text; }
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: $muted;
+  margin: 0;
+  opacity: 0.7;
+}
+
+// ─── 프리뷰 카드 ─────────────────────────────────────────
+.preview {
+  display: flex;
+  justify-content: center;
+
+  @media (max-width: 900px) {
+    order: -1;
+  }
+}
+
+.previewCard {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 18px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow:
+    0 0 0 1px rgba(255,107,43,0.08),
+    0 24px 80px rgba(0,0,0,0.5);
+  animation: floatCard 5s ease-in-out infinite;
+}
+
+@keyframes floatCard {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.previewHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.previewDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.previewTitle {
+  flex: 1;
+  text-align: center;
+  font-size: 0.78rem;
+  color: $muted;
+  font-weight: 500;
+}
+
+.photoArea {
+  background: rgba(255,255,255,0.03);
+  border: 1.5px dashed $border;
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  margin-bottom: 1rem;
+
+  p {
+    margin: 0.25rem 0 0.75rem;
+    font-size: 0.85rem;
+    color: $muted;
+  }
+}
+
+.photoIcon { font-size: 2rem; }
+
+.analyzing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  font-size: 0.78rem;
+  color: $accent-light;
+}
+
+.analyzeBar {
+  display: block;
+  width: 80px;
+  height: 3px;
+  background: $border;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 40%;
+    background: $accent;
+    border-radius: 2px;
+    animation: scan 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes scan {
+  0% { left: -40%; }
+  100% { left: 100%; }
+}
+
+// ─── 체크 리스트 ─────────────────────────────────────────
+.checkList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.82rem;
+  color: $muted;
+  transition: all 0.4s;
+
+  &.active {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,107,43,0.2);
+    color: $text;
+  }
+}
+
+.checkBadge {
+  flex-shrink: 0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+
+  .pass & {
+    background: rgba(0,208,132,0.15);
+    color: $success;
+    border: 1px solid rgba(0,208,132,0.3);
+  }
+
+  .fail & {
+    background: rgba(255,59,92,0.15);
+    color: $danger;
+    border: 1px solid rgba(255,59,92,0.3);
+  }
+
+  .warn & {
+    background: rgba(255,184,0,0.15);
+    color: $warning;
+    border: 1px solid rgba(255,184,0,0.3);
+  }
+}
+
+// ─── 최종 판정 ───────────────────────────────────────────
+.verdict {
+  border-top: 1px solid $border;
+  padding-top: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.verdictLabel {
+  font-size: 0.75rem;
+  color: $muted;
+  font-weight: 500;
+}
+
+.verdictResult {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: $warning;
+}
+
+.verdictIcon { font-size: 0.9rem; }
+
+.verdictLaw {
+  width: 100%;
+  margin: 0.3rem 0 0;
+  font-size: 0.72rem;
+  color: $muted;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+// ─── 스크롤 힌트 ─────────────────────────────────────────
+.scrollHint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  color: $muted;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  animation: bounce 2s ease-in-out infinite;
+  z-index: 1;
+
+  span {
+    width: 1.5px;
+    height: 32px;
+    background: linear-gradient($accent, transparent);
+    border-radius: 1px;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}

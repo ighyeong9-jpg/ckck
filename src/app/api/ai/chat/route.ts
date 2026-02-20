@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
       context: {
         userMessage: message,
         projectId,
+        userId: user.id,
         projectCtx,
         conversationHistory: history.slice(-10),   // 최근 10개
       },

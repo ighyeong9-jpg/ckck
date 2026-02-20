@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Process, ProcessStatus } from '@/types/process'
@@ -8,6 +8,7 @@ import { PROCESS_STATUS, DEFAULT_PROCESSES } from '@/types/process'
 import QuickActions from '@/components/ui/QuickActions'
 import { logActivity } from '@/lib/activity/logger'
 import { useToast } from '@/components/ui/Toast'
+import PdfDownloadButton from '@/components/pdf/PdfDownloadButton'
 import styles from './page.module.scss'
 
 type ViewMode = 'list' | 'gantt'
@@ -18,6 +19,7 @@ export default function ProcessPage() {
   const supabase = createClient()
   const toast = useToast()
   const [processes, setProcesses] = useState<Process[]>([])
+  const [projectName, setProjectName] = useState('')
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingProcess, setEditingProcess] = useState<Process | null>(null)
@@ -40,20 +42,34 @@ export default function ProcessPage() {
 
   const loadData = async () => {
     try {
-      const { data, error } = await supabase
-        .from('processes')
-        .select('*')
-        .eq('project_id', projectId)
-        .order('order_index')
-
-      if (error) throw error
-      if (data) setProcesses(data)
+      const [processRes, projectRes] = await Promise.all([
+        supabase.from('processes').select('*').eq('project_id', projectId).order('order_index'),
+        supabase.from('projects').select('name').eq('id', projectId).single(),
+      ])
+      if (processRes.data) setProcesses(processRes.data)
+      if (projectRes.data) setProjectName((projectRes.data as any).name ?? '')
     } catch (err) {
       console.error('Error:', err)
     } finally {
       setLoading(false)
     }
   }
+
+  const handleExportDailyReport = useCallback(async () => {
+    const { exportDailyReportPdf } = await import('@/lib/pdf/daily-report-pdf')
+    await exportDailyReportPdf({
+      projectName: projectName || `Project-${projectId}`,
+      reportDate: new Date().toISOString().split('T')[0],
+      processes: processes.map(p => ({
+        name: p.name,
+        status: p.status,
+        progress: p.progress,
+        note: p.description ?? undefined,
+      })),
+      workforce: [],
+      materials: [],
+    })
+  }, [processes, projectName, projectId])
 
   const resetForm = () => {
     setFormData({
@@ -393,6 +409,14 @@ export default function ProcessPage() {
             </button>
           </div>
           <div className={styles.actionBtns}>
+            {processes.length > 0 && (
+              <PdfDownloadButton
+                onExport={handleExportDailyReport}
+                label="현장 일보 PDF"
+                variant="secondary"
+                size="sm"
+              />
+            )}
             <button
               className={styles.templateBtn}
               onClick={loadTemplate}

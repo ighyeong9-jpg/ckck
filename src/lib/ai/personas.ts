@@ -214,14 +214,32 @@ export const PERSONAS: Record<UserPersona, PersonaMeta> = {
 }
 
 // ═══════════════════════════════════════════════════════════
+// 카카오 스타일 말투 가이드 (전 페르소나 공통 적용)
+// ═══════════════════════════════════════════════════════════
+
+const KAKAO_TONE_GUIDE = `
+[말투 가이드 — 카카오 스타일]
+- 존댓말이되 친근하게: ~해요, ~이에요, ~드릴게요, ~있어요
+- 한 문장 20자 이내. 짧고 명확하게.
+- 이모지 1~2개만 자연스럽게 사용 (과하지 않게)
+- 결론·행동 먼저, 법조문·근거는 뒤에 괄호나 짧게
+- 긴 인사말 금지. 바로 핵심부터 시작.
+- 딱딱한 표현 금지: "해야 합니다" → "해야 해요", "입니다" → "이에요/예요", "불가합니다" → "안 돼요"
+- GO 판정: "✅ 통과예요!" / NO-GO: "🚫 아직 안 돼요." / 위험: "⚠️ 주의가 필요해요."
+- 예시 (변환 전→후):
+  전: "GO 판정입니다. 법적 근거: 건설산업기본법 제28조"
+  후: "✅ 통과예요! 방수 상태 좋아 보여요. (건산법 28조 충족)"
+`
+
+// ═══════════════════════════════════════════════════════════
 // 헬퍼 함수
 // ═══════════════════════════════════════════════════════════
 
-/** persona의 시스템 프롬프트를 userMessage 앞에 주입 */
+/** persona의 시스템 프롬프트를 userMessage 앞에 주입 (카카오 말투 포함) */
 export function injectPersonaContext(userMessage: string, persona: UserPersona): string {
   const meta = PERSONAS[persona]
   if (!meta) return userMessage
-  return `${meta.systemPrompt}\n\n---\n\n사용자 질문: ${userMessage}`
+  return `${meta.systemPrompt}\n${KAKAO_TONE_GUIDE}\n---\n\n사용자 질문: ${userMessage}`
 }
 
 /** 페르소나 목록 (UI 선택용) */

@@ -1,0 +1,98 @@
+// KakaoShare — 카카오톡 공유 버튼
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #FEE500;
+  color: #191919;
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.1s;
+
+  &:hover:not(:disabled) {
+    background: #F5DC00;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  svg { flex-shrink: 0; }
+}
+
+// 아이콘만 표시
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #FEE500;
+  color: #191919;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.1s;
+
+  &:hover:not(:disabled) {
+    background: #F5DC00;
+    transform: scale(1.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(1);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ─── 토스트 알림 ───────────────────────────────────────────
+.toast {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  animation: fadeInUp 0.2s ease;
+  z-index: 100;
+
+  &.success {
+    background: #191919;
+    color: #FEE500;
+  }
+
+  &.error {
+    background: #ef4444;
+    color: #fff;
+  }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

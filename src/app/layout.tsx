@@ -4,7 +4,7 @@ import Providers from '@/components/ui/Providers'
 
 export const metadata = {
   title: 'Check-In',
-  description: '기록의 편 - 인테리어 프로젝트 관리 플랫폼',
+  description: '나만의 AI 인테리어 비서 — 현장 관리 플랫폼',
   manifest: '/manifest.json',
   themeColor: '#7c3aed',
   appleWebApp: {

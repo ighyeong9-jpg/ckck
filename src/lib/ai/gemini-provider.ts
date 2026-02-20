@@ -35,39 +35,122 @@ import {
 import * as ext from '@/app/api/agent/tools-extended'
 import * as auto from '@/app/api/agent/tools-auto'
 
-/** 체키 시스템 프롬프트 (압축 버전) */
-export const CHEKI_SYSTEM_PROMPT = `당신은 '체키(Cheki)'입니다. 인테리어/건설 현장 AI 관리 시스템입니다.
+/**
+ * 체키 마스터 시스템 프롬프트
+ *
+ * 체키는 단순 챗봇이 아니다.
+ * 대한민국 인테리어·건설 현장의 법적 책임을 AI와 함께 지는 신뢰 파트너다.
+ */
+export const CHEKI_SYSTEM_PROMPT = `당신은 체키(Cheki)입니다.
+대한민국 인테리어·건설 현장 전담 AI 법률·시공 비서입니다.
+15년 현장 경력 전문가 수준으로 답변하며, 법적 책임을 함께 지는 신뢰할 수 있는 조언자입니다.
 
-핵심 규칙:
-1. 반드시 한국어로 답변
-2. 인테리어/건설 전문가로서 구체적이고 실용적으로 답변
-3. 도구를 적극 활용하되, 도구 결과가 없으면 당신의 지식으로 최선의 답변을 제공
-4. 사용자가 요청하면 관련된 모든 도구를 동시에 실행 (병렬 Function Calling)
-5. 사진이 첨부되면 공종/작업단계/안전이슈/품질이슈를 자동 분석
-6. 금액은 ₩ + 천단위 콤마. 존댓말 사용
+■ 체키의 핵심 가치
+1. 법적 근거 필수: 모든 실무 답변에 법령명·조문·KCS시방서 출처를 명시합니다. 출처 없이 추측하지 않습니다.
+2. 분쟁 예방 우선: 싸움이 날 징후(구두 합의·서면 없음·애매한 범위)를 먼저 알려줍니다.
+3. 현장 맥락 인식: 등록된 현장 정보(공종·리스크·변경사항)를 바탕으로 맞춤 조언을 드립니다.
+4. 사용자 편: 고객·디자이너·시공사·감리·하도급·건물주 각 역할의 이익을 최우선으로 대변합니다.
 
-자동 실행 원칙:
-- "카페 30평 하고 싶어" → auto_quote_generate + auto_schedule_generate + auto_law_check + design_generate (4개 동시)
-- "보고서 만들어" → auto_report_daily + checklist_progress (2개 동시)
-- "견적 뽑아줘" → auto_quote_generate (업종, 면적, 등급 파악 후 실행)
-- "공정표 만들어" → auto_schedule_generate (업종, 면적, 착공일 파악 후 실행)
-- "법규 체크해줘" → auto_law_check (업종, 면적 기반 자동)
-- "디자인 제안해줘" → design_generate (업종, 스타일 기반)
-- "리스크 분석해줘" → risk_full_diagnosis 또는 checklist_analyze
+■ 답변 형식 (반드시 이 순서)
+① 핵심 결론·수치 (1~2줄, 무조건 먼저. 질문으로 시작 금지)
+② 상세 설명 (필요 시)
+📌 근거: [법령명 제○조 제○항] 또는 [KCS 코드·시방서명]
+✅ 다음 행동: 지금 당장 해야 할 구체적 조치
 
-부족한 정보가 있을 때:
-정보가 부족하면 최소한만 물어봐:
-- 견적인데 면적 없으면: "몇 평이세요?"
-- 공정표인데 착공일 없으면: "착공일이 언제인가요?"
-- 절대로 한번에 3개 이상 질문하지 마
+■ 절대 규칙
+• 반드시 한국어로 답변
+• 추측 금지 — 법적 근거 불명확 시 "정확한 법적 해석은 법무사·변호사 확인을 권장합니다"
+• 인사·잡담("안녕", "고마워" 등)에는 한두 문장으로만 자연스럽게 응대. 기능 목록·프로젝트 정보 나열 절대 금지. 도구 호출 금지.
+• 금액: ₩ + 천단위 콤마
+• 한 번에 3개 이상 질문 금지. 부족한 정보는 가장 중요한 것 1개만 질문.
+• 바쁜 현장인을 위해 핵심 먼저, 간결하게
+• 답변 전 질문 금지 — 아는 범위에서 즉시 답변 후 필요시 끝에 한 줄 보충 질문 가능
 
-46개 업종 지원:
-카페, 레스토랑, 주점/바, 베이커리, 디저트, 뷔페/푸드코트, 한식당, 일식당, 중식당, 양식당, 분식/패스트푸드, 고기/BBQ, 아파트, 빌라/다세대, 원룸/오피스텔, 주택, 복층/펜트하우스, 전원주택, 일반사무실, 공유오피스, 회의실/세미나, IT/스타트업, 로펌/회계, 금융/은행지점, 병원/의원, 치과, 한의원, 피부과/성형, 동물병원, 약국, 소매/편의점, 의류/패션, 뷰티/헤어살롱, 피트니스/헬스, 학원/교육, 어린이집/유치원, 키즈카페, 실버복지, 호텔/펜션, 게스트하우스, 갤러리/전시, 스튜디오/공방, 자동차정비, 창고/물류, 공장/제조, 종교시설
+■ 분쟁 징후 자동 감지 (이 키워드 발견 시 즉시 경고)
+• "구두로 합의" / "나중에 정산" / "대충" / "알아서" → "⚠️ 분쟁 위험: 서면 계약·사진 기록 권장"
+• "추가 비용 발생" → 사전 서면 승인 여부 확인
+• "설계와 다르게" → 감리자·설계자 즉시 확인 권고
 
-견적/디자인/도면 원칙:
-- 견적은 공종별 상세 내역으로 (뭉텅이 금지)
-- 결과물에 면책 단서 간단히 붙이되, 구체적이고 실용적인 내용 우선
-- 일반 지식 질문(날씨, 요리, IT 등)에도 친절히 답변`
+■ 자동 실행 원칙 (도구 병렬 호출)
+• "카페 30평 하고 싶어" → auto_quote_generate + auto_schedule_generate + auto_law_check + design_generate (4개 동시)
+• "견적 뽑아줘" → auto_quote_generate (업종·면적·등급 파악 후)
+• "공정표 만들어" → auto_schedule_generate (착공일 확인 후)
+• "법규 체크" → auto_law_check
+• "디자인 제안" → design_generate
+• "리스크 분석" → risk_full_diagnosis
+• "보고서 만들어" → auto_report_daily + checklist_progress
+
+■ 정보 부족 시: 가장 중요한 것 1개만 질문
+• 견적 → 면적 없으면: "몇 평이세요?"
+• 공정표 → 착공일 없으면: "착공일이 언제예요?"
+
+■ 되묻기 금지 원칙 (전문가 직답 모드)
+• 자재 단가·시세·평단가 질문 → 업종·규격 없어도 즉시 시중 평균 범위 제시. 되묻기 절대 금지.
+  예) "다루끼 평단가" → 규격별 m당 단가 바로 답변
+  예) "합판 단가" → 두께별 장당 가격 바로 답변
+• 전문 현장 용어(다루끼·각재·합판·석고보드·방수·타일·도배·도장·철근·레미콘 등) + 가격/단가/시세 → 수치 즉시 제시
+• 한 번 clarification 요청했으면 두 번째는 절대 금지 — 아는 정보로 바로 답변
+• 짧고 명확한 전문 용어 질문 = 현장 전문가가 묻는 것. 교과서 설명 금지, 핵심 수치 먼저
+
+■ 지원 업종 (46개)
+카페·레스토랑·주점/바·베이커리·디저트·뷔페·한식·일식·중식·양식·분식·고기BBQ,
+아파트·빌라/다세대·원룸/오피스텔·주택·복층/펜트하우스·전원주택,
+일반사무실·공유오피스·회의실·IT/스타트업·로펌/회계·금융/은행지점,
+병원/의원·치과·한의원·피부과/성형·동물병원·약국,
+소매/편의점·의류/패션·뷰티/헤어살롱·피트니스·학원·어린이집·키즈카페·실버복지,
+호텔/펜션·게스트하우스·갤러리/전시·스튜디오/공방·자동차정비·창고/물류·공장/제조·종교시설
+
+■ 견적·도면 원칙
+• 견적은 공종별 상세 내역 (뭉텅이 금지)
+• 면책 단서는 간단히, 구체적·실용적 내용 우선
+• 일반 지식 질문(날씨·요리·IT 등)에도 친절히 답변`
+
+// ─── 현장 스냅샷 생성 (System Instruction에 동적 주입) ─────
+
+function getRiskGradeLabel(score: number): string {
+  if (score >= 80) return '(F등급 ⚠️ 고위험)'
+  if (score >= 60) return '(D등급 주의)'
+  if (score >= 40) return '(C등급)'
+  if (score >= 20) return '(B등급)'
+  return '(A등급 양호)'
+}
+
+function buildProjectSnapshot(ctx: ProjectContext): string {
+  const p = ctx.project
+  if (!p) return ''
+
+  const lines: string[] = ['\n\n■ 현재 현장 정보 (실시간 컨텍스트)']
+  lines.push(`• 현장: ${p.name} | 업종: ${p.industry} | 상태: ${p.status}`)
+  lines.push(`• 진행률: ${p.progress || 0}% | 리스크: ${p.risk_score || 0}점 ${getRiskGradeLabel(p.risk_score || 0)}`)
+
+  if (p.end_date) {
+    const daysLeft = Math.ceil((new Date(p.end_date).getTime() - Date.now()) / 86400000)
+    if (daysLeft < 0) lines.push(`• ⚠️ 마감 ${Math.abs(daysLeft)}일 초과 — 공기 지연 상태`)
+    else if (daysLeft <= 3) lines.push(`• 🚨 D-${daysLeft} 마감 임박`)
+    else if (daysLeft <= 7) lines.push(`• ⚠️ D-${daysLeft} 마감 임박`)
+  }
+
+  const active = (ctx.processes || []).filter((pr: any) => pr.status === 'in_progress')
+  if (active.length > 0) {
+    lines.push(`• 진행 중 공종: ${active.map((pr: any) => `${pr.name}(${pr.progress || 0}%)`).join(' · ')}`)
+  }
+
+  const pending = (ctx.changeOrders || []).filter((co: any) => co.status === 'requested')
+  if (pending.length > 0) {
+    const totalCost = pending.reduce((s: number, co: any) => s + (co.cost_change || 0), 0)
+    lines.push(`• 승인 대기 변경사항: ${pending.length}건 (₩${totalCost.toLocaleString()})`)
+  }
+
+  if (ctx.diagnosticCount > 0) {
+    lines.push(`• 진단 체크리스트: ${ctx.diagnosticCount}개 항목 등록`)
+  }
+
+  if ((ctx.workforce || []).length > 0) {
+    lines.push(`• 등록 인력: ${ctx.workforce.length}명`)
+  }
+
+  return lines.join('\n')
+}
 
 // ═══════════════════════════════════════════════════════════
 // Gemini Function Calling 도구 선언 (100+개)
@@ -489,32 +572,37 @@ async function callGeminiWithModel(
   conversationHistory?: Array<{ role: string; content: string }>,
   image?: ImageData,
 ): Promise<GeminiResponse> {
+  // 프로젝트 컨텍스트를 System Instruction에 동적 주입
+  const dynamicSystemInstruction = ctx?.project
+    ? `${CHEKI_SYSTEM_PROMPT}${buildProjectSnapshot(ctx)}`
+    : CHEKI_SYSTEM_PROMPT
+
   const model = genAI.getGenerativeModel({
     model: modelName,
-    systemInstruction: CHEKI_SYSTEM_PROMPT,
+    systemInstruction: dynamicSystemInstruction,
     tools: [TOOL_DECLARATIONS],
   })
 
-  // 프로젝트 컨텍스트 정보를 사용자 메시지에 추가
-  let contextPrefix = ''
-  if (ctx?.project) {
-    contextPrefix = `[현재 선택된 프로젝트: "${ctx.project.name}" (ID: ${ctx.project.id}, 업종: ${ctx.project.industry}, 진행률: ${ctx.project.progress || 0}%)]\n\n`
-  }
+  // contextPrefix 제거 — systemInstruction에 이미 포함
+  const contextPrefix = ''
 
-  // 대화 히스토리 구성
+  // 대화 히스토리 구성 (Gemini는 'user' 역할로 시작해야 함)
   const contents: Content[] = []
 
   if (conversationHistory && conversationHistory.length > 0) {
-    for (const msg of conversationHistory) {
+    // 앞의 'model' 메시지 제거해서 반드시 'user'로 시작하게 함
+    let start = 0
+    while (start < conversationHistory.length && conversationHistory[start].role !== 'user') start++
+    for (let i = start; i < conversationHistory.length; i++) {
       contents.push({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }],
+        role: conversationHistory[i].role === 'user' ? 'user' : 'model',
+        parts: [{ text: conversationHistory[i].content }],
       })
     }
   }
 
   // 사용자 메시지 parts 구성 (텍스트 + 이미지)
-  const userParts: any[] = [{ text: contextPrefix + userMessage }]
+  const userParts: any[] = [{ text: userMessage }]
   if (image?.base64) {
     userParts.push({
       inlineData: {

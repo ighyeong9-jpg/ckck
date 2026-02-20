@@ -1,0 +1,106 @@
+$navy: #0A1628;
+$surface: #111E35;
+$accent: #FF6B2B;
+$text: #FFFFFF;
+$muted: #8B9BB4;
+$border: #1E2F4A;
+
+.section {
+  background: $surface;
+  padding: 6rem 2rem;
+  border-top: 1px solid $border;
+  border-bottom: 1px solid $border;
+}
+
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-block;
+  color: $accent;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  color: $text;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+  margin: 0 0 3.5rem;
+}
+
+.accent { color: $accent; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: $navy;
+  border: 1px solid $border;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: rgba(255,107,43,0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+}
+
+.number {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.count {
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-weight: 900;
+  color: $accent;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.suffix {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: $accent;
+}
+
+.label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $text;
+  margin-bottom: 0.4rem;
+  line-height: 1.35;
+}
+
+.desc {
+  font-size: 0.78rem;
+  color: $muted;
+  line-height: 1.5;
+}

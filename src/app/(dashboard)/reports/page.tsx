@@ -66,7 +66,7 @@ export default function ReportsPage() {
 
   const handleGenerate = async () => {
     if (!selectedProject) {
-      toast.error('프로젝트를 선택해주세요.')
+      toast.error('현장을 선택해주세요.')
       return
     }
     setGenerating(true)
@@ -149,7 +149,7 @@ export default function ReportsPage() {
               <b>{reports.length}</b><small>저장된 리포트</small>
             </div>
             <div className={styles.statChip}>
-              <b>{projects.length}</b><small>진행 프로젝트</small>
+              <b>{projects.length}</b><small>진행 현장</small>
             </div>
           </div>
         </div>
@@ -169,12 +169,12 @@ export default function ReportsPage() {
 
           <div className={styles.aiForm}>
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>프로젝트</label>
+              <label className={styles.formLabel}>현장</label>
               {projects.length === 0 ? (
                 <p className={styles.noProjectMsg}>
-                  진행 중인 프로젝트가 없어요.{' '}
+                  진행 중인 현장이 없어요.{' '}
                   <button className={styles.noProjectLink} onClick={() => router.push('/projects')}>
-                    프로젝트 만들기 →
+                    현장 등록하기 →
                   </button>
                 </p>
               ) : (

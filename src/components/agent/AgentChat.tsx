@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import styles from './AgentChat.module.scss'
 
@@ -119,6 +119,7 @@ export default function AgentChat() {
   const [imageBase64, setImageBase64] = useState<string | null>(null)
   const [imageMimeType, setImageMimeType] = useState<string>('image/jpeg')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 현재 프로젝트 ID 추출
@@ -146,33 +147,55 @@ export default function AgentChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
-  // Ctrl+K 단축키로 체키 열기/닫기
+  // open/sendMessage의 최신 값을 ref로 유지 (stale closure 방지)
+  const openRef = useRef(open)
+  useEffect(() => { openRef.current = open }, [open])
+
+  const sendMessageRef = useRef<typeof sendMessage | null>(null)
+
+  // 채팅창 열릴 때 입력창 자동 포커스 (다른 input에 입력 중이면 포커스 도둑질 안 함)
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        const active = document.activeElement
+        const isOtherInputFocused =
+          active instanceof HTMLInputElement ||
+          active instanceof HTMLTextAreaElement ||
+          active instanceof HTMLSelectElement
+        if (!isOtherInputFocused) {
+          inputRef.current?.focus()
+        }
+      }, 100)
+    }
+  }, [open])
+
+  // Ctrl+K 단축키로 체키 열기/닫기 (deps 없이 ref로 처리)
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault()
         setOpen(prev => !prev)
       }
-      if (e.key === 'Escape' && open) {
+      if (e.key === 'Escape' && openRef.current) {
         setOpen(false)
       }
     }
     window.addEventListener('keydown', handleKeyboard)
     return () => window.removeEventListener('keydown', handleKeyboard)
-  }, [open])
+  }, [])
 
-  // 외부에서 메시지를 보내는 이벤트 리스너 (QuickActions 연동)
+  // 외부에서 메시지를 보내는 이벤트 리스너 (QuickActions 연동, 안정된 deps)
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail
       if (detail?.message) {
         setOpen(true)
-        setTimeout(() => sendMessage(detail.message), 300)
+        setTimeout(() => sendMessageRef.current?.(detail.message), 300)
       }
     }
     window.addEventListener('cheki-send', handler)
     return () => window.removeEventListener('cheki-send', handler)
-  }, [loading])
+  }, [])
 
   // 파일 선택 핸들러
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -211,13 +234,22 @@ export default function AgentChat() {
     setImageBase64(null)
   }
 
-  const sendMessage = async (msgText?: string) => {
+  const sendMessage = useCallback(async (msgText?: string) => {
     const userMsg = (msgText || input).trim()
     if ((!userMsg && !imageBase64) || loading) return
 
     const currentImage = imagePreview
     const currentBase64 = imageBase64
     const currentMime = imageMimeType
+
+    // 대화 히스토리 캡처 (state 업데이트 전)
+    const historyMessages = messages
+      .filter(m => m.content)
+      .slice(-20)
+      .map(m => ({
+        role: m.role === 'ai' ? 'model' : 'user',
+        content: m.content,
+      }))
 
     setInput('')
     setImagePreview(null)
@@ -235,7 +267,10 @@ export default function AgentChat() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: userMsg || '이 이미지를 분석해줘' }],
+          messages: [
+            ...historyMessages,
+            { role: 'user', content: userMsg || '이 이미지를 분석해줘' },
+          ],
           projectId,
           pageContext: pathname,
           ...(currentBase64 && {
@@ -269,8 +304,13 @@ export default function AgentChat() {
       }])
     } finally {
       setLoading(false)
+      // 전송 후 입력창 포커스 자동 복원
+      setTimeout(() => inputRef.current?.focus(), 50)
     }
-  }
+  }, [input, imageBase64, imagePreview, imageMimeType, messages, projectId, pathname, loading])
+
+  // sendMessageRef를 항상 최신 sendMessage로 유지
+  useEffect(() => { sendMessageRef.current = sendMessage }, [sendMessage])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -415,6 +455,7 @@ export default function AgentChat() {
               📷
             </button>
             <input
+              ref={inputRef}
               className={styles.input}
               value={input}
               onChange={e => setInput(e.target.value)}

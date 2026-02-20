@@ -3,7 +3,7 @@
  * JSON 파일을 읽어 평탄화된 청크 배열로 반환
  */
 
-export type KnowledgeCategory = 'law' | 'process' | 'defect' | 'material' | 'contract' | 'safety'
+export type KnowledgeCategory = 'law' | 'process' | 'defect' | 'material' | 'contract' | 'safety' | 'case'
 
 export interface KnowledgeChunk {
   id: string
@@ -28,7 +28,7 @@ function loadJson(filename: string): KnowledgeChunk[] {
 
 /** 모든 지식 청크를 하나의 배열로 반환 */
 export function loadAllChunks(): KnowledgeChunk[] {
-  const files = ['laws.json', 'process.json', 'defects.json', 'materials.json', 'contracts.json']
+  const files = ['laws.json', 'process.json', 'defects.json', 'materials.json', 'contracts.json', 'case-law.json']
   return files.flatMap(f => loadJson(f))
 }
 

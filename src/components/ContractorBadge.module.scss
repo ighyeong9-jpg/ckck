@@ -1,0 +1,86 @@
+// ContractorBadge — 체키 인증 업체 뱃지
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1.5px solid;
+  border-radius: 10px;
+  font-weight: 600;
+
+  &.sm  { padding: 0.3rem 0.65rem; }
+  &.md  { padding: 0.5rem 0.9rem;  }
+  &.lg  { padding: 0.75rem 1.2rem; }
+}
+
+.icon {
+  font-size: 1.1em;
+  flex-shrink: 0;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.detail {
+  font-size: 0.68rem;
+  opacity: 0.75;
+  font-weight: 400;
+}
+
+// ─── 조건 표시 박스 (미달성 시) ────────────────────────
+.progressBox {
+  background: var(--color-border-light, #f9fafb);
+  border: 1.5px dashed var(--color-border, #e5e7eb);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.progressTitle {
+  margin: 0 0 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.conditionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.progressSub {
+  margin: 0.2rem 0 0;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+// ─── 스켈레톤 ──────────────────────────────────────────
+.skeleton {
+  border-radius: 10px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e9eaec 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+
+  &.sm { width: 140px; height: 30px; }
+  &.md { width: 180px; height: 38px; }
+  &.lg { width: 220px; height: 48px; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

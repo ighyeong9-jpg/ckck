@@ -278,6 +278,43 @@ body {
   color: var(--color-text);
 }
 
+/* ===== 다크모드 CSS 변수 ===== */
+[data-theme="dark"] {
+  --color-bg: #0A1628;
+  --color-bg-elevated: #111E35;
+  --color-text: #F0F4FF;
+  --color-text-secondary: #8B9BB4;
+  --color-text-muted: #5A6B84;
+  --color-border: #1E2F4A;
+  --color-border-light: #162238;
+
+  --card-bg: #111E35;
+  --card-border: 1px solid #1E2F4A;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.4);
+
+  --color-primary-light: rgba(124, 58, 237, 0.2);
+  --color-success-light: rgba(16, 185, 129, 0.15);
+  --color-warning-light: rgba(245, 158, 11, 0.15);
+  --color-danger-light: rgba(239, 68, 68, 0.15);
+  --color-info-light: rgba(59, 130, 246, 0.15);
+
+  /* 스크롤바 다크 */
+  color-scheme: dark;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* 다크모드 토글 트랜지션 */
+html {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
 /* ===== Mobile Responsive ===== */
 @media (max-width: 768px) {
   :root {

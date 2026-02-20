@@ -1,0 +1,166 @@
+$navy: #0A1628;
+$surface: #111E35;
+$accent: #FF6B2B;
+$accent-light: #FF8C55;
+$text: #FFFFFF;
+$muted: #8B9BB4;
+$border: #1E2F4A;
+
+.page {
+  background: $navy;
+  color: $text;
+  font-family: 'Pretendard', 'Noto Sans KR', -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+// ─── 최종 CTA ────────────────────────────────────────────
+.finalCta {
+  background: $surface;
+  padding: 8rem 2rem;
+  border-top: 1px solid $border;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(255,107,43,0.1) 0%, transparent 65%);
+    pointer-events: none;
+  }
+}
+
+.finalCtaInner {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.finalCtaEye {
+  display: inline-block;
+  color: $accent;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.finalCtaTitle {
+  font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+  font-weight: 900;
+  color: $text;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.finalCtaAccent { color: $accent; }
+
+.finalCtaSub {
+  font-size: 1rem;
+  color: $muted;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.finalCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  background: $accent;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  padding: 1.1rem 2.75rem;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 6px 30px rgba(255,107,43,0.4);
+  margin-top: 0.5rem;
+  letter-spacing: -0.01em;
+
+  &:hover {
+    background: $accent-light;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(255,107,43,0.5);
+  }
+}
+
+.finalCtaHint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba($muted, 0.7);
+}
+
+// ─── 푸터 ────────────────────────────────────────────────
+.footer {
+  background: darken($navy, 3%);
+  border-top: 1px solid $border;
+  padding: 2.5rem 2rem;
+}
+
+.footerInner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.footerBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.footerLogo {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: $accent;
+}
+
+.footerTagline {
+  font-size: 0.8rem;
+  color: $muted;
+}
+
+.footerLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+
+  a {
+    color: $muted;
+    text-decoration: none;
+    transition: color 0.2s;
+    &:hover { color: $text; }
+  }
+
+  span { color: $border; }
+}
+
+.footerCopy {
+  width: 100%;
+  margin: 1rem 0 0;
+  font-size: 0.75rem;
+  color: rgba($muted, 0.5);
+  text-align: center;
+}

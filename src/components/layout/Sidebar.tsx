@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import styles from './Sidebar.module.scss'
+import { Badge } from '@/components/ui/Badge'
 
 interface NavItem {
   icon: string
@@ -22,7 +23,9 @@ interface SubMenuItem {
 
 const mainNavItems: NavItem[] = [
   { icon: '🏠', label: '대시보드', href: '/dashboard' },
-  { icon: '📁', label: '프로젝트', href: '/projects' },
+  { icon: '📁', label: '현장 관리', href: '/projects' },
+  { icon: '💰', label: '예산 가이드', href: '/quotes' },
+  { icon: '📡', label: '현장 이슈', href: '/issues' },
   { icon: '🤖', label: 'AI 채팅', href: '/ai-chat' },
   { icon: '📒', label: 'AI 노트북', href: '/notebook' },
   { icon: '📊', label: '리포트', href: '/reports' },
@@ -51,7 +54,7 @@ const bottomNavItems: NavItem[] = [
   { icon: '⚙️', label: '설정', href: '/settings' },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -59,6 +62,7 @@ export default function Sidebar() {
   const [userPlan, setUserPlan] = useState('Free')
   const [subMenuOpen, setSubMenuOpen] = useState(true)
   const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({})
+  const [globalBadge, setGlobalBadge] = useState(0)
   const [collapsed, setCollapsed] = useState(false)
 
   // Hydration-safe: read localStorage after mount
@@ -79,6 +83,11 @@ export default function Sidebar() {
     )
   }, [collapsed])
 
+  // 모바일에서 페이지 이동 시 사이드바 닫기
+  useEffect(() => {
+    if (onNavigate) onNavigate()
+  }, [pathname])
+
   useEffect(() => {
     const loadUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -95,6 +104,29 @@ export default function Sidebar() {
       }
     }
     loadUser()
+  }, [])
+
+  // 글로벌 미확인 뱃지 (분쟁 징후 + 하자담보 만료 + 변경 승인 대기)
+  useEffect(() => {
+    const loadGlobalBadge = async () => {
+      try {
+        const thirtyDaysLater = new Date(Date.now() + 30 * 86400000).toISOString()
+        const now = new Date().toISOString()
+        const [
+          { count: disputes },
+          { count: changes },
+          { count: warranty },
+        ] = await Promise.all([
+          supabase.from('dispute_signals').select('*', { count: 'exact', head: true }).eq('resolved', false),
+          supabase.from('change_orders').select('*', { count: 'exact', head: true }).eq('status', 'requested'),
+          supabase.from('warranty_tracking').select('*', { count: 'exact', head: true }).lt('expires_date', thirtyDaysLater).gt('expires_date', now),
+        ])
+        setGlobalBadge((disputes ?? 0) + (changes ?? 0) + (warranty ?? 0))
+      } catch { /* 조용히 실패 */ }
+    }
+    loadGlobalBadge()
+    const interval = setInterval(loadGlobalBadge, 60000)
+    return () => clearInterval(interval)
   }, [])
 
   // Load badge counts for current project
@@ -150,6 +182,8 @@ export default function Sidebar() {
 
   const isActive = (href: string) => {
     if (href === '/projects' && pathname.startsWith('/projects')) return true
+    if (href === '/quotes' && pathname.startsWith('/quotes')) return true
+    if (href === '/issues' && pathname.startsWith('/issues')) return true
     return pathname === href
   }
 
@@ -189,7 +223,7 @@ export default function Sidebar() {
             </svg>
           </button>
         </div>
-        {!collapsed && <span className={styles.tagline}>기록의 편</span>}
+        {!collapsed && <span className={styles.tagline}>AI 인테리어 비서</span>}
       </div>
 
       {/* Main Navigation */}
@@ -204,6 +238,9 @@ export default function Sidebar() {
               >
                 <span className={styles.navIcon}>{item.icon}</span>
                 {!collapsed && <span className={styles.navLabel}>{item.label}</span>}
+                {!collapsed && item.href === '/projects' && globalBadge > 0 && (
+                  <Badge count={globalBadge} size="sm" />
+                )}
                 {collapsed && <span className={styles.tooltip}>{item.label}</span>}
               </Link>
 
@@ -214,7 +251,7 @@ export default function Sidebar() {
                     className={styles.accordionToggle}
                     onClick={() => setSubMenuOpen(!subMenuOpen)}
                   >
-                    <span className={styles.accordionLabel}>프로젝트 메뉴</span>
+                    <span className={styles.accordionLabel}>현장 메뉴</span>
                     <span className={`${styles.accordionArrow} ${subMenuOpen ? styles.open : ''}`}>▾</span>
                   </button>
                   <ul className={`${styles.subMenu} ${subMenuOpen ? styles.subMenuOpen : ''}`}>

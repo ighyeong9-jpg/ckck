@@ -1,0 +1,93 @@
+// MobileTabBar — 카카오톡 스타일 모바일 하단 탭바
+// 768px 이하에서만 표시
+
+.tabBar {
+  display: none; // 데스크탑에서 숨김
+
+  @media (max-width: 768px) {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+
+    background: var(--card-bg, #fff);
+    border-top: 1px solid var(--color-border, #e5e7eb);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+
+    // iOS safe area 대응
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px;
+  text-decoration: none;
+  color: var(--color-text-muted, #9ca3af);
+  transition: color 0.12s;
+  min-height: 56px;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    opacity: 0.7;
+  }
+
+  &.active {
+    color: #7c3aed;
+  }
+}
+
+.iconWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.icon {
+  font-size: 1.35rem;
+  line-height: 1;
+  transition: transform 0.12s;
+
+  .tab.active & {
+    transform: scale(1.1);
+  }
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: #FF3B5C;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--card-bg, #fff);
+  line-height: 1;
+}
+
+.label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  line-height: 1;
+
+  .tab.active & {
+    font-weight: 700;
+  }
+}

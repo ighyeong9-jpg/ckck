@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { QuoteLineItem, QuoteSummary } from '@/types/quote'
 import { QUOTE_CATEGORIES, UNITS } from '@/types/quote'
+import type { QuoteAnalysisResult } from '@/lib/ai/quote-analyzer'
 import QuickActions from '@/components/ui/QuickActions'
+import PdfDownloadButton from '@/components/pdf/PdfDownloadButton'
 import styles from './page.module.scss'
 
 export default function SOWPage() {
@@ -18,6 +20,9 @@ export default function SOWPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingItem, setEditingItem] = useState<QuoteLineItem | null>(null)
   const [saving, setSaving] = useState(false)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<QuoteAnalysisResult | null>(null)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -81,6 +86,77 @@ export default function SOWPage() {
     })
     return groups
   }, [items])
+
+  // AI 견적 분석
+  const handleAnalyze = async () => {
+    if (items.length === 0) {
+      alert('견적 항목을 먼저 추가해주세요.')
+      return
+    }
+    setAnalyzing(true)
+    setAnalysisError(null)
+    try {
+      const res = await fetch('/api/ai/quote-analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'AI 분석 실패')
+      setAnalysisResult(data.analysis)
+    } catch (err: any) {
+      setAnalysisError(err.message || 'AI 분석 중 오류가 발생했습니다.')
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
+  // 하자담보 안내서 PDF
+  const handleExportWarranty = useCallback(async () => {
+    const { exportWarrantyPdf } = await import('@/lib/pdf/warranty-pdf')
+    const { WARRANTY_STANDARDS } = await import('@/lib/pdf/warranty-pdf')
+
+    // 견적 카테고리 → 하자담보 매핑
+    const categoryMap: Record<string, { months: number; law: string }> = {
+      demolition:  { months: 120, law: '건산법 제28조 제3항 (구조물 10년)' },
+      electrical:  { months: 36,  law: '건산법 제28조 제2항 (설비 3년)' },
+      plumbing:    { months: 36,  law: '건산법 제28조 제2항 (설비 3년)' },
+      carpentry:   { months: 12,  law: '건산법 제28조 제1항 (마감 1년)' },
+      tile:        { months: 12,  law: '건산법 제28조 제1항 (마감 1년)' },
+      paint:       { months: 12,  law: '건산법 제28조 제1항 (마감 1년)' },
+      wallpaper:   { months: 12,  law: '건산법 제28조 제1항 (마감 1년)' },
+      flooring:    { months: 12,  law: '건산법 제28조 제1항 (마감 1년)' },
+      furniture:   { months: 12,  law: '건산법 제28조 제1항 (마감 1년)' },
+      other:       { months: 12,  law: '건산법 제28조 제1항 (마감 1년)' },
+    }
+
+    const today = new Date().toISOString().split('T')[0]
+    // 카테고리별 대표 항목 하나씩만 추출
+    const seen = new Set<string>()
+    const warrantyItems = items
+      .filter(i => { if (seen.has(i.category)) return false; seen.add(i.category); return true })
+      .map(i => {
+        const { months, law } = categoryMap[i.category] ?? { months: 12, law: '건산법 제28조 제1항' }
+        const expiry = new Date(today)
+        expiry.setMonth(expiry.getMonth() + months)
+        const expiryStr = expiry.toISOString().split('T')[0]
+        const daysLeft = Math.ceil((expiry.getTime() - Date.now()) / 86400000)
+        return {
+          processName: getCategoryName(i.category),
+          completedDate: today,
+          warrantyMonths: months,
+          expiryDate: expiryStr,
+          legalBasis: law,
+          status: daysLeft <= 90 ? 'expiring_soon' as const : 'active' as const,
+          daysLeft,
+        }
+      })
+
+    const projectRes = await supabase.from('projects').select('name').eq('id', projectId).single()
+    const name = (projectRes.data as any)?.name ?? `Project-${projectId}`
+
+    await exportWarrantyPdf(warrantyItems, name)
+  }, [items, projectId, supabase])
 
   // 폼 초기화
   const resetForm = () => {
@@ -270,6 +346,22 @@ export default function SOWPage() {
           >
             ⚡ AI 표준 견적
           </button>
+          <button
+            className={styles.addBtn}
+            style={{ background: analyzing ? '#9ca3af' : 'linear-gradient(135deg, #059669, #10b981)', cursor: analyzing ? 'not-allowed' : 'pointer' }}
+            onClick={handleAnalyze}
+            disabled={analyzing}
+          >
+            {analyzing ? '분석 중...' : '🔍 AI 견적 분석'}
+          </button>
+          {items.length > 0 && (
+            <PdfDownloadButton
+              onExport={handleExportWarranty}
+              label="하자담보 안내서 PDF"
+              variant="secondary"
+              size="sm"
+            />
+          )}
         </section>
 
         {/* AI Quick Actions */}
@@ -281,6 +373,113 @@ export default function SOWPage() {
             { icon: '📄', label: 'PDF 내보내기', description: '견적서 PDF 다운로드', message: '견적서 PDF로 내보내줘' },
           ]}
         />
+
+        {/* AI 견적 분석 결과 */}
+        {analysisError && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 12, padding: '1rem 1.25rem', marginBottom: '1.5rem', color: '#dc2626', fontSize: '0.875rem' }}>
+            ❌ {analysisError}
+          </div>
+        )}
+
+        {analysisResult && (
+          <section style={{ background: 'var(--card-bg)', borderRadius: 16, padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+            {/* 헤더 */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-text)' }}>
+                🔍 AI 견적 분석 결과
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: 20,
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  background: analysisResult.overall_risk === 'HIGH' ? '#fef2f2'
+                    : analysisResult.overall_risk === 'MEDIUM' ? '#fffbeb' : '#f0fdf4',
+                  color: analysisResult.overall_risk === 'HIGH' ? '#dc2626'
+                    : analysisResult.overall_risk === 'MEDIUM' ? '#d97706' : '#059669',
+                }}>
+                  {analysisResult.overall_risk === 'HIGH' ? '🚨 고위험' : analysisResult.overall_risk === 'MEDIUM' ? '⚠️ 주의' : '✅ 정상'}
+                </span>
+                <button
+                  onClick={() => setAnalysisResult(null)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '1.1rem' }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* AI 코멘트 */}
+            {analysisResult.ai_comment && (
+              <p style={{ margin: '0 0 1rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, background: '#f8f9fa', borderRadius: 8, padding: '0.75rem 1rem' }}>
+                {analysisResult.ai_comment}
+              </p>
+            )}
+
+            {/* 과다청구 항목 */}
+            {analysisResult.overcharge_items.length > 0 && (
+              <div style={{ marginBottom: '1rem' }}>
+                <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem', fontWeight: 600, color: '#dc2626' }}>
+                  📈 과다청구 의심 항목 ({analysisResult.overcharge_items.length}건)
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {analysisResult.overcharge_items.map((item, i) => (
+                    <div key={i} style={{
+                      background: item.risk_level === 'HIGH' ? '#fef2f2' : item.risk_level === 'MEDIUM' ? '#fffbeb' : '#f0fdf4',
+                      border: `1px solid ${item.risk_level === 'HIGH' ? '#fecaca' : item.risk_level === 'MEDIUM' ? '#fed7aa' : '#bbf7d0'}`,
+                      borderRadius: 10,
+                      padding: '0.75rem 1rem',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                        <strong style={{ fontSize: '0.9rem', color: 'var(--color-text)' }}>{item.item_name}</strong>
+                        <span style={{
+                          fontSize: '0.75rem', fontWeight: 700,
+                          color: item.risk_level === 'HIGH' ? '#dc2626' : item.risk_level === 'MEDIUM' ? '#d97706' : '#059669',
+                        }}>
+                          +{item.difference_pct}% 초과
+                        </span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.82rem', color: '#6b7280' }}>{item.message}</p>
+                      <p style={{ margin: '0.25rem 0 0', fontSize: '0.82rem', color: '#6b7280' }}>
+                        견적 단가: <strong>{item.quoted_price.toLocaleString()}원/{item.unit}</strong>
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 과소청구 항목 */}
+            {analysisResult.undercharge_items.length > 0 && (
+              <div>
+                <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem', fontWeight: 600, color: '#7c3aed' }}>
+                  📉 품질 의심 항목 ({analysisResult.undercharge_items.length}건)
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {analysisResult.undercharge_items.map((item, i) => (
+                    <div key={i} style={{ background: '#faf5ff', border: '1px solid #e9d5ff', borderRadius: 10, padding: '0.75rem 1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                        <strong style={{ fontSize: '0.9rem', color: 'var(--color-text)' }}>{item.item_name}</strong>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#7c3aed' }}>
+                          {item.difference_pct}% 시세 미달
+                        </span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.82rem', color: '#6b7280' }}>{item.message}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 이상 없음 */}
+            {analysisResult.overcharge_items.length === 0 && analysisResult.undercharge_items.length === 0 && (
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#059669', textAlign: 'center', padding: '0.5rem' }}>
+                ✅ 모든 항목이 시장 단가 범위 내에 있습니다.
+              </p>
+            )}
+          </section>
+        )}
 
         {/* Items by Category */}
         <section className={styles.itemsSection}>
