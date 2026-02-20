@@ -43,7 +43,23 @@ export async function POST(request: NextRequest) {
     }
 
     // 프로젝트 컨텍스트 로드
-    const ctx = projectId ? await loadProjectContext(projectId) : null
+    // projectId 없으면 사용자의 가장 최근 진행 중 프로젝트를 자동 선택 (체키 자율 실행 지원)
+    let resolvedProjectId = projectId
+    if (!resolvedProjectId) {
+      const { data: projects } = await supabase
+        .from('projects')
+        .select('id, name, status, updated_at')
+        .order('updated_at', { ascending: false })
+        .limit(10)
+
+      if (projects && projects.length > 0) {
+        // 우선순위: 1) 진행중(in_progress) 중 최신 2) 전체 중 최신
+        const inProgress = projects.filter((p: any) => p.status === 'in_progress')
+        resolvedProjectId = inProgress.length > 0 ? inProgress[0].id : projects[0].id
+      }
+    }
+
+    const ctx = resolvedProjectId ? await loadProjectContext(resolvedProjectId) : null
 
     // ── 1순위: Gemini API ──
     if (process.env.GEMINI_API_KEY) {
