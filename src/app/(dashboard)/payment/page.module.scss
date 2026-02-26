@@ -1,19 +1,38 @@
 .container { min-height: 100vh; background: var(--color-bg); }
 
 .loading {
-  display: flex; align-items: center; justify-content: center;
-  min-height: 50vh; color: var(--color-text-secondary);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 50vh; gap: 1rem; color: var(--color-text-secondary);
 }
+.spinner {
+  width: 32px; height: 32px; border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary); border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
+// ─── Header ───────────────────────────────────────────────
 .header {
-  background: linear-gradient(135deg, var(--color-primary), #a78bfa);
-  padding: 2rem; color: white; text-align: center;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  padding: 2.5rem 2rem; color: white; text-align: center;
 }
 .title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
-.subtitle { font-size: 0.875rem; opacity: 0.9; }
+.subtitle { font-size: 0.875rem; opacity: 0.85; }
 
 .main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
 
+// ─── Current Plan Banner ──────────────────────────────────
+.currentPlanBanner {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: linear-gradient(135deg, rgba(79,70,229,0.08), rgba(124,58,237,0.08));
+  border: 1px solid rgba(124,58,237,0.2); border-radius: var(--card-radius);
+  padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 0.9rem;
+  color: var(--color-text);
+  strong { color: var(--color-primary); }
+}
+.bannerIcon { font-size: 1.5rem; }
+.bannerSub { color: var(--color-text-secondary); font-weight: 400; }
+
+// ─── Billing Toggle ───────────────────────────────────────
 .billingToggle {
   display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem;
   background: var(--card-bg); padding: 0.5rem; border-radius: var(--radius-md);
@@ -25,93 +44,304 @@
   color: var(--color-text-secondary); font-size: 0.875rem; font-weight: 600; cursor: pointer;
   transition: all var(--transition-fast);
   &:hover { background: var(--color-border-light); }
-  &.active { background: var(--color-primary); color: white; }
+  &.active { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; }
 }
 .discount {
-  background: var(--color-warning-light); color: #b45309;
-  padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+  background: #fef3c7; color: #92400e;
+  padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
 }
 
+// ─── Plans Grid ───────────────────────────────────────────
 .plansGrid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem; margin-bottom: 2rem;
+  gap: 1.5rem; margin-bottom: 2.5rem;
 }
 .planCard {
-  position: relative; background: var(--card-bg); border-radius: var(--card-radius); padding: var(--card-padding);
-  box-shadow: var(--card-shadow); border: 2px solid transparent;
+  position: relative; background: var(--card-bg); border-radius: var(--card-radius);
+  padding: 1.75rem 1.5rem 1.5rem; box-shadow: var(--card-shadow); border: 2px solid transparent;
   transition: all var(--transition-normal);
   &:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-  &.recommended { border-color: var(--color-primary); }
-  &.current { background: rgba(124,58,237,0.04); }
+  &.recommended { border-color: #7c3aed; }
+  &.current { background: rgba(79,70,229,0.04); border-color: #4f46e5; }
 }
-.recommendedBadge {
+.planBadge {
   position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--color-primary), #a78bfa);
-  color: white; padding: 0.25rem 1rem; border-radius: var(--radius-full);
-  font-size: 0.75rem; font-weight: 600;
+  background: var(--color-border-light); color: var(--color-text-secondary);
+  padding: 0.25rem 1rem; border-radius: var(--radius-full);
+  font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+  &.planBadgeHot { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; }
 }
 .currentBadge {
   position: absolute; top: 1rem; right: 1rem;
-  background: var(--color-success-light); color: #166534;
-  padding: 0.25rem 0.75rem; border-radius: var(--radius-full);
-  font-size: 0.75rem; font-weight: 600;
+  background: #dcfce7; color: #166534;
+  padding: 0.2rem 0.7rem; border-radius: var(--radius-full);
+  font-size: 0.72rem; font-weight: 700;
 }
-.planName { font-size: 1.25rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem; margin-top: 0.5rem; }
+.planName { font-size: 1.25rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.75rem; margin-top: 0.5rem; }
 .planPrice { margin-bottom: 1.5rem; }
-.price { font-size: 1.75rem; font-weight: 700; color: var(--color-primary); }
-.originalPrice { display: block; font-size: 0.875rem; color: var(--color-text-muted); text-decoration: line-through; margin-top: 0.25rem; }
+.price { font-size: 1.875rem; font-weight: 800; color: var(--color-primary); }
+.originalPrice {
+  display: block; font-size: 0.8rem; color: var(--color-text-muted);
+  text-decoration: line-through; margin-top: 0.2rem;
+}
+.yearlySave {
+  display: inline-block; background: #dcfce7; color: #166534;
+  font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.5rem;
+  border-radius: 4px; margin-top: 0.35rem;
+}
 .features {
   list-style: none; padding: 0; margin: 0 0 1.5rem 0;
   li {
-    display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;
-    font-size: 0.875rem; color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border-light);
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0;
+    font-size: 0.85rem; color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-border-light);
     &:last-child { border-bottom: none; }
   }
 }
-.checkIcon { color: var(--color-success); font-weight: 700; }
+.checkIcon { color: #10b981; font-weight: 800; font-size: 0.9rem; flex-shrink: 0; }
 .selectBtn {
   width: 100%; padding: 0.875rem; border: none; border-radius: var(--btn-radius);
-  font-size: 1rem; font-weight: var(--btn-font-weight); cursor: pointer; transition: all var(--transition-fast);
-  background: linear-gradient(135deg, var(--color-primary), #a78bfa); color: white;
-  &:hover:not(:disabled) { transform: scale(1.02); }
+  font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all var(--transition-fast);
+  background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white;
+  &:hover:not(:disabled) { transform: scale(1.02); box-shadow: var(--shadow-purple); }
   &:disabled { background: var(--color-border); color: var(--color-text-muted); cursor: default; }
+  &.currentBtn { background: #f3f4f6; color: var(--color-text-secondary); }
 }
 
-.section { margin-bottom: 1.5rem; }
-.sectionTitle { font-size: 1.125rem; font-weight: 600; color: var(--color-text); margin-bottom: 1rem; }
+// ─── Section ──────────────────────────────────────────────
+.section { margin-bottom: 2rem; }
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.sectionTitle { font-size: 1.1rem; font-weight: 700; color: var(--color-text); }
+.addBtn {
+  padding: 0.5rem 1rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: none; border-radius: var(--radius-sm); color: white;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  transition: all var(--transition-fast);
+  &:hover { transform: translateY(-1px); box-shadow: var(--shadow-purple); }
+}
+
 .card {
-  background: var(--card-bg); border-radius: var(--card-radius); padding: var(--card-padding);
+  background: var(--card-bg); border-radius: var(--card-radius); padding: 1.25rem;
   box-shadow: var(--card-shadow); border: var(--card-border);
 }
-
 .emptyState {
   display: flex; flex-direction: column; align-items: center; padding: 2rem;
-  color: var(--color-text-secondary); text-align: center;
+  color: var(--color-text-secondary); text-align: center; gap: 0.5rem;
 }
-.emptyIcon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.emptyIcon { font-size: 2.5rem; }
 .addCardBtn {
-  margin-top: 1rem; padding: 0.75rem 1.5rem; border: 2px dashed var(--color-border);
+  margin-top: 0.5rem; padding: 0.75rem 1.5rem; border: 2px dashed var(--color-border);
   border-radius: var(--radius-sm); background: transparent;
   color: var(--color-text-secondary); font-size: 0.875rem; font-weight: 600;
   cursor: pointer; transition: all var(--transition-fast);
-  &:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  &:hover { border-color: #7c3aed; color: #7c3aed; }
 }
 
-.contactSection { margin-top: 2rem; }
+// ─── Card List ────────────────────────────────────────────
+.cardList { display: flex; flex-direction: column; gap: 0.75rem; }
+.cardItem {
+  display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem;
+  background: var(--color-bg); border-radius: var(--radius-md);
+  border: 2px solid var(--color-border); cursor: pointer;
+  transition: all var(--transition-fast);
+  &:hover { border-color: #7c3aed; }
+  &.cardSelected { border-color: #7c3aed; background: rgba(124,58,237,0.04); }
+}
+.cardVisual {
+  width: 52px; height: 34px; background: linear-gradient(135deg, #1e3a5f, #2563eb);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cardBrand { font-size: 0.55rem; font-weight: 800; color: white; letter-spacing: 0.02em; }
+.cardInfo { flex: 1; }
+.cardNumber { display: block; font-size: 0.9rem; font-weight: 600; color: var(--color-text); letter-spacing: 0.1em; }
+.cardMeta { font-size: 0.75rem; color: var(--color-text-secondary); }
+.cardCheck { color: #7c3aed; font-weight: 800; font-size: 1.1rem; }
+.cardRemove {
+  background: none; border: none; color: var(--color-text-muted); cursor: pointer;
+  padding: 0.25rem; font-size: 0.875rem; transition: color var(--transition-fast);
+  &:hover { color: var(--color-danger); }
+}
+
+// ─── Payment History Table ────────────────────────────────
+.historyTable {
+  width: 100%; border-collapse: collapse;
+  th {
+    text-align: left; padding: 0.75rem 1rem; font-size: 0.8rem; font-weight: 700;
+    color: var(--color-text-secondary); border-bottom: 2px solid var(--color-border);
+    background: var(--color-bg);
+  }
+  td {
+    padding: 0.875rem 1rem; font-size: 0.875rem; color: var(--color-text);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--color-bg); }
+}
+.statusBadge {
+  padding: 0.2rem 0.6rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700;
+}
+.status완료 { background: #dcfce7; color: #166534; }
+.status실패 { background: #fee2e2; color: #991b1b; }
+.status환불 { background: #fef3c7; color: #92400e; }
+
+// ─── Contact ──────────────────────────────────────────────
+.contactSection { margin-top: 1rem; margin-bottom: 2rem; }
 .contactCard {
   display: flex; align-items: center; gap: 1rem;
-  background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(124,58,237,0.1));
-  border-radius: var(--card-radius); padding: var(--card-padding);
+  background: linear-gradient(135deg, rgba(79,70,229,0.06), rgba(124,58,237,0.1));
+  border-radius: var(--card-radius); padding: 1.25rem 1.5rem;
   @media (max-width: 600px) { flex-direction: column; text-align: center; }
 }
 .contactIcon { font-size: 2rem; }
-.contactCard h3 { font-size: 1rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.25rem; }
-.contactCard p { font-size: 0.875rem; color: var(--color-text-secondary); }
+.contactCard h3 { font-size: 1rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.25rem; }
+.contactCard p { font-size: 0.85rem; color: var(--color-text-secondary); }
 .contactBtn {
-  margin-left: auto; padding: 0.75rem 1.5rem; background: var(--color-primary);
+  margin-left: auto; padding: 0.75rem 1.5rem; background: #4f46e5;
   border: none; border-radius: var(--radius-sm); color: white;
   font-size: 0.875rem; font-weight: 600; cursor: pointer; white-space: nowrap;
   transition: background var(--transition-fast);
-  &:hover { background: var(--color-primary-hover); }
-  @media (max-width: 600px) { margin-left: 0; margin-top: 1rem; }
+  &:hover { background: #4338ca; }
+  @media (max-width: 600px) { margin-left: 0; }
+}
+
+// ─── Modal ────────────────────────────────────────────────
+.modalOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 1rem; animation: fadeIn 0.2s;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--card-bg); border-radius: var(--card-radius);
+  width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modalHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--color-border);
+  h2 { font-size: 1.125rem; font-weight: 700; }
+  button { background: var(--color-border-light); border: none; width: 30px; height: 30px;
+    border-radius: var(--radius-sm); cursor: pointer; font-size: 1rem;
+    transition: background var(--transition-fast); &:hover { background: var(--color-border); }
+  }
+}
+.modalBody { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+.securityBadge {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0.5rem 1rem; background: #f0fdf4; border: 1px solid #bbf7d0;
+  border-radius: var(--radius-sm); font-size: 0.75rem; color: #166534; font-weight: 600;
+}
+
+// Card Preview
+.cardPreview {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #7c3aed 100%);
+  border-radius: 12px; padding: 1.5rem; color: white; min-height: 120px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow: 0 8px 24px rgba(37,99,235,0.3);
+}
+.cardPreviewChip {
+  width: 36px; height: 26px; background: linear-gradient(135deg, #f6d365, #fda085);
+  border-radius: 4px; margin-bottom: 1rem;
+}
+.cardPreviewNumber {
+  font-size: 1.1rem; letter-spacing: 0.15em; font-weight: 600; font-family: monospace;
+  margin-bottom: 0.75rem;
+}
+.cardPreviewBottom {
+  display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.85;
+}
+
+// Form
+.formGroup {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  label { font-size: 0.8rem; font-weight: 700; color: var(--color-text); }
+  input {
+    padding: 0.75rem 1rem; border: 1.5px solid var(--color-border); border-radius: var(--input-radius);
+    font-size: 1rem; background: var(--color-bg); color: var(--color-text);
+    transition: all var(--transition-fast);
+    &:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.12); }
+    &::placeholder { color: var(--color-text-muted); }
+  }
+}
+.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.modalActions { display: flex; gap: 0.75rem; margin-top: 0.25rem; }
+.cancelBtn {
+  flex: 1; padding: 0.875rem; background: var(--color-border-light); border: none;
+  border-radius: var(--btn-radius); font-weight: 700; cursor: pointer;
+  transition: background var(--transition-fast); color: var(--color-text);
+  &:hover { background: var(--color-border); }
+}
+.submitBtn {
+  flex: 2; padding: 0.875rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: none; border-radius: var(--btn-radius); color: white; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  transition: all var(--transition-fast);
+  &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-purple); }
+  &:disabled { opacity: 0.65; cursor: not-allowed; }
+}
+.btnSpinner {
+  width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+// ─── Order Summary ────────────────────────────────────────
+.orderSummary {
+  background: var(--color-bg); border-radius: var(--radius-md);
+  border: 1px solid var(--color-border); overflow: hidden;
+}
+.orderRow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.875rem 1rem; font-size: 0.875rem; color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border-light);
+  &:last-of-type { border-bottom: none; }
+  strong { color: var(--color-text); font-weight: 600; }
+  &.orderTotal {
+    background: rgba(79,70,229,0.04);
+    strong { font-weight: 700; }
+  }
+}
+.orderPrice { font-size: 1.125rem; color: #4f46e5; font-weight: 800; }
+.orderSave {
+  padding: 0.5rem 1rem; background: #dcfce7; text-align: center;
+  font-size: 0.75rem; font-weight: 700; color: #166534;
+}
+
+// ─── Pay Card Section ─────────────────────────────────────
+.payCardSection { display: flex; flex-direction: column; gap: 0.75rem; }
+.payCardHeader { display: flex; align-items: center; justify-content: space-between; }
+.payCardHeader label { font-size: 0.8rem; font-weight: 700; color: var(--color-text); }
+.addCardSmall {
+  background: none; border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  padding: 0.3rem 0.75rem; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+  color: var(--color-text-secondary); transition: all var(--transition-fast);
+  &:hover { border-color: #7c3aed; color: #7c3aed; }
+}
+.noCard {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem; background: var(--color-bg); border-radius: var(--radius-sm);
+  border: 1px dashed var(--color-border); font-size: 0.85rem; color: var(--color-text-secondary);
+}
+.payNotice {
+  font-size: 0.75rem; color: var(--color-text-muted); text-align: center; line-height: 1.5;
+}
+
+// ─── Pay Success ──────────────────────────────────────────
+.paySuccess {
+  padding: 3rem 2rem; display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 0.75rem;
+  h2 { font-size: 1.25rem; font-weight: 700; color: var(--color-text); }
+  p { font-size: 0.9rem; color: var(--color-text-secondary); }
+  .submitBtn { width: 100%; margin-top: 0.5rem; }
+}
+.paySuccessIcon { font-size: 3.5rem; }
+.paySuccessAmount {
+  font-size: 1.25rem; font-weight: 800; color: #4f46e5;
 }
