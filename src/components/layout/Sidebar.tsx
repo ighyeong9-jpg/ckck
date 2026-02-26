@@ -177,7 +177,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       {/* 로고 */}
       <div className="px-5 py-[22px] text-[18px] font-black text-white border-b border-white/[0.06] flex items-center justify-between flex-shrink-0">
         <Link href="/" className="text-white no-underline">
-          체<span className="text-orange-500">키</span>
+          체크<span className="text-orange-500">인</span>
         </Link>
         <span className="text-[10px] font-normal text-white/25">v2.0</span>
       </div>
