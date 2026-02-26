@@ -6,7 +6,7 @@ export const metadata = {
   title: 'Check-In',
   description: '나만의 AI 인테리어 비서 — 현장 관리 플랫폼',
   manifest: '/manifest.json',
-  themeColor: '#7c3aed',
+  themeColor: '#0F2744',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -33,7 +33,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Check-In" />
-        <meta name="theme-color" content="#7c3aed" />
+        <meta name="theme-color" content="#0F2744" />
       </head>
       <body>
         <Providers>{children}</Providers>
