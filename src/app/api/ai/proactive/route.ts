@@ -19,6 +19,10 @@ import {
   saveNotificationsToDb,
   type ProactiveSummary,
 } from '@/lib/ai/proactive-engine'
+import { registerEventHandlers } from '@/lib/events/handlers'
+
+// 이벤트 핸들러 등록
+registerEventHandlers()
 
 export const dynamic = 'force-dynamic'
 

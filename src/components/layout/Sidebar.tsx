@@ -26,6 +26,7 @@ const mainNavItems: NavItem[] = [
   { icon: '📁', label: '현장 관리', href: '/projects' },
   { icon: '💰', label: '예산 가이드', href: '/quotes' },
   { icon: '📡', label: '현장 이슈', href: '/issues' },
+  { icon: '🛡️', label: '하자담보', href: '/warranty' },
   { icon: '🤖', label: 'AI 채팅', href: '/ai-chat' },
   { icon: '📒', label: 'AI 노트북', href: '/notebook' },
   { icon: '📊', label: '리포트', href: '/reports' },
@@ -184,6 +185,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     if (href === '/projects' && pathname.startsWith('/projects')) return true
     if (href === '/quotes' && pathname.startsWith('/quotes')) return true
     if (href === '/issues' && pathname.startsWith('/issues')) return true
+    if (href === '/warranty' && pathname.startsWith('/warranty')) return true
     return pathname === href
   }
 

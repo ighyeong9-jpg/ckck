@@ -1,20 +1,21 @@
-// ─── 토큰 ─────────────────────────────────────────────────
-$navy:       #4f46e5;
-$navy-dark:  #1a0533;
-$navy-mid:   #2d1254;
+// ─── 토큰 (체키 시그니처 컬러) ─────────────────────────────
+$navy:       #0F2744;
+$navy-dark:  #0A1929;
+$navy-mid:   #1A3A5C;
 $surface:    rgba(255,255,255,0.08);
 $surface2:   rgba(255,255,255,0.12);
-$accent:     #FF6B2B;
-$accent2:    #4F8EF7;
+$accent:     #E8651A;
+$accent-hot: #FF7020;
+$accent2:    #3B82F6;
 $text:       #FFFFFF;
 $text-sub:   rgba(255,255,255,0.65);
 $text-muted: rgba(255,255,255,0.38);
-$border:     rgba(255,255,255,0.1);
+$border:     rgba(255,255,255,0.08);
 $max:        1120px;
 
 // ─── 공통 ─────────────────────────────────────────────────
 .page {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+  background: linear-gradient(135deg, #0A1929 0%, #0F2744 100%);
   color: $text;
   font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
   overflow-x: hidden;
@@ -33,7 +34,7 @@ $max:        1120px;
 // ─── NAV ──────────────────────────────────────────────────
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(26,5,51,0.88); backdrop-filter: blur(16px);
+  background: rgba(10,25,41,0.92); backdrop-filter: blur(16px);
   border-bottom: 1px solid $border;
 }
 .navInner {
@@ -71,7 +72,7 @@ $max:        1120px;
 @media (max-width: 700px) {
   .navLinks {
     display: none; flex-direction: column; align-items: flex-start; gap: 0; position: absolute;
-    top: 64px; left: 0; right: 0; background: #1a0533; border-bottom: 1px solid $border;
+    top: 64px; left: 0; right: 0; background: #0A1929; border-bottom: 1px solid $border;
     padding: 1rem 1.5rem 1.5rem;
     a { padding: 0.75rem 0; width: 100%; border-bottom: 1px solid $border; color: $text !important; font-size: 1rem !important; }
     &.navOpen { display: flex; }
@@ -88,15 +89,15 @@ $max:        1120px;
 .heroBg {
   position: absolute; inset: 0; z-index: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(219,39,119,0.22) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(255,107,43,0.12) 0%, transparent 60%),
-    linear-gradient(180deg, #1a0533 0%, #2d1254 100%);
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,101,26,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(30,73,118,0.30) 0%, transparent 60%),
+    linear-gradient(180deg, #0A1929 0%, #0F2744 100%);
 }
 .heroInner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
 
 .heroEye {
   display: inline-block; padding: 0.35rem 1rem; border-radius: 99px;
-  background: rgba(255,107,43,0.15); border: 1px solid rgba(255,107,43,0.35);
+  background: rgba(232,101,26,0.15); border: 1px solid rgba(232,101,26,0.35);
   color: $accent; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
   margin-bottom: 1.5rem; animation: fadeInUp 0.5s ease both;
 }
@@ -121,8 +122,8 @@ $max:        1120px;
   display: inline-flex; align-items: center; gap: 0.5rem;
   padding: 1rem 2rem; background: $accent; border-radius: 12px;
   color: $text; font-size: 1.05rem; font-weight: 800; text-decoration: none;
-  transition: all 0.25s; box-shadow: 0 4px 24px rgba(255,107,43,0.4);
-  &:hover { background: #e55a1f; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(255,107,43,0.5); }
+  transition: all 0.25s; box-shadow: 0 4px 24px rgba(232,101,26,0.4);
+  &:hover { background: $accent-hot; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(232,101,26,0.5); }
 }
 .heroBtnArrow { font-size: 1.25rem; transition: transform 0.2s; .heroBtn:hover & { transform: translateX(4px); } }
 .heroSecondary {

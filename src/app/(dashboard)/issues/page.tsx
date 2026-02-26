@@ -182,6 +182,7 @@ export default function IssuesPage() {
               onToggle={() => setExpandedId(prev => prev === issue.id ? null : issue.id)}
               onApprove={id => updateStatus(id, 'approved')}
               onReject={id => updateStatus(id, 'rejected')}
+              onNegotiate={id => updateStatus(id, 'reviewing')}
               onResolve={id => updateStatus(id, 'resolved')}
             />
           ))}
