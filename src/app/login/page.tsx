@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-// import { createClient } from '@/lib/supabase/client'  // ── 테스트 바이패스 중 비활성
+// import { createClient } from '@/lib/supabase/client'  // ── 인증 꺼짐
 
 export default function LoginPage() {
   const router = useRouter()
-  // const supabase = createClient()  // ── 테스트 바이패스 중 비활성
+  // const supabase = createClient()  // ── 인증 꺼짐
 
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
@@ -18,43 +18,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    // ══════════════════════════════════════════════════════════
-    // 테스트 바이패스: 인증 건너뜀 (복구하려면 이 블록 삭제 후 아래 주석 해제)
     router.push('/dashboard')
-    return
-    // ══════════════════════════════════════════════════════════
-
-    /* 실제 인증 코드 — 나중에 위 return 삭제 후 아래 주석 해제
-    setLoading(true)
-    setError(null)
-    setMessage(null)
-
-    try {
-      if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { name } },
-        })
-        if (error) throw error
-        if (data.user?.identities?.length === 0) {
-          setError('이미 등록된 이메일입니다.')
-        } else {
-          setMessage('회원가입 완료! 이메일을 확인해주세요.')
-        }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) throw error
-        router.push('/dashboard')
-        router.refresh()
-      }
-    } catch (err: unknown) {
-      setError((err as Error).message || '오류가 발생했습니다.')
-    } finally {
-      setLoading(false)
-    }
-    */
   }
 
   const darkInput =
@@ -107,7 +71,7 @@ export default function LoginPage() {
                 className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
                 style={active
                   ? { backgroundColor: '#E8651A', color: '#FFFFFF', boxShadow: '0 4px 24px rgba(232,101,26,0.4)' }
-                  : { color: 'rgba(255,255,255,0.45)' }
+                  : { color: 'rgba(255,255,255,0.65)' }
                 }
               >
                 {tab}
@@ -198,7 +162,6 @@ export default function LoginPage() {
           type="button"
           className="w-full h-11 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors duration-200"
           style={{ color: '#3C1E1E', backgroundColor: '#FEE500' }}
-          onClick={() => router.push('/dashboard')}
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path fillRule="evenodd" clipRule="evenodd" d="M9 1.5C4.858 1.5 1.5 4.134 1.5 7.367c0 2.07 1.373 3.887 3.44 4.908l-.875 3.25a.281.281 0 0 0 .43.305L8.12 13.54c.288.04.584.06.88.06 4.142 0 7.5-2.634 7.5-5.867C16.5 4.134 13.142 1.5 9 1.5z" fill="currentColor"/>

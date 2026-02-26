@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import LandingNav from './LandingNav'
 
 interface LandingPageProps {
   isLoggedIn?: boolean
@@ -59,16 +60,18 @@ const pricingPlans = [
 export default function LandingPage({ isLoggedIn }: LandingPageProps) {
   return (
     <div className="font-sans antialiased">
+      <LandingNav />
+
       {/* ──── HERO ──── */}
       <section
-        className="min-h-screen blueprint relative overflow-hidden flex items-center"
+        className="min-h-screen blueprint relative overflow-hidden flex items-center pt-16"
         style={{ backgroundColor: '#060E1A' }}
       >
         <div
           className="absolute w-[600px] h-[600px] rounded-full pointer-events-none top-1/2 -translate-y-1/2 right-[5%]"
           style={{ background: 'radial-gradient(circle, rgba(232,101,26,0.18) 0%, transparent 70%)' }}
         />
-        <div className="max-w-[1280px] mx-auto px-8 md:px-14 py-20 w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-8 md:px-14 py-20 w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* LEFT */}
           <div className="fade-up">
             <div className="inline-flex items-center gap-2 border border-orange-500/30 text-[11px] font-bold tracking-[0.06em] px-3.5 py-1.5 rounded-full mb-7" style={{ backgroundColor: 'rgba(232,101,26,0.15)', color: '#FF7020' }}>
@@ -96,21 +99,21 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center gap-2 h-[52px] px-8 rounded-xl text-[15px] font-semibold transition-all duration-200 hover:-translate-y-0.5"
-                style={{ color: 'rgba(255,255,255,0.8)', backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)' }}
+                style={{ color: '#FFFFFF', backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.30)' }}
               >
                 데모 보기 ▶
               </Link>
             </div>
             <div className="flex flex-wrap gap-6">
               {['🔒 특허 3건 등록', '⚖️ 법령 12개 자동', '🛡️ 분쟁 예방 보장'].map((t) => (
-                <div key={t} className="flex items-center gap-2 text-xs font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>{t}</div>
+                <div key={t} className="flex items-center gap-2 text-xs font-medium" style={{ color: 'rgba(255,255,255,0.90)' }}>{t}</div>
               ))}
             </div>
           </div>
 
           {/* RIGHT — 프리뷰 */}
-          <div className="hidden lg:block">
-            <div className="backdrop-blur-xl rounded-2xl p-5 animate-float" style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', boxShadow: '0 32px 80px rgba(0,0,0,.5)' }}>
+          <div className="w-full lg:block">
+            <div className="backdrop-blur-xl rounded-2xl p-5 lg:animate-float" style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', boxShadow: '0 32px 80px rgba(0,0,0,.5)' }}>
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <div className="text-xs font-bold text-white">강남 카페 인테리어</div>
@@ -147,7 +150,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
 
       {/* ──── STATS STRIP ──── */}
       <section className="border-y py-10" style={{ backgroundColor: '#0A1628', borderColor: 'rgba(255,255,255,0.06)' }}>
-        <div className="max-w-[1280px] mx-auto px-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
           {[{ num: '12', label: '건설 법령 자동 적용' }, { num: '526', label: '체크리스트 항목' }, { num: '3', label: '특허 등록 확정' }, { num: '700만', label: '평균 분쟁 비용' }].map((stat) => (
             <div key={stat.label}>
               <div className="font-mono text-[32px] font-black leading-none" style={{ color: '#E8651A' }}>{stat.num}</div>
@@ -158,7 +161,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
       </section>
 
       {/* ──── PROBLEM ──── */}
-      <section className="bg-white py-24 px-8">
+      <section className="bg-white py-16 md:py-24 px-4 sm:px-8">
         <div className="max-w-[1280px] mx-auto">
           <div className="text-center mb-14">
             <div className="inline-block text-[11px] font-bold tracking-[0.06em] text-orange-500 bg-orange-100 px-3.5 py-1.5 rounded-full mb-4">왜 분쟁이 생기나요?</div>
@@ -180,7 +183,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
       </section>
 
       {/* ──── SOLUTION ──── */}
-      <section className="bg-gray-50 py-24 px-8">
+      <section id="features" className="bg-gray-50 py-16 md:py-24 px-4 sm:px-8">
         <div className="max-w-[1280px] mx-auto">
           <div className="text-center mb-14">
             <div className="inline-block text-[11px] font-bold tracking-[0.06em] text-orange-500 bg-orange-100 px-3.5 py-1.5 rounded-full mb-4">체크인이 해결합니다</div>
@@ -201,7 +204,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
       </section>
 
       {/* ──── LAW SECTION ──── */}
-      <section className="blueprint py-24 px-8" style={{ backgroundColor: '#0F2744' }}>
+      <section id="law" className="blueprint py-16 md:py-24 px-4 sm:px-8" style={{ backgroundColor: '#0F2744' }}>
         <div className="max-w-[1280px] mx-auto">
           <div className="text-center mb-14">
             <div className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.06em] px-3.5 py-1.5 rounded-full mb-4" style={{ color: '#FF7020', backgroundColor: 'rgba(232,101,26,0.15)', border: '1px solid rgba(232,101,26,0.30)' }}>
@@ -219,7 +222,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
               >
                 <div className="font-mono text-[10px] tracking-widest mb-1.5" style={{ color: '#E8651A' }}>{law.no}</div>
                 <div className="text-sm font-bold text-white leading-tight mb-1">{law.title}</div>
-                <div className="text-[11px]" style={{ color: 'rgba(255,255,255,0.40)' }}>{law.desc}</div>
+                <div className="text-[11px]" style={{ color: 'rgba(255,255,255,0.80)' }}>{law.desc}</div>
               </div>
             ))}
           </div>
@@ -227,41 +230,51 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
       </section>
 
       {/* ──── PRICING ──── */}
-      <section className="bg-white py-24 px-8">
+      <section id="pricing" className="py-16 md:py-24 px-4 sm:px-8" style={{ backgroundColor: '#0A1628' }}>
         <div className="max-w-[1280px] mx-auto">
           <div className="text-center mb-14">
-            <div className="inline-block text-[11px] font-bold tracking-[0.06em] text-orange-500 bg-orange-100 px-3.5 py-1.5 rounded-full mb-4">요금제</div>
-            <h2 className="text-heading mb-3" style={{ color: '#0F2744' }}>현장 규모에 맞게 선택</h2>
+            <div className="inline-block text-[11px] font-bold tracking-[0.06em] px-3.5 py-1.5 rounded-full mb-4" style={{ color: '#E8651A', backgroundColor: 'rgba(232,101,26,0.15)', border: '1px solid rgba(232,101,26,0.25)' }}>요금제</div>
+            <h2 className="text-heading text-white mb-3">현장 규모에 맞게 선택</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-start">
             {pricingPlans.map((plan) => (
               <div
                 key={plan.name}
-                className={['rounded-xl p-6 relative', plan.featured ? 'text-white scale-[1.04]' : 'bg-white border border-gray-200 text-gray-900 shadow-card'].join(' ')}
-                style={plan.featured ? { background: 'linear-gradient(135deg, #0F2744 0%, #1A3A5C 100%)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 4px 24px rgba(15,39,68,0.50)' } : {}}
+                className={`rounded-xl p-6 relative text-white${plan.featured ? ' lg:scale-[1.04]' : ''}`}
+                style={plan.featured
+                  ? {
+                      background: 'linear-gradient(135deg, #0F2744 0%, #1A3A5C 100%)',
+                      border: '2px solid #E8913A',
+                      boxShadow: '0 0 20px rgba(232,145,58,0.30), 0 8px 32px rgba(15,39,68,0.5)',
+                    }
+                  : {
+                      backgroundColor: '#1e293b',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                    }
+                }
               >
                 {plan.badge && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-black text-white px-3 py-1 rounded-full whitespace-nowrap" style={{ backgroundColor: '#E8651A' }}>{plan.badge}</div>
                 )}
-                <div className={`text-xs font-bold mb-2`} style={{ color: plan.featured ? '#FF7020' : '#1A3A5C' }}>{plan.name}</div>
+                <div className="text-xs font-bold mb-2" style={{ color: plan.featured ? '#FF7020' : 'rgba(255,255,255,0.55)' }}>{plan.name}</div>
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-[32px] font-black leading-none" style={{ color: plan.featured ? '#FFFFFF' : '#0F2744' }}>{plan.price === '문의' ? '문의' : `₩${plan.price}`}</span>
-                  {plan.period && <span className="text-sm" style={{ color: plan.featured ? 'rgba(255,255,255,0.5)' : '#9CA3AF' }}>/{plan.period}</span>}
+                  <span className="text-[32px] font-black leading-none" style={{ color: '#E8913A' }}>{plan.price === '문의' ? '문의' : `₩${plan.price}`}</span>
+                  {plan.period && <span className="text-sm" style={{ color: 'rgba(255,255,255,0.40)' }}>/{plan.period}</span>}
                 </div>
                 <ul className="mt-4 mb-5 space-y-2">
                   {plan.features.map((f) => (
-                    <li key={f} className="text-sm flex items-center gap-2" style={{ color: plan.featured ? 'rgba(255,255,255,0.80)' : '#4B5563' }}>
-                      <span className="text-xs" style={{ color: plan.featured ? '#FF7020' : '#10B981' }}>✓</span>
+                    <li key={f} className="text-sm flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                      <span className="text-xs" style={{ color: '#E8913A' }}>✓</span>
                       {f}
                     </li>
                   ))}
                 </ul>
                 <Link
                   href="/login"
-                  className="block text-center py-2.5 rounded-lg text-sm font-bold transition-all duration-200"
+                  className="block text-center py-2.5 rounded-lg text-sm font-bold transition-all duration-200 hover:-translate-y-0.5"
                   style={plan.featured
-                    ? { backgroundColor: '#E8651A', color: '#FFFFFF' }
-                    : { border: '1.5px solid #0F2744', color: '#0F2744' }
+                    ? { backgroundColor: '#E8913A', color: '#FFFFFF', boxShadow: '0 4px 16px rgba(232,145,58,0.35)' }
+                    : { border: '1px solid rgba(255,255,255,0.30)', color: '#FFFFFF', backgroundColor: 'transparent' }
                   }
                 >{plan.cta}</Link>
               </div>
@@ -271,14 +284,18 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
       </section>
 
       {/* ──── CTA BOTTOM ──── */}
-      <section className="py-20 px-8 text-center" style={{ background: 'linear-gradient(135deg, #E8651A 0%, #C4511A 100%)' }}>
+      <section id="faq" className="py-14 md:py-20 px-4 sm:px-8 text-center" style={{ background: 'linear-gradient(135deg, #E8651A 0%, #C4511A 100%)' }}>
         <div className="max-w-[800px] mx-auto">
           <h2 className="text-[40px] font-black text-white mb-4 leading-tight">지금 바로 무료로 시작하세요</h2>
           <p className="text-base mb-8" style={{ color: 'rgba(255,255,255,0.75)' }}>설치 없이, 카드 등록 없이. 지금 바로 현장을 보호하세요.</p>
           <Link
             href="/login"
-            className="inline-flex items-center justify-center gap-2 h-[52px] px-10 rounded-xl text-[15px] font-extrabold bg-white hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-200"
-            style={{ color: '#E8651A', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl text-[16px] font-extrabold text-white hover:-translate-y-1 hover:scale-[1.03] transition-all duration-200"
+            style={{
+              backgroundColor: '#E8913A',
+              padding: '16px 48px',
+              boxShadow: '0 8px 32px rgba(232,145,58,0.45)',
+            }}
           >
             무료로 시작하기 →
           </Link>
@@ -286,9 +303,90 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
       </section>
 
       {/* ──── FOOTER ──── */}
-      <footer className="py-8 px-8 text-center" style={{ backgroundColor: '#0A1628', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="text-[18px] font-black text-white mb-1">체크<span className="text-orange-500">인</span></div>
-        <div className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>© 2026 Check-In. 건설 분쟁 예방 플랫폼. 특허 출원 중.</div>
+      <footer style={{ backgroundColor: '#0f0f1a', borderTop: '1px solid rgba(255,255,255,0.10)' }}>
+        {/* 3컬럼 본문 */}
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-8 py-12 md:py-16 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+          {/* 왼쪽: 브랜드 */}
+          <div>
+            <div className="text-[22px] font-black text-white mb-3">
+              체크<span style={{ color: '#E8651A' }}>인</span>
+            </div>
+            <p className="text-sm leading-[1.7] mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              AI 기반 건설 분쟁 예방 플랫폼
+            </p>
+            <a
+              href="mailto:contact@check-in.kr"
+              className="text-sm no-underline transition-colors duration-200"
+              style={{ color: 'rgba(255,255,255,0.50)' }}
+              onMouseEnter={(e) => ((e.target as HTMLElement).style.color = '#FFFFFF')}
+              onMouseLeave={(e) => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.50)')}
+            >
+              contact@check-in.kr
+            </a>
+          </div>
+
+          {/* 가운데: 서비스 */}
+          <div>
+            <div className="text-xs font-bold tracking-[0.08em] uppercase mb-5" style={{ color: 'rgba(255,255,255,0.35)' }}>서비스</div>
+            <ul className="space-y-3">
+              {[
+                { label: '기능 소개', href: '#features' },
+                { label: '요금제', href: '#pricing' },
+                { label: '법령 안내', href: '#law' },
+                { label: 'FAQ', href: '#faq' },
+              ].map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className="text-sm no-underline transition-colors duration-200"
+                    style={{ color: 'rgba(255,255,255,0.55)' }}
+                    onMouseEnter={(e) => ((e.target as HTMLElement).style.color = '#FFFFFF')}
+                    onMouseLeave={(e) => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.55)')}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 오른쪽: 법적 고지 */}
+          <div>
+            <div className="text-xs font-bold tracking-[0.08em] uppercase mb-5" style={{ color: 'rgba(255,255,255,0.35)' }}>법적 고지</div>
+            <ul className="space-y-3">
+              {[
+                { label: '이용약관', href: '#' },
+                { label: '개인정보처리방침', href: '#' },
+                { label: '사업자 정보', href: '#' },
+              ].map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className="text-sm no-underline transition-colors duration-200"
+                    style={{ color: 'rgba(255,255,255,0.55)' }}
+                    onMouseEnter={(e) => ((e.target as HTMLElement).style.color = '#FFFFFF')}
+                    onMouseLeave={(e) => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.55)')}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* 하단 카피라이트 */}
+        <div
+          className="max-w-[1280px] mx-auto px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            © 2025 체크인. All rights reserved.
+          </span>
+          <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            특허 출원번호: 10-2024-XXXXXXX
+          </span>
+        </div>
       </footer>
     </div>
   )
