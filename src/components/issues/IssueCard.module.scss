@@ -192,16 +192,29 @@
 }
 
 .approveBtn {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--checkin-go);
+  color: #FFFFFF;
+
+  &:hover { background: #0da271 !important; opacity: 1 !important; }
 }
 
 .rejectBtn {
-  background: #fef2f2;
-  color: #991b1b;
+  background: var(--checkin-nogo);
+  color: #FFFFFF;
+
+  &:hover { background: #dc2626 !important; opacity: 1 !important; }
+}
+
+.negotiateBtn {
+  background: var(--checkin-orange);
+  color: #FFFFFF;
+
+  &:hover { background: var(--checkin-orange-hot) !important; opacity: 1 !important; }
 }
 
 .resolveBtn {
-  background: #f5f3ff;
-  color: #4f46e5;
+  background: var(--checkin-navy);
+  color: #FFFFFF;
+
+  &:hover { background: var(--checkin-navy-mid) !important; opacity: 1 !important; }
 }

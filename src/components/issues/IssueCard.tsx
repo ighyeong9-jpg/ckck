@@ -27,6 +27,7 @@ interface IssueCardProps {
   issue: SiteIssue
   onApprove?: (id: string) => void
   onReject?: (id: string) => void
+  onNegotiate?: (id: string) => void
   onResolve?: (id: string) => void
   expanded?: boolean
   onToggle?: () => void
@@ -34,10 +35,10 @@ interface IssueCardProps {
 
 const STATUS_LABELS: Record<IssueStatus, { label: string; color: string }> = {
   open:      { label: '신규', color: '#6b7280' },
-  reviewing: { label: '검토 중', color: '#d97706' },
+  reviewing: { label: '협의 중', color: '#d97706' },
   approved:  { label: '승인', color: '#059669' },
   rejected:  { label: '반려', color: '#dc2626' },
-  resolved:  { label: '해결', color: '#4f46e5' },
+  resolved:  { label: '해결', color: '#0F2744' },
 }
 
 function formatDate(iso: string) {
@@ -52,7 +53,7 @@ function formatDate(iso: string) {
   return `${d.getMonth() + 1}/${d.getDate()}`
 }
 
-export default function IssueCard({ issue, onApprove, onReject, onResolve, expanded, onToggle }: IssueCardProps) {
+export default function IssueCard({ issue, onApprove, onReject, onNegotiate, onResolve, expanded, onToggle }: IssueCardProps) {
   const sev = SEVERITY_CONFIG[issue.severity]
   const cat = CATEGORY_CONFIG[issue.category]
   const status = STATUS_LABELS[issue.status]
@@ -126,26 +127,61 @@ export default function IssueCard({ issue, onApprove, onReject, onResolve, expan
             <p className={styles.legalBasis}>⚖️ {issue.legal_basis}</p>
           )}
 
-          {/* 액션 버튼 */}
-          {(onApprove || onReject || onResolve) && issue.status !== 'resolved' && (
+          {/* 액션 버튼 — [승인][거절][협의] 3버튼 */}
+          {issue.status !== 'resolved' && (
             <div className={styles.actions}>
-              {issue.status === 'open' && onApprove && (
-                <button
-                  className={`${styles.actionBtn} ${styles.approveBtn}`}
-                  onClick={() => onApprove(issue.id)}
-                >
-                  ✅ 승인
-                </button>
+              {/* 신규 이슈: 3버튼 모두 표시 */}
+              {issue.status === 'open' && (
+                <>
+                  {onApprove && (
+                    <button
+                      className={`${styles.actionBtn} ${styles.approveBtn}`}
+                      onClick={() => onApprove(issue.id)}
+                    >
+                      ✅ 승인
+                    </button>
+                  )}
+                  {onReject && (
+                    <button
+                      className={`${styles.actionBtn} ${styles.rejectBtn}`}
+                      onClick={() => onReject(issue.id)}
+                    >
+                      ❌ 거절
+                    </button>
+                  )}
+                  {onNegotiate && (
+                    <button
+                      className={`${styles.actionBtn} ${styles.negotiateBtn}`}
+                      onClick={() => onNegotiate(issue.id)}
+                    >
+                      🤝 협의
+                    </button>
+                  )}
+                </>
               )}
-              {issue.status === 'open' && onReject && (
-                <button
-                  className={`${styles.actionBtn} ${styles.rejectBtn}`}
-                  onClick={() => onReject(issue.id)}
-                >
-                  ❌ 반려
-                </button>
+              {/* 협의 중: 승인 또는 거절로 종결 */}
+              {issue.status === 'reviewing' && (
+                <>
+                  {onApprove && (
+                    <button
+                      className={`${styles.actionBtn} ${styles.approveBtn}`}
+                      onClick={() => onApprove(issue.id)}
+                    >
+                      ✅ 승인 확정
+                    </button>
+                  )}
+                  {onReject && (
+                    <button
+                      className={`${styles.actionBtn} ${styles.rejectBtn}`}
+                      onClick={() => onReject(issue.id)}
+                    >
+                      ❌ 거절 확정
+                    </button>
+                  )}
+                </>
               )}
-              {(issue.status === 'approved' || issue.status === 'open') && onResolve && (
+              {/* 승인된 이슈: 해결 완료 */}
+              {issue.status === 'approved' && onResolve && (
                 <button
                   className={`${styles.actionBtn} ${styles.resolveBtn}`}
                   onClick={() => onResolve(issue.id)}
