@@ -1,13 +1,61 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
 
 :root {
+  /* ===== Check-In 체키 시그니처 컬러 시스템 ===== */
+  /* 법적 권위(네이비) + 현장 전문성(오렌지) = 당신을 완전히 보호하는 시스템 */
+
+  /* ── 브랜드 코어 ── */
+  --checkin-navy:         #0F2744;
+  --checkin-navy-mid:     #1A3A5C;
+  --checkin-navy-light:   #1E4976;
+  --checkin-navy-glow:    rgba(15,39,68,0.12);
+
+  --checkin-orange:       #E8651A;
+  --checkin-orange-hot:   #FF7020;
+  --checkin-orange-soft:  #FFF3ED;
+  --checkin-orange-glow:  rgba(232,101,26,0.35);
+
+  /* ── 시맨틱 ── */
+  --checkin-go:           #10B981;
+  --checkin-go-bg:        rgba(16,185,129,0.08);
+  --checkin-nogo:         #EF4444;
+  --checkin-nogo-bg:      rgba(239,68,68,0.08);
+  --checkin-warn:         #F59E0B;
+  --checkin-warn-bg:      rgba(245,158,11,0.08);
+  --checkin-info:         #3B82F6;
+
+  /* ── 배경 ── */
+  --bg-primary:           #FFFFFF;
+  --bg-secondary:         #F8FAFC;
+  --bg-tertiary:          #F1F5F9;
+  --bg-dark:              #0A1929;
+  --bg-dark-card:         #0F2744;
+
+  /* ── 텍스트 ── */
+  --text-primary:         #0F172A;
+  --text-secondary:       #475569;
+  --text-muted:           #94A3B8;
+  --text-on-dark:         #F8FAFC;
+  --text-on-navy:         #CBD5E1;
+
+  /* ── 보더 ── */
+  --border-light:         #E2E8F0;
+  --border-mid:           #CBD5E1;
+  --border-navy:          rgba(255,255,255,0.08);
+  --border-orange:        rgba(232,101,26,0.25);
+
+  /* ── 체키 그림자 ── */
+  --shadow-cta:   0 4px 20px rgba(232,101,26,0.35);
+  --shadow-card:  0 2px 12px rgba(15,39,68,0.07);
+  --shadow-navy:  0 8px 32px rgba(15,39,68,0.14);
+
   /* ===== Design System: Check-In ===== */
 
-  /* Primary Colors */
-  --color-primary: #7c3aed;
-  --color-primary-hover: #6d28d9;
-  --color-primary-light: rgba(124, 58, 237, 0.1);
-  --color-primary-gradient: linear-gradient(135deg, #7c3aed, #3b82f6);
+  /* Primary Colors — 오렌지(CTA) + 네이비(브랜드) */
+  --color-primary: #E8651A;
+  --color-primary-hover: #FF7020;
+  --color-primary-light: rgba(232, 101, 26, 0.1);
+  --color-primary-gradient: linear-gradient(135deg, #0F2744, #E8651A);
 
   /* Semantic Colors */
   --color-success: #10b981;
@@ -56,10 +104,11 @@
   --radius-full: 9999px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-  --shadow-purple: 0 4px 16px rgba(124,58,237,0.25);
+  --shadow-sm: 0 1px 3px rgba(15,39,68,0.08);
+  --shadow-md: 0 4px 16px rgba(15,39,68,0.10);
+  --shadow-lg: 0 8px 32px rgba(15,39,68,0.14);
+  --shadow-xl: 0 16px 48px rgba(15,39,68,0.18);
+  --shadow-purple: 0 4px 16px rgba(232,101,26,0.25);
 
   /* Sidebar */
   --sidebar-width: 260px;
