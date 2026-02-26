@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Report } from '@/types/report'
 import { REPORT_TYPES } from '@/types/report'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 interface ProjectData {
@@ -23,6 +24,7 @@ interface ProjectData {
 }
 
 export default function ReportPage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -175,10 +177,10 @@ export default function ReportPage() {
       if (error) throw error
 
       setReports(prev => [data, ...prev])
-      alert('리포트가 생성되었습니다.')
+      toast.success('리포트가 생성되었습니다.')
     } catch (err: any) {
       console.error('Error generating report:', err)
-      alert(`리포트 생성 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`리포트 생성 오류: ${err?.message || JSON.stringify(err)}`)
     } finally {
       setGenerating(false)
     }
@@ -204,7 +206,7 @@ export default function ReportPage() {
       }
     } catch (err: any) {
       console.error('Error deleting report:', err)
-      alert(`삭제 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`삭제 오류: ${err?.message || JSON.stringify(err)}`)
     }
   }
 
@@ -238,7 +240,7 @@ export default function ReportPage() {
       pdf.save(`${selectedReport?.title || 'report'}.pdf`)
     } catch (err) {
       console.error('PDF Error:', err)
-      alert('PDF 생성 중 오류가 발생했습니다.')
+      toast.error('PDF 생성 중 오류가 발생했습니다.')
     } finally {
       setPdfLoading(false)
     }

@@ -6,9 +6,11 @@ import { createClient } from '@/lib/supabase/client'
 import type { Material, MaterialStatus } from '@/types/material'
 import { MATERIAL_STATUS, MATERIAL_CATEGORIES } from '@/types/material'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function MaterialsPage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -96,7 +98,7 @@ export default function MaterialsPage() {
       setShowModal(false)
       resetForm()
     } catch (err: any) {
-      alert(`추가 오류: ${err?.message}`)
+      toast.error(`추가 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -147,7 +149,7 @@ export default function MaterialsPage() {
       setShowModal(false)
       resetForm()
     } catch (err: any) {
-      alert(`수정 오류: ${err?.message}`)
+      toast.error(`수정 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -161,7 +163,7 @@ export default function MaterialsPage() {
       if (error) throw error
       setMaterials(prev => prev.filter(m => m.id !== id))
     } catch (err: any) {
-      alert(`삭제 오류: ${err?.message}`)
+      toast.error(`삭제 오류: ${err?.message}`)
     }
   }
 
@@ -197,7 +199,7 @@ export default function MaterialsPage() {
         m.id === material.id ? { ...m, status: newStatus as any } : m
       ))
     } catch (err: any) {
-      alert(`상태 변경 오류: ${err?.message}`)
+      toast.error(`상태 변경 오류: ${err?.message}`)
     }
   }
 

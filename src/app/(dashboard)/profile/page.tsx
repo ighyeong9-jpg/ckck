@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { CompanyProfile } from '@/types/companyProfile'
 import { SPECIALTY_OPTIONS } from '@/types/companyProfile'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function ProfilePage() {
+  const toast = useToast()
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -115,9 +117,9 @@ export default function ProfilePage() {
       const { error } = await supabase.from('profiles').update(saveData).eq('id', user.id)
       if (error) throw error
 
-      alert('프로필이 저장되었습니다.')
+      toast.success('프로필이 저장되었습니다.')
     } catch (err: any) {
-      alert(`저장 오류: ${err?.message}`)
+      toast.error(`저장 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -149,7 +151,7 @@ export default function ProfilePage() {
       const { data } = supabase.storage.from('evidence').getPublicUrl(fileName)
       setProfile(prev => ({ ...prev, logo_url: data.publicUrl }))
     } catch (err: any) {
-      alert(`로고 업로드 오류: ${err?.message}`)
+      toast.error(`로고 업로드 오류: ${err?.message}`)
     }
   }
 
@@ -169,7 +171,7 @@ export default function ProfilePage() {
       }
       setProfile(prev => ({ ...prev, portfolio_images: [...(prev.portfolio_images || []), ...newImages] }))
     } catch (err: any) {
-      alert(`포트폴리오 업로드 오류: ${err?.message}`)
+      toast.error(`포트폴리오 업로드 오류: ${err?.message}`)
     }
   }
 
@@ -332,7 +334,7 @@ export default function ProfilePage() {
                 className={styles.copyBtn}
                 onClick={() => {
                   navigator.clipboard.writeText(`${window.location.origin}/profile/${profile.profile_token}`)
-                  alert('링크가 복사되었습니다!')
+                  toast.success('링크가 복사되었습니다!')
                 }}
               >
                 복사

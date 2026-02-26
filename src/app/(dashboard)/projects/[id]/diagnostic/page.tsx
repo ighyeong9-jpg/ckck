@@ -306,7 +306,7 @@ export default function DiagnosticPage() {
   // 커스텀 항목 추가
   const handleAddCustomItem = async () => {
     if (!customForm.item.trim() || !customForm.subcategory.trim()) {
-      alert('항목명과 세부 카테고리를 입력해주세요.')
+      toast.warning('항목명과 세부 카테고리를 입력해주세요.')
       return
     }
 
@@ -344,14 +344,14 @@ export default function DiagnosticPage() {
       resetForm()
     } catch (err) {
       console.error('Error adding custom item:', err)
-      alert('항목 추가 중 오류가 발생했습니다.')
+      toast.error('항목 추가 중 오류가 발생했습니다.')
     }
   }
 
   // 커스텀 항목 수정
   const handleUpdateCustomItem = async () => {
     if (!editingItem || !customForm.item.trim() || !customForm.subcategory.trim()) {
-      alert('항목명과 세부 카테고리를 입력해주세요.')
+      toast.warning('항목명과 세부 카테고리를 입력해주세요.')
       return
     }
 
@@ -382,7 +382,7 @@ export default function DiagnosticPage() {
       resetForm()
     } catch (err) {
       console.error('Error updating custom item:', err)
-      alert('항목 수정 중 오류가 발생했습니다.')
+      toast.error('항목 수정 중 오류가 발생했습니다.')
     }
   }
 
@@ -406,7 +406,7 @@ export default function DiagnosticPage() {
       })
     } catch (err) {
       console.error('Error deleting custom item:', err)
-      alert('항목 삭제 중 오류가 발생했습니다.')
+      toast.error('항목 삭제 중 오류가 발생했습니다.')
     }
   }
 
@@ -555,10 +555,10 @@ export default function DiagnosticPage() {
 
       // 미체크 항목 수 계산
       const uncheckedCount = Object.values(newResponses).filter(v => !v).length
-      alert(`🤖 AI 자동 진단 완료!\n\n✅ 양호 처리: ${allItems.length - uncheckedCount}개\n⚠️ 현장 확인 필요: ${uncheckedCount}개\n\n위험 카테고리(${riskCats.join(', ')})의 필수 항목은\n현장에서 직접 확인 후 체크해주세요.`)
+      toast.success(`AI 자동 진단 완료! 양호 ${allItems.length - uncheckedCount}개 / 확인 필요 ${uncheckedCount}개`)
     } catch (err) {
       console.error('AI 자동 진단 오류:', err)
-      alert('자동 진단 중 오류가 발생했습니다.')
+      toast.error('자동 진단 중 오류가 발생했습니다.')
     } finally {
       setAutoDiagnosing(false)
     }

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
+import { useToast } from '@/components/ui/Toast'
 import styles from './AgentChat.module.scss'
 
 interface Message {
@@ -109,6 +110,7 @@ function getChekiGreeting(): string {
 
 export default function AgentChat() {
   const pathname = usePathname()
+  const toast = useToast()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     { role: 'ai', content: `${getChekiGreeting()}\n체키입니다 🤖 무엇을 도와드릴까요?\n\n인테리어는 물론 무엇이든 물어보세요!\n• "카페 20평 견적 알려줘"\n• "리스크 분석해줘"\n• 일반 질문도 OK!` },
@@ -227,13 +229,13 @@ export default function AgentChat() {
 
     // 이미지 파일 검증
     if (!file.type.startsWith('image/')) {
-      alert('이미지 파일만 업로드 가능합니다. (JPG, PNG, GIF, WebP)')
+      toast.warning('이미지 파일만 업로드 가능합니다. (JPG, PNG, GIF, WebP)')
       return
     }
 
     // 10MB 제한
     if (file.size > 10 * 1024 * 1024) {
-      alert('파일 크기는 10MB 이하만 가능합니다.')
+      toast.warning('파일 크기는 10MB 이하만 가능합니다.')
       return
     }
 

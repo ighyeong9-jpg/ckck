@@ -6,9 +6,11 @@ import { createClient } from '@/lib/supabase/client'
 import type { ChangeOrder, ChangeOrderStatus, ChangeOrderType } from '@/types/changeOrder'
 import { CHANGE_TYPES, CHANGE_STATUSES } from '@/types/changeOrder'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function ChangesPage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -115,7 +117,7 @@ export default function ChangesPage() {
       resetForm()
     } catch (err: any) {
       console.error('Error adding:', err)
-      alert(`추가 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`추가 오류: ${err?.message || JSON.stringify(err)}`)
     } finally {
       setSaving(false)
     }
@@ -155,7 +157,7 @@ export default function ChangesPage() {
       resetForm()
     } catch (err: any) {
       console.error('Error updating:', err)
-      alert(`수정 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`수정 오류: ${err?.message || JSON.stringify(err)}`)
     } finally {
       setSaving(false)
     }
@@ -184,7 +186,7 @@ export default function ChangesPage() {
       ))
     } catch (err: any) {
       console.error('Error changing status:', err)
-      alert(`상태변경 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`상태변경 오류: ${err?.message || JSON.stringify(err)}`)
     }
   }
 
@@ -202,7 +204,7 @@ export default function ChangesPage() {
       setOrders(prev => prev.filter(o => o.id !== id))
     } catch (err: any) {
       console.error('Error deleting:', err)
-      alert(`삭제 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`삭제 오류: ${err?.message || JSON.stringify(err)}`)
     }
   }
 
