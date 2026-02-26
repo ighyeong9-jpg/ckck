@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Client, ClientType } from '@/types/client'
 import { CLIENT_TYPES } from '@/types/client'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function ClientsPage() {
+  const toast = useToast()
   const supabase = createClient()
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
@@ -78,7 +80,7 @@ export default function ClientsPage() {
       setShowModal(false)
       resetForm()
     } catch (err: any) {
-      alert(`추가 오류: ${err?.message}`)
+      toast.error(`추가 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -104,7 +106,7 @@ export default function ClientsPage() {
       setShowModal(false)
       resetForm()
     } catch (err: any) {
-      alert(`수정 오류: ${err?.message}`)
+      toast.error(`수정 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -122,7 +124,7 @@ export default function ClientsPage() {
       if (error) throw error
       setClients(prev => prev.filter(c => c.id !== id))
     } catch (err: any) {
-      alert(`삭제 오류: ${err?.message}`)
+      toast.error(`삭제 오류: ${err?.message}`)
     }
   }
 

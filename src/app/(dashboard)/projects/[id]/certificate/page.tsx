@@ -6,9 +6,11 @@ import { createClient } from '@/lib/supabase/client'
 import type { VerificationCertificate, ScoreBreakdown } from '@/types/verification'
 import { GRADE_LABELS, GRADE_COLORS } from '@/types/verification'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function CertificatePage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -289,7 +291,7 @@ export default function CertificatePage() {
                   className={styles.copyBtn}
                   onClick={() => {
                     navigator.clipboard.writeText(verifyUrl)
-                    alert('검증 URL이 복사되었습니다.')
+                    toast.success('검증 URL이 복사되었습니다.')
                   }}
                 >
                   복사

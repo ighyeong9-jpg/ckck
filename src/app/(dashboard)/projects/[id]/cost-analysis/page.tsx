@@ -6,9 +6,11 @@ import { createClient } from '@/lib/supabase/client'
 import { COST_FACTORS } from '@/types/costAnalysis'
 import { calculateCost, formatKRW, type CostFactor } from '@/lib/utils/costCalculator'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function CostAnalysisPage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -132,10 +134,10 @@ export default function CostAnalysisPage() {
         setAnalysisId(newData.id)
       }
 
-      alert('저장되었습니다.')
+      toast.success('저장되었습니다.')
     } catch (err: any) {
       console.error('Error saving:', err)
-      alert(`저장 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`저장 오류: ${err?.message || JSON.stringify(err)}`)
     } finally {
       setSaving(false)
     }

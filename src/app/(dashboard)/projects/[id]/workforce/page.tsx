@@ -6,9 +6,11 @@ import { createClient } from '@/lib/supabase/client'
 import type { Workforce, WorkStatus } from '@/types/workforce'
 import { WORKER_TYPES, ATTENDANCE_STATUS } from '@/types/workforce'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function WorkforcePage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -91,7 +93,7 @@ export default function WorkforcePage() {
       setShowModal(false)
       resetForm()
     } catch (err: any) {
-      alert(`추가 오류: ${err?.message}`)
+      toast.error(`추가 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -136,7 +138,7 @@ export default function WorkforcePage() {
       setShowModal(false)
       resetForm()
     } catch (err: any) {
-      alert(`수정 오류: ${err?.message}`)
+      toast.error(`수정 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -150,7 +152,7 @@ export default function WorkforcePage() {
       if (error) throw error
       setWorkers(prev => prev.filter(w => w.id !== id))
     } catch (err: any) {
-      alert(`삭제 오류: ${err?.message}`)
+      toast.error(`삭제 오류: ${err?.message}`)
     }
   }
 
@@ -185,7 +187,7 @@ export default function WorkforcePage() {
         w.id === worker.id ? { ...w, attendance_status: status as any } : w
       ))
     } catch (err: any) {
-      alert(`상태 변경 오류: ${err?.message}`)
+      toast.error(`상태 변경 오류: ${err?.message}`)
     }
   }
 

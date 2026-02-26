@@ -104,7 +104,7 @@ export default function ProcessPage() {
       setShowModal(false)
       resetForm()
     } catch (err: any) {
-      alert(`추가 오류: ${err?.message}`)
+      toast.error(`추가 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -131,7 +131,7 @@ export default function ProcessPage() {
       setShowModal(false)
       resetForm()
     } catch (err: any) {
-      alert(`수정 오류: ${err?.message}`)
+      toast.error(`수정 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -145,7 +145,7 @@ export default function ProcessPage() {
       if (error) throw error
       setProcesses(prev => prev.filter(p => p.id !== id))
     } catch (err: any) {
-      alert(`삭제 오류: ${err?.message}`)
+      toast.error(`삭제 오류: ${err?.message}`)
     }
   }
 

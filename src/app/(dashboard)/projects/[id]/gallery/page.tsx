@@ -7,9 +7,11 @@ import PhotoGallery from '@/components/gallery/PhotoGallery'
 import BeforeAfterSlider from '@/components/gallery/BeforeAfterSlider'
 import type { GalleryPhoto } from '@/types/photoGallery'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function GalleryPage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -98,7 +100,7 @@ export default function GalleryPage() {
         }
       }
     } catch (err: any) {
-      alert(`업로드 오류: ${err?.message}`)
+      toast.error(`업로드 오류: ${err?.message}`)
     } finally {
       setUploading(false)
     }

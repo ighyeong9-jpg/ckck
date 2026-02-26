@@ -7,9 +7,11 @@ import { sha256 } from '@/lib/utils/merkleTree'
 import type { Defect, DefectSeverity, DefectStatus } from '@/types/defect'
 import { DEFECT_SEVERITIES, DEFECT_STATUSES } from '@/types/defect'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function DefectsPage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -62,7 +64,7 @@ export default function DefectsPage() {
     const files = e.target.files
     if (!files || files.length === 0) return
     if (formData.photos.length + files.length > 5) {
-      alert('사진은 최대 5장까지 업로드할 수 있습니다.')
+      toast.warning('사진은 최대 5장까지 업로드할 수 있습니다.')
       return
     }
 
@@ -79,7 +81,7 @@ export default function DefectsPage() {
       }
       setFormData(prev => ({ ...prev, photos: [...prev.photos, ...newPhotos] }))
     } catch (err: any) {
-      alert(`업로드 오류: ${err?.message}`)
+      toast.error(`업로드 오류: ${err?.message}`)
     } finally {
       setUploadingPhotos(false)
     }
@@ -142,7 +144,7 @@ export default function DefectsPage() {
       setShowModal(false)
       resetForm()
     } catch (err: any) {
-      alert(`저장 오류: ${err?.message}`)
+      toast.error(`저장 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }
@@ -167,7 +169,7 @@ export default function DefectsPage() {
         d.id === defect.id ? { ...d, ...updates } : d
       ))
     } catch (err: any) {
-      alert(`상태 변경 오류: ${err?.message}`)
+      toast.error(`상태 변경 오류: ${err?.message}`)
     }
   }
 
@@ -178,7 +180,7 @@ export default function DefectsPage() {
       if (error) throw error
       setDefects(prev => prev.filter(d => d.id !== id))
     } catch (err: any) {
-      alert(`삭제 오류: ${err?.message}`)
+      toast.error(`삭제 오류: ${err?.message}`)
     }
   }
 

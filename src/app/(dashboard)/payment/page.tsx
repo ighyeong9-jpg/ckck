@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 interface Plan {
@@ -54,6 +55,7 @@ const PLANS: Plan[] = [
 ]
 
 export default function PaymentPage() {
+  const toast = useToast()
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [currentPlan, setCurrentPlan] = useState<string>('free')
@@ -95,14 +97,14 @@ export default function PaymentPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        alert('로그인이 필요합니다.')
+        toast.warning('로그인이 필요합니다.')
         return
       }
 
       // TODO: 실제 결제 연동 (Stripe, Toss Payments 등)
       // 여기서는 시뮬레이션
       if (planId !== 'free') {
-        alert(`${PLANS.find(p => p.id === planId)?.name} 플랜 결제 페이지로 이동합니다.`)
+        toast.info(`${PLANS.find(p => p.id === planId)?.name} 플랜 결제 페이지로 이동합니다.`)
         return
       }
 
@@ -114,9 +116,9 @@ export default function PaymentPage() {
       if (error) throw error
 
       setCurrentPlan(planId)
-      alert('플랜이 변경되었습니다.')
+      toast.success('플랜이 변경되었습니다.')
     } catch (err: any) {
-      alert(`오류: ${err?.message}`)
+      toast.error(`오류: ${err?.message}`)
     }
   }
 

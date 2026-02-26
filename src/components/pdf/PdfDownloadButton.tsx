@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useToast } from '@/components/ui/Toast'
 import styles from './PdfDownloadButton.module.scss'
 
 interface PdfDownloadButtonProps {
@@ -16,6 +17,7 @@ export default function PdfDownloadButton({
   variant = 'secondary',
   size = 'md',
 }: PdfDownloadButtonProps) {
+  const toast = useToast()
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
 
@@ -29,7 +31,7 @@ export default function PdfDownloadButton({
       setTimeout(() => setDone(false), 2500)
     } catch (err) {
       console.error('[PDF] 내보내기 실패:', err)
-      alert('PDF 생성 중 오류가 발생했습니다.')
+      toast.error('PDF 생성 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
