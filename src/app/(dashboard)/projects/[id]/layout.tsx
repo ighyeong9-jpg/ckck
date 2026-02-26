@@ -31,6 +31,7 @@ export default async function ProjectDetailLayout({
     fireLawViolationsRes,
   ] = await Promise.all([
     Promise.all([
+      supabase.from('projects').select('id', { count: 'exact', head: true }).eq('id', projectId), // overview: always has data
       supabase.from('diagnostic_responses').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
       supabase.from('quote_line_items').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
       supabase.from('cost_analysis').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
@@ -43,6 +44,7 @@ export default async function ProjectDetailLayout({
       supabase.from('materials').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
       supabase.from('law_checks').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
       supabase.from('law_checks').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
+      supabase.from('warranties').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
     ]),
     // 전체 violated law_checks (법령 탭 배지용)
     supabase
@@ -60,9 +62,9 @@ export default async function ProjectDetailLayout({
   ])
 
   const tabKeys = [
-    'diagnostic', 'sow', 'cost-analysis', 'changes',
+    'overview', 'diagnostic', 'sow', 'cost-analysis', 'changes',
     'evidence-package', 'agreement', 'report',
-    'process', 'workforce', 'materials', 'law-check', 'fire-safety',
+    'process', 'workforce', 'materials', 'law-check', 'fire-safety', 'warranty',
   ]
 
   const tabStatuses: Record<string, 'completed' | 'in_progress' | 'not_started'> = {}

@@ -152,6 +152,43 @@ export default function DashboardPage() {
 
   const nogoCount = summary?.recent_go_nogo.nogo ?? 0
 
+  // 온보딩 화면 (프로젝트 없을 때)
+  if (!loading && projects.length === 0) {
+    return (
+      <div className="p-7">
+        <div className="max-w-xl mx-auto text-center py-16">
+          <div className="text-6xl mb-5">🏗️</div>
+          <h1 className="text-2xl font-black text-gray-900 mb-2">체크인에 오신 것을 환영합니다</h1>
+          <p className="text-base text-gray-500 mb-8 leading-relaxed">
+            첫 현장을 등록하면 체크리스트·법령점검·리스크 관리가<br/>자동으로 시작됩니다.
+          </p>
+          {/* 3단계 설명 */}
+          <div className="grid grid-cols-3 gap-4 mb-10">
+            {[
+              { step: '1', icon: '📋', title: '현장 등록', desc: '업종 선택 → 체크리스트 자동 생성' },
+              { step: '2', icon: '⚖️', title: '법령 점검', desc: '17개 건설·소방 법령 자동 분석' },
+              { step: '3', icon: '📄', title: '증거 패키지', desc: 'SHA-256 해시로 무결성 보장' },
+            ].map(item => (
+              <div key={item.step} className="bg-white border border-gray-200 rounded-xl p-4 text-center shadow-sm">
+                <div className="text-2xl mb-1.5">{item.icon}</div>
+                <div className="text-xs font-bold text-orange-500 mb-1">Step {item.step}</div>
+                <div className="text-sm font-bold text-gray-800 mb-1">{item.title}</div>
+                <div className="text-xs text-gray-400 leading-relaxed">{item.desc}</div>
+              </div>
+            ))}
+          </div>
+          <Link
+            href="/projects/new"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-lg shadow-orange-200 text-base"
+          >
+            🚀 첫 현장 등록하기
+          </Link>
+          <p className="mt-3 text-xs text-gray-400">무료로 시작 · 설치 불필요 · 3분 완성</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="p-7 space-y-6">
       {/* 알림 배너 */}

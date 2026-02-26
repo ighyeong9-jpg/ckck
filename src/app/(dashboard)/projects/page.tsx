@@ -241,9 +241,9 @@ export default function ProjectsPage() {
             <h1 className={styles.title}>현장 관리</h1>
             <p className={styles.subtitle}>진행 중인 모든 현장을 관리하세요</p>
           </div>
-          <button type="button" className={styles.newProjectBtn} onClick={() => setShowModal(true)}>
-            + 새 현장
-          </button>
+          <Link href="/projects/new" className={styles.newProjectBtn} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+            + 새 현장 등록
+          </Link>
           <button type="button" className={styles.newProjectBtn} style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }} onClick={() => {
             const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
             if (btn) btn.click()
@@ -303,9 +303,9 @@ export default function ProjectsPage() {
               <h3>첫 현장을 등록해보세요!</h3>
               <p>현장을 등록하면 진단부터 리포트까지<br/>모든 과정을 체계적으로 관리할 수 있습니다</p>
               <div className={styles.emptyActions}>
-                <button type="button" className={styles.emptyBtn} onClick={() => setShowModal(true)}>
-                  + 새 현장 등록
-                </button>
+                <Link href="/projects/new" className={styles.emptyBtn} style={{ textDecoration: 'none' }}>
+                  + 첫 현장 등록하기
+                </Link>
                 <button type="button" className={styles.emptyBtnAlt} onClick={() => setShowQuickStart(true)}>
                   ⚡ 퀵스타트로 시작
                 </button>

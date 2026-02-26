@@ -323,3 +323,34 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+// 도넛 차트 + 요약
+.summarySection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: white;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  margin-bottom: 1rem;
+}
+
+.donutWrap {
+  flex-shrink: 0;
+}
+
+// 건설/소방 구분 섹션
+.sectionGroup {
+  margin-bottom: 1.5rem;
+}
+
+.sectionGroupTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0F2744;
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 2px solid #e5e7eb;
+}

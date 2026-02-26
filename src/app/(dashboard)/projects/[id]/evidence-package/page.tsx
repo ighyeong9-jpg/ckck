@@ -55,6 +55,19 @@ export default function EvidencePackagePage() {
   const [aiResultFile, setAiResultFile] = useState<string>('')         // 분석된 파일명
   const [showAiModal, setShowAiModal] = useState(false)
 
+  // 드래그&드롭 + 업로드 진행 상태
+  const [isDragging, setIsDragging] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<{ step: number; fileName: string } | null>(null)
+  // step: 1=업로드, 2=SHA-256, 3=메타데이터, 4=완료
+
+  // 사진 상세 모달
+  const [selectedFile, setSelectedFile] = useState<EvidenceFile | null>(null)
+  const [verifyingHash, setVerifyingHash] = useState(false)
+  const [hashVerifyResult, setHashVerifyResult] = useState<'match' | 'mismatch' | null>(null)
+
+  // 카테고리 필터
+  const [activeFilter, setActiveFilter] = useState<string>('all')
+
   // 데이터 로드
   useEffect(() => {
     const loadData = async () => {
@@ -92,39 +105,46 @@ export default function EvidencePackagePage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   }
 
-  // 파일 업로드
-  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = event.target.files
-    if (!selectedFiles || selectedFiles.length === 0) return
+  // 드래그&드롭 핸들러
+  const handleDragEnter = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(true) }
+  const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(false) }
+  const handleDragOver = (e: React.DragEvent) => { e.preventDefault() }
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const droppedFiles = e.dataTransfer.files
+    if (droppedFiles.length > 0) {
+      await uploadFiles(Array.from(droppedFiles))
+    }
+  }
 
+  // 공통 업로드 로직
+  const uploadFiles = async (fileList: File[]) => {
     setUploading(true)
-
     try {
-      for (const file of Array.from(selectedFiles)) {
-        // 파일 크기 체크 (5MB 제한)
+      for (const file of fileList) {
         if (file.size > 5 * 1024 * 1024) {
           toast.warning(`"${file.name}" 파일이 너무 큽니다. (최대 5MB)`)
           continue
         }
 
-        // SHA-256 해시 생성
-        const sha256Hash = await generateSHA256(file)
-
-        // 파일명 생성 (중복 방지)
+        // Step 1: 업로드 시작
+        setUploadProgress({ step: 1, fileName: file.name })
         const timestamp = Date.now()
         const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
         const storagePath = `${projectId}/${timestamp}_${safeName}`
 
-        // Supabase Storage에 업로드
         const { error: uploadError } = await supabase.storage
           .from('evidence')
           .upload(storagePath, file)
+        if (uploadError) throw new Error(uploadError.message || '파일 업로드 실패')
 
-        if (uploadError) {
-          throw new Error(uploadError.message || '파일 업로드 실패')
-        }
+        // Step 2: SHA-256 해시 생성
+        setUploadProgress({ step: 2, fileName: file.name })
+        const sha256Hash = await generateSHA256(file)
 
-        // DB에 메타데이터 저장
+        // Step 3: 메타데이터 저장
+        setUploadProgress({ step: 3, fileName: file.name })
         const { data, error: dbError } = await supabase
           .from('evidence_files')
           .insert([{
@@ -135,25 +155,63 @@ export default function EvidencePackagePage() {
             storage_path: storagePath,
             sha256_hash: sha256Hash,
             category: selectedCategory,
+            is_evidence: false,
           }])
           .select()
           .single()
-
         if (dbError) throw dbError
 
+        // Step 4: 완료
+        setUploadProgress({ step: 4, fileName: file.name })
         setFiles(prev => [data, ...prev])
+        await new Promise(r => setTimeout(r, 400))
       }
-
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-
-      toast.success('업로드 완료!')
-    } catch (err: any) {
-      console.error('Error uploading:', err)
-      toast.error(`업로드 오류: ${err?.message || JSON.stringify(err)}`)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      toast.success('업로드 완료! SHA-256 해시가 자동 생성됐습니다.')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '업로드 오류'
+      toast.error(`업로드 오류: ${msg}`)
     } finally {
       setUploading(false)
+      setUploadProgress(null)
+    }
+  }
+
+  // 파일 업로드 (input change)
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = event.target.files
+    if (!selectedFiles || selectedFiles.length === 0) return
+    await uploadFiles(Array.from(selectedFiles))
+  }
+
+  // 법정 증거 지정 토글
+  const handleToggleEvidence = async (file: EvidenceFile) => {
+    const newVal = !file.is_evidence
+    const { error } = await supabase
+      .from('evidence_files')
+      .update({ is_evidence: newVal })
+      .eq('id', file.id)
+    if (!error) {
+      setFiles(prev => prev.map(f => f.id === file.id ? { ...f, is_evidence: newVal } : f))
+      if (selectedFile?.id === file.id) setSelectedFile({ ...file, is_evidence: newVal })
+      toast.success(newVal ? '법정 증거로 지정됐습니다.' : '증거 지정이 해제됐습니다.')
+    }
+  }
+
+  // 단일 파일 해시 무결성 검증
+  const handleVerifyHash = async (file: EvidenceFile) => {
+    if (!file.sha256_hash) { toast.warning('해시값이 없습니다.'); return }
+    setVerifyingHash(true)
+    setHashVerifyResult(null)
+    try {
+      const { data: blob } = await supabase.storage.from('evidence').download(file.storage_path)
+      if (!blob) throw new Error('파일 다운로드 실패')
+      const currentHash = await generateSHA256(new File([blob], file.file_name, { type: file.file_type || undefined }))
+      setHashVerifyResult(currentHash === file.sha256_hash ? 'match' : 'mismatch')
+    } catch {
+      toast.error('무결성 검증 중 오류가 발생했습니다.')
+    } finally {
+      setVerifyingHash(false)
     }
   }
 
@@ -358,6 +416,82 @@ export default function EvidencePackagePage() {
     }
   }
 
+  // 증거 패키지 HTML 다운로드
+  const handleDownloadPackage = () => {
+    if (files.length === 0) {
+      toast.warning('다운로드할 파일이 없습니다.')
+      return
+    }
+
+    const now = new Date().toLocaleString('ko-KR')
+    const evidenceFiles = files.filter(f => f.is_evidence)
+    const hashedFiles = files.filter(f => f.sha256_hash)
+
+    const rows = files.map(f => `
+      <tr>
+        <td>${f.file_name}</td>
+        <td>${FILE_CATEGORIES.find(c => c.id === f.category)?.name || '기타'}</td>
+        <td style="font-family:monospace;font-size:11px">${f.sha256_hash ? f.sha256_hash.substring(0, 16) + '...' : '미생성'}</td>
+        <td>${f.is_evidence ? '✅ 법정증거' : '-'}</td>
+        <td>${formatFileSize(f.file_size)}</td>
+        <td>${new Date(f.created_at).toLocaleDateString('ko-KR')}</td>
+      </tr>
+    `).join('')
+
+    const html = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>증거 패키지 리포트</title>
+<style>
+  body { font-family: 'Malgun Gothic', sans-serif; padding: 40px; color: #1f2937; max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 22px; color: #0F2744; border-bottom: 3px solid #E8651A; padding-bottom: 8px; }
+  .meta { display: flex; gap: 32px; margin: 20px 0; }
+  .meta-item { display: flex; flex-direction: column; }
+  .meta-label { font-size: 11px; color: #6b7280; }
+  .meta-value { font-size: 18px; font-weight: 700; color: #0F2744; }
+  .merkle { background: #f3f4f6; border-radius: 8px; padding: 12px 16px; margin: 20px 0; }
+  .merkle-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+  .merkle-code { font-family: monospace; font-size: 13px; color: #374151; word-break: break-all; }
+  table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+  th { background: #0F2744; color: white; padding: 10px 12px; text-align: left; font-size: 12px; }
+  td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
+  tr:nth-child(even) { background: #f9fafb; }
+  .footer { margin-top: 40px; font-size: 11px; color: #9ca3af; }
+</style>
+</head>
+<body>
+  <h1>⚖️ 증거 패키지 무결성 리포트</h1>
+  <div class="meta">
+    <div class="meta-item"><span class="meta-label">생성 일시</span><span class="meta-value">${now}</span></div>
+    <div class="meta-item"><span class="meta-label">전체 파일</span><span class="meta-value">${files.length}개</span></div>
+    <div class="meta-item"><span class="meta-label">법정 증거</span><span class="meta-value">${evidenceFiles.length}개</span></div>
+    <div class="meta-item"><span class="meta-label">해시 생성</span><span class="meta-value">${hashedFiles.length}개</span></div>
+  </div>
+  <div class="merkle">
+    <div class="merkle-label">Merkle Tree Root Hash</div>
+    <div class="merkle-code">${merkleRoot || '(미생성)'}</div>
+  </div>
+  <table>
+    <thead><tr><th>파일명</th><th>카테고리</th><th>SHA-256</th><th>증거 지정</th><th>크기</th><th>업로드 일</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="footer">
+    본 리포트는 체크인(Check-In) 시스템에서 자동 생성되었습니다. SHA-256 해시 및 Merkle Root는 파일 무결성 검증에 활용됩니다.
+  </div>
+</body>
+</html>`
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `evidence-package-${projectId}-${Date.now()}.html`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success('증거 패키지 리포트가 다운로드됐습니다.')
+  }
+
   // 카테고리별 그룹화
   const groupedFiles = files.reduce((acc, file) => {
     const cat = file.category || 'other'
@@ -422,6 +556,13 @@ export default function EvidencePackagePage() {
               >
                 인증값 저장
               </button>
+              <button
+                className={styles.downloadPackageBtn}
+                onClick={handleDownloadPackage}
+                disabled={files.length === 0}
+              >
+                ⬇️ 패키지 다운로드
+              </button>
             </div>
           </div>
 
@@ -466,39 +607,79 @@ export default function EvidencePackagePage() {
           )}
         </section>
 
-        {/* Upload Section */}
+        {/* 증거 패키지 요약 */}
+        <section className={styles.evidenceSummary}>
+          <div className={styles.evidSumCard}>
+            <span className={styles.evidSumNumber}>{files.length}</span>
+            <span className={styles.evidSumLabel}>전체 파일</span>
+          </div>
+          <div className={styles.evidSumCard} style={{ borderColor: '#3b82f6' }}>
+            <span className={styles.evidSumNumber} style={{ color: '#3b82f6' }}>{files.filter(f => f.is_evidence).length}</span>
+            <span className={styles.evidSumLabel}>법정 증거 지정</span>
+          </div>
+          <div className={styles.evidSumCard} style={{ borderColor: '#10b981' }}>
+            <span className={styles.evidSumNumber} style={{ color: '#10b981' }}>{files.filter(f => f.sha256_hash).length}</span>
+            <span className={styles.evidSumLabel}>해시 생성 완료</span>
+          </div>
+          <div className={styles.evidSumCard} style={{ borderColor: merkleRoot ? '#10b981' : '#d1d5db' }}>
+            <span className={styles.evidSumNumber} style={{ color: merkleRoot ? '#10b981' : '#9ca3af', fontSize: '0.85rem' }}>
+              {merkleRoot ? `${merkleRoot.substring(0, 8)}...` : '미생성'}
+            </span>
+            <span className={styles.evidSumLabel}>Merkle Tree</span>
+          </div>
+        </section>
+
+        {/* Upload Section — 드래그&드롭 */}
         <section className={styles.uploadSection}>
-          <div className={styles.uploadCard}>
-            <div className={styles.uploadLeft}>
-              <select
-                value={selectedCategory}
-                onChange={e => setSelectedCategory(e.target.value)}
-                className={styles.categorySelect}
-              >
-                {FILE_CATEGORIES.map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.icon} {cat.name}
-                  </option>
-                ))}
+          <div
+            className={`${styles.dropZone} ${isDragging ? styles.dropZoneActive : ''} ${uploading ? styles.dropZoneUploading : ''}`}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
+            <span className={styles.dropIcon}>{isDragging ? '📂' : '📁'}</span>
+            <p className={styles.dropText}>
+              {isDragging ? '여기에 놓으세요!' : '사진 또는 문서를 여기에 끌어다 놓으세요'}
+            </p>
+            <p className={styles.dropHint}>또는</p>
+            <input ref={fileInputRef} type="file" multiple onChange={handleUpload} className={styles.fileInput} id="fileUpload" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" />
+            <label htmlFor="fileUpload" className={styles.uploadBtn}>
+              파일 선택
+            </label>
+            <div className={styles.dropMeta}>
+              <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className={styles.categorySelect}>
+                {FILE_CATEGORIES.map(cat => <option key={cat.id} value={cat.id}>{cat.icon} {cat.name}</option>)}
               </select>
-            </div>
-            <div className={styles.uploadRight}>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                onChange={handleUpload}
-                className={styles.fileInput}
-                id="fileUpload"
-              />
-              <label htmlFor="fileUpload" className={styles.uploadBtn}>
-                {uploading ? '업로드 중...' : '📎 파일 선택'}
-              </label>
+              <span className={styles.dropMetaHint}>파일당 최대 5MB</span>
             </div>
           </div>
-          <p className={styles.uploadHint}>
-            파일당 최대 5MB / SHA-256 해시 자동 생성
-          </p>
+
+          {/* 업로드 진행 상태 */}
+          {uploadProgress && (
+            <div className={styles.uploadSteps}>
+              <p className={styles.uploadFileName}>{uploadProgress.fileName}</p>
+              <div className={styles.uploadStepList}>
+                {[
+                  { step: 1, label: '파일 업로드' },
+                  { step: 2, label: 'SHA-256 해시 생성' },
+                  { step: 3, label: '메타데이터 저장' },
+                  { step: 4, label: '완료!' },
+                ].map(s => (
+                  <div
+                    key={s.step}
+                    className={`${styles.uploadStep} ${
+                      s.step < uploadProgress.step ? styles.stepDone :
+                      s.step === uploadProgress.step ? styles.stepActive : ''
+                    }`}
+                  >
+                    <span>{s.step < uploadProgress.step ? '✅' : s.step === uploadProgress.step ? '⏳' : '⭕'}</span>
+                    <span>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* AI 체크 결과 모달 */}
@@ -605,73 +786,76 @@ export default function EvidencePackagePage() {
           )
         })()}
 
+        {/* 카테고리 필터 */}
+        {files.length > 0 && (
+          <div className={styles.filterTabs}>
+            <button type="button" className={`${styles.filterTab} ${activeFilter === 'all' ? styles.filterTabActive : ''}`} onClick={() => setActiveFilter('all')}>
+              전체 {files.length}
+            </button>
+            <button type="button" className={`${styles.filterTab} ${activeFilter === 'evidence' ? styles.filterTabActive : ''}`} onClick={() => setActiveFilter('evidence')}>
+              🔒 법정증거 {files.filter(f => f.is_evidence).length}
+            </button>
+            {Object.keys(groupedFiles).map(cat => {
+              const catInfo = getCategoryInfo(cat)
+              return (
+                <button key={cat} type="button" className={`${styles.filterTab} ${activeFilter === cat ? styles.filterTabActive : ''}`} onClick={() => setActiveFilter(cat)}>
+                  {catInfo?.icon} {catInfo?.name || '기타'} {groupedFiles[cat].length}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
         {/* Files List */}
         <section className={styles.filesSection}>
           {files.length === 0 ? (
             <div className={styles.emptyState}>
               <span className={styles.emptyIcon}>📸</span>
               <h3>증빙 파일을 업로드해보세요</h3>
-              <p>사진, 문서 등 증빙 자료를 업로드하면<br/>자동으로 카테고리별 정리됩니다</p>
+              <p>사진, 문서 등 증빙 자료를 업로드하면<br/>자동으로 SHA-256 해시가 생성됩니다</p>
               <label htmlFor="fileUpload" className={styles.emptyBtn}>
                 + 첫 파일 업로드하기
               </label>
             </div>
-          ) : (
-            Object.entries(groupedFiles).map(([category, categoryFiles]) => {
+          ) : (() => {
+            const displayFiles = activeFilter === 'all' ? files :
+              activeFilter === 'evidence' ? files.filter(f => f.is_evidence) :
+              (groupedFiles[activeFilter] || [])
+            const displayGroups = activeFilter === 'all' || activeFilter === 'evidence'
+              ? Object.entries(displayFiles.reduce((acc, f) => { const cat = f.category || 'other'; if (!acc[cat]) acc[cat] = []; acc[cat].push(f); return acc }, {} as Record<string, EvidenceFile[]>))
+              : [[activeFilter, displayFiles]] as [string, EvidenceFile[]][]
+            return displayGroups.map(([category, categoryFiles]) => {
               const catInfo = getCategoryInfo(category)
               return (
                 <div key={category} className={styles.categoryGroup}>
                   <div className={styles.categoryHeader}>
-                    <h2>
-                      <span>{catInfo?.icon}</span>
-                      {catInfo?.name || '기타'}
-                    </h2>
+                    <h2><span>{catInfo?.icon}</span>{catInfo?.name || '기타'}</h2>
                     <span className={styles.fileCount}>{categoryFiles.length}개</span>
                   </div>
-
                   <div className={styles.filesList}>
                     {categoryFiles.map(file => (
-                      <div key={file.id} className={styles.fileCard}>
-                        <div className={styles.fileInfo}>
+                      <div key={file.id} className={`${styles.fileCard} ${file.is_evidence ? styles.fileCardEvidence : ''}`}>
+                        {file.is_evidence && <span className={styles.evidenceBadge}>🔒 법정증거</span>}
+                        <div className={styles.fileInfo} onClick={() => { setSelectedFile(file); setHashVerifyResult(null) }} style={{ cursor: 'pointer' }}>
                           <span className={styles.fileName}>{file.file_name}</span>
                           <div className={styles.fileMeta}>
                             <span>{formatFileSize(file.file_size)}</span>
                             <span>•</span>
                             <span>{new Date(file.created_at).toLocaleDateString('ko-KR')}</span>
+                            {file.sha256_hash && <span>• ✅ 해시생성</span>}
                           </div>
-                          {file.sha256_hash && (
-                            <div
-                              className={styles.hash}
-                              onClick={() => copyHash(file.sha256_hash!)}
-                              title="클릭하여 복사"
-                            >
-                              파일 인증값: {file.sha256_hash.substring(0, 16)}...
-                            </div>
-                          )}
                         </div>
                         <div className={styles.fileActions}>
                           {isImageFile(file) && (
-                            <button
-                              className={styles.aiCheckBtn}
-                              onClick={() => handleAiCheck(file)}
-                              disabled={aiChecking === file.id}
-                              title="AI 자동 품질 체크"
-                            >
+                            <button className={styles.aiCheckBtn} onClick={() => handleAiCheck(file)} disabled={aiChecking === file.id}>
                               {aiChecking === file.id ? '분석 중...' : 'AI 체크'}
                             </button>
                           )}
-                          <button
-                            className={styles.downloadBtn}
-                            onClick={() => handleDownload(file)}
-                          >
-                            다운로드
+                          <button className={`${styles.evidenceToggle} ${file.is_evidence ? styles.evidenceActive : ''}`} onClick={() => handleToggleEvidence(file)} title={file.is_evidence ? '증거 지정 해제' : '법정 증거로 지정'}>
+                            {file.is_evidence ? '🔒' : '🔓'}
                           </button>
-                          <button
-                            className={styles.deleteBtn}
-                            onClick={() => handleDelete(file)}
-                          >
-                            삭제
-                          </button>
+                          <button className={styles.downloadBtn} onClick={() => handleDownload(file)}>다운로드</button>
+                          <button className={styles.deleteBtn} onClick={() => handleDelete(file)}>삭제</button>
                         </div>
                       </div>
                     ))}
@@ -679,8 +863,63 @@ export default function EvidencePackagePage() {
                 </div>
               )
             })
-          )}
+          })()}
         </section>
+
+        {/* 사진 상세 모달 */}
+        {selectedFile && (
+          <div className={styles.modalOverlay} onClick={() => setSelectedFile(null)}>
+            <div className={styles.detailModal} onClick={e => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <h2>파일 상세 정보</h2>
+                <button type="button" className={styles.modalClose} onClick={() => setSelectedFile(null)}>✕</button>
+              </div>
+              <div className={styles.detailBody}>
+                <div className={styles.detailMeta}>
+                  <div className={styles.detailRow}><span>파일명</span><strong>{selectedFile.file_name}</strong></div>
+                  <div className={styles.detailRow}><span>파일 크기</span><strong>{formatFileSize(selectedFile.file_size)}</strong></div>
+                  <div className={styles.detailRow}><span>파일 형식</span><strong>{selectedFile.file_type || '알 수 없음'}</strong></div>
+                  <div className={styles.detailRow}><span>업로드 일시</span><strong>{new Date(selectedFile.created_at).toLocaleString('ko-KR')}</strong></div>
+                  <div className={styles.detailRow}><span>카테고리</span><strong>{getCategoryInfo(selectedFile.category)?.name || '기타'}</strong></div>
+                  <div className={`${styles.detailRow} ${styles.hashRow}`}>
+                    <span>SHA-256</span>
+                    <div className={styles.hashDisplay}>
+                      <code className={styles.hashCode}>{selectedFile.sha256_hash || '미생성'}</code>
+                      {selectedFile.sha256_hash && (
+                        <button type="button" className={styles.copyBtn} onClick={() => copyHash(selectedFile.sha256_hash!)}>복사</button>
+                      )}
+                    </div>
+                  </div>
+                  {hashVerifyResult && (
+                    <div className={`${styles.verifyResult} ${hashVerifyResult === 'match' ? styles.verifyMatch : styles.verifyMismatch}`}>
+                      {hashVerifyResult === 'match' ? '✅ 무결성 검증 완료 — 파일이 변조되지 않았습니다.' : '❌ 해시 불일치 — 파일이 변조되었을 수 있습니다!'}
+                    </div>
+                  )}
+                </div>
+                <div className={styles.detailActions}>
+                  <button
+                    type="button"
+                    className={`${styles.evidenceToggleBtn} ${selectedFile.is_evidence ? styles.evidenceActiveBtn : ''}`}
+                    onClick={() => handleToggleEvidence(selectedFile)}
+                  >
+                    {selectedFile.is_evidence ? '🔒 법정 증거 지정됨 (해제)' : '🔓 법정 증거로 지정'}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.verifyBtn2}
+                    onClick={() => handleVerifyHash(selectedFile)}
+                    disabled={verifyingHash || !selectedFile.sha256_hash}
+                  >
+                    {verifyingHash ? '검증 중...' : '🔍 무결성 검증'}
+                  </button>
+                  <button type="button" className={styles.downloadBtn2} onClick={() => handleDownload(selectedFile)}>
+                    ⬇️ 다운로드
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

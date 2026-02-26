@@ -19,6 +19,7 @@ interface ProjectTabsProps {
 }
 
 const tabs: Tab[] = [
+  { key: 'overview', label: '개요', icon: '🏠', path: 'overview' },
   { key: 'diagnostic', label: '진단', icon: '📋', path: 'diagnostic' },
   { key: 'sow', label: '견적서', icon: '💰', path: 'sow' },
   { key: 'cost-analysis', label: '비용분석', icon: '📊', path: 'cost-analysis' },
@@ -31,6 +32,7 @@ const tabs: Tab[] = [
   { key: 'materials', label: '자재관리', icon: '📦', path: 'materials' },
   { key: 'law-check', label: '법령', icon: '⚖️', path: 'law-check' },
   { key: 'fire-safety', label: '소방안전', icon: '🔥', path: 'fire-safety' },
+  { key: 'warranty', label: '하자담보', icon: '🛡️', path: 'warranty' },
   { key: 'certificate', label: '인증서', icon: '🤖', path: 'certificate' },
 ]
 

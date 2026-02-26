@@ -1,0 +1,269 @@
+// 하자담보 탭
+
+.page {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 900px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  gap: 1rem;
+  color: #6b7280;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #E8651A;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// 배너
+.pendingBanner {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.bannerIcon { font-size: 2.5rem; flex-shrink: 0; }
+
+.bannerContent {
+  flex: 1;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0F2744;
+    margin: 0 0 0.35rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+.completeBtn {
+  flex-shrink: 0;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #0F2744 0%, #1a3a60 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 39, 68, 0.3);
+  }
+
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.completedBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: #065f46;
+
+  strong { font-weight: 700; }
+}
+
+// 요약 카드
+.summaryCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: 600px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.sumCard {
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sumNum {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0F2744;
+}
+
+.sumLabel {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+// 목록
+.warrantyList {
+  h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0F2744;
+    margin: 0 0 1rem;
+  }
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.warrantyCard {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #10b981;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.875rem;
+}
+
+.tradeInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0F2744;
+    margin: 0;
+  }
+}
+
+.tradeBadge { font-size: 1rem; }
+
+.statusBadge {
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.cardBody {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.metaRow {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+
+  span { color: #9ca3af; flex-shrink: 0; }
+  strong { color: #1f2937; }
+}
+
+// 타임라인
+.timeline {
+  margin-top: 0.5rem;
+}
+
+.timelineBar {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  position: relative;
+  overflow: visible;
+}
+
+.timelineFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.timelineNow {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.timelineLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #9ca3af;
+  margin-top: 0.35rem;
+}
+
+// 빈 상태
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #9ca3af;
+
+  span { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+  p { font-size: 0.875rem; line-height: 1.6; }
+}
+
+// 내보내기
+.exportSection {
+  text-align: center;
+}
+
+.exportBtn {
+  padding: 0.75rem 1.5rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { border-color: #0F2744; color: #0F2744; }
+}

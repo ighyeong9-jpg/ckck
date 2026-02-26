@@ -126,19 +126,63 @@ export default function LawCheckPage() {
         </button>
       </div>
 
-      {/* 요약 카드 */}
-      <div className={styles.summaryRow}>
-        {[
-          { key: 'compliant',      label: '충족',     count: summary.compliant,      color: '#10b981' },
-          { key: 'violated',       label: '미충족',   count: summary.violated,       color: '#ef4444' },
-          { key: 'not_applicable', label: '해당없음', count: summary.not_applicable, color: '#6b7280' },
-          { key: 'pending',        label: '확인필요', count: summary.pending,        color: '#f59e0b' },
-        ].map(item => (
-          <div key={item.key} className={styles.summaryCard}>
-            <div className={styles.summaryCount} style={{ color: item.color }}>{item.count}</div>
-            <div className={styles.summaryLabel}>{item.label}</div>
-          </div>
-        ))}
+      {/* 요약: 도넛 차트 + 카드 */}
+      <div className={styles.summarySection}>
+        {/* 도넛 차트 */}
+        {checks.length > 0 && (() => {
+          const total = checks.length
+          const radius = 42
+          const circ = 2 * Math.PI * radius
+          const segments = [
+            { count: summary.compliant, color: '#10b981' },
+            { count: summary.violated, color: '#ef4444' },
+            { count: summary.not_applicable, color: '#d1d5db' },
+            { count: summary.pending, color: '#f59e0b' },
+          ]
+          let cumulative = 0
+          return (
+            <div className={styles.donutWrap}>
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                {segments.map((seg, i) => {
+                  if (seg.count === 0) return null
+                  const pct = seg.count / total
+                  const dash = pct * circ
+                  const offset = circ - cumulative * circ / total * circ / pct * pct
+                  const dashOffset = circ - cumulative * (circ / total)
+                  cumulative += seg.count
+                  return (
+                    <circle
+                      key={i}
+                      cx="50" cy="50" r={radius}
+                      fill="none"
+                      stroke={seg.color}
+                      strokeWidth="14"
+                      strokeDasharray={`${dash} ${circ - dash}`}
+                      strokeDashoffset={dashOffset}
+                      transform="rotate(-90 50 50)"
+                      style={{ transition: 'stroke-dasharray 0.5s ease' }}
+                    />
+                  )
+                })}
+                <text x="50" y="46" textAnchor="middle" fontSize="14" fontWeight="700" fill="#0F2744">{total}</text>
+                <text x="50" y="60" textAnchor="middle" fontSize="8" fill="#6b7280">법령</text>
+              </svg>
+            </div>
+          )
+        })()}
+        <div className={styles.summaryRow}>
+          {[
+            { key: 'compliant',      label: '충족',     count: summary.compliant,      color: '#10b981' },
+            { key: 'violated',       label: '미충족',   count: summary.violated,       color: '#ef4444' },
+            { key: 'not_applicable', label: '해당없음', count: summary.not_applicable, color: '#6b7280' },
+            { key: 'pending',        label: '확인필요', count: summary.pending,        color: '#f59e0b' },
+          ].map(item => (
+            <div key={item.key} className={styles.summaryCard}>
+              <div className={styles.summaryCount} style={{ color: item.color }}>{item.count}</div>
+              <div className={styles.summaryLabel}>{item.label}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {lastChecked && (
@@ -157,20 +201,21 @@ export default function LawCheckPage() {
             {running ? '점검 중...' : '⚡ 법령 점검 시작'}
           </button>
         </div>
-      ) : (
-        <div className={styles.list}>
-          {checks.map((check) => {
-            const cfg = STATUS_CONFIG[check.status]
-            const isExpanded = expandedId === check.id
-            const isViolated = check.status === 'violated'
+      ) : (() => {
+        const buildingChecks = checks.filter(c => c.laws.category !== 'fire_safety')
+        const fireChecks = checks.filter(c => c.laws.category === 'fire_safety')
 
-            return (
-              <div
-                key={check.id}
-                className={`${styles.card} ${isViolated ? styles.cardViolated : ''}`}
-                style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
-                onClick={() => setExpandedId(isExpanded ? null : check.id)}
-              >
+        const renderCard = (check: LawCheckRow) => {
+          const cfg = STATUS_CONFIG[check.status]
+          const isExpanded = expandedId === check.id
+          const isViolated = check.status === 'violated'
+          return (
+            <div
+              key={check.id}
+              className={`${styles.card} ${isViolated ? styles.cardViolated : ''}`}
+              style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
+              onClick={() => setExpandedId(isExpanded ? null : check.id)}
+            >
                 <div className={styles.cardRow}>
                   <span className={styles.statusIcon}>{cfg.icon}</span>
                   <div className={styles.cardMain}>
@@ -218,10 +263,28 @@ export default function LawCheckPage() {
                   </div>
                 )}
               </div>
-            )
-          })}
-        </div>
-      )}
+          )
+        }
+
+        return (
+          <>
+            {/* 건설 법령 */}
+            {buildingChecks.length > 0 && (
+              <div className={styles.sectionGroup}>
+                <h3 className={styles.sectionGroupTitle}>⚖️ 건설 법령 ({buildingChecks.length}개)</h3>
+                <div className={styles.list}>{buildingChecks.map(renderCard)}</div>
+              </div>
+            )}
+            {/* 소방 법령 */}
+            {fireChecks.length > 0 && (
+              <div className={styles.sectionGroup}>
+                <h3 className={styles.sectionGroupTitle}>🔥 소방 법령 ({fireChecks.length}개)</h3>
+                <div className={styles.list}>{fireChecks.map(renderCard)}</div>
+              </div>
+            )}
+          </>
+        )
+      })()}
     </div>
   )
 }
