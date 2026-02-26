@@ -1,6 +1,6 @@
 # SCHEMA.md — 체크인 DB 스키마
 
-> 최종 업데이트: 2026-02-26
+> 최종 업데이트: 2026-02-27
 > 상태: 코드 대조 완료
 > 범례: ✅ 구현됨 | 📋 미구현 | ⚠️ 설계와 다름
 
@@ -12,8 +12,8 @@
 > - `users` 테이블 없음 → Supabase Auth가 users를 관리 (`auth.users`)
 > - `checklists`/`checklist_items` 없음 → `diagnostic_responses`/`custom_checklist_items`
 > - `photos`/`photo_metadata` 없음 → `evidence_files` + `files` (gallery)
-> - `laws`/`law_checks` 없음 → DB 테이블 미구현 (설계 개념만 존재)
-> - `risk_scores` 없음 → `projects.risk_score` 필드에 최신값만 저장, 이력 테이블 없음
+> - `laws`/`law_checks` ✅ → 20260226 마이그레이션으로 구현 완료 (17개 법령: 건설 12 + 소방 5)
+> - `risk_scores` ✅ → 별도 이력 테이블 구현 (매 체크마다 새 row INSERT)
 > - `project_members` 없음 → 미구현
 > - `notifications` 없음 → 미구현
 
@@ -380,12 +380,27 @@ erDiagram
 
 | 테이블 | 설명 | 마이그레이션 상태 |
 |--------|------|-----------------|
-| `laws` | 12개 법령 마스터 | ✅ SQL 파일 준비 완료 |
-| `law_checks` | 프로젝트별 법령 체크 결과 | ✅ SQL 파일 준비 완료 |
-| `risk_scores` | 리스크 점수 이력 | ✅ SQL 파일 준비 완료 |
-| `warranties` | 하자담보 | ✅ SQL 파일 준비 완료 |
+| `laws` | **17개** 법령 마스터 (건설 12 + 소방 5) | ✅ 구현 완료 |
+| `law_checks` | 프로젝트별 법령 체크 결과 | ✅ 구현 완료 |
+| `risk_scores` | 리스크 점수 이력 (매 체크마다 INSERT) | ✅ 구현 완료 |
+| `warranties` | 하자담보 | ✅ 구현 완료 |
 
-시드 데이터: `supabase/migrations/20260226_seed_laws.sql` (12개 법령 INSERT)
+시드 데이터:
+- `supabase/migrations/20260226_seed_laws.sql` — 건설 12개 법령
+- `supabase/migrations/20260227_add_fire_safety_laws.sql` — 소방 5개 법령 추가
+
+### laws 테이블 category 값
+
+| category | 설명 |
+|----------|------|
+| `warranty` | 하자담보 관련 |
+| `contract` | 계약 관련 |
+| `quality` | 품질 관련 |
+| `dispute` | 분쟁 관련 |
+| `safety` | 안전 관련 |
+| `fire_safety` | 소방 안전 (risk_weight 1.3~1.5 — 인명 직결) |
+
+> [특이사항] `fire_safety` 카테고리 법령은 체크리스트 미존재 시 `violated` 처리 (다른 카테고리는 `not_applicable`)
 
 ## 미구현 테이블 (설계에만 존재) 📋
 

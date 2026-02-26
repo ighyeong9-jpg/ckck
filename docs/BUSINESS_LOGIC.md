@@ -1,33 +1,63 @@
 # BUSINESS_LOGIC.md — 체크인 비즈니스 로직
 
-> 최종 업데이트: 2026-02-26
+> 최종 업데이트: 2026-02-27
 > 상태: 코드 대조 완료
 > 범례: ✅ 구현됨 | 📋 미구현 | ⚠️ 설계와 다름
 
 ---
 
-## 1. GO/NO-GO 판정 알고리즘
+## 1. 리스크 등급 판정 알고리즘
 
-### 설계 기준 판정 로직 📋
+> [변경] GO/NO-GO 이진 판정 → **4단계 리스크 등급 시스템**으로 전면 교체
+> 체크인은 판정하지 않는다. 데이터를 보여주고 결정은 사용자 몫이다.
+
+### 리스크 등급 기반 판정 ✅ (구현 완료)
 
 ```
-IF 12개 법령 중 하나라도 "violated" 상태:
-  → NO-GO (법령 위반 해소 필요)
+IF 17개 법령 중 하나라도 "violated" 상태:
+  → 위험 등급 + 권장 조치: 법령 미충족 항목 해소
 
-IF 리스크 점수 >= 76 (위험 등급):
-  → NO-GO (리스크 완화 필요)
+IF 리스크 점수 >= 76:
+  → 위험 등급 + 권장 조치: 리스크 요인 점검
 
-IF 필수 체크리스트 완료율 < 80%:
-  → NO-GO (체크리스트 완료 필요)
+IF 리스크 점수 >= 51:
+  → 경고 등급 + 권장 조치: 체크리스트 완료 및 증빙 보강
+
+IF 리스크 점수 >= 26:
+  → 주의 등급 + 권장 조치: 주요 항목 점검
 
 ELSE:
-  → GO (진행 가능)
+  → 안전 등급
 ```
 
-> [GAP] 설계의 GO/NO-GO 판정(laws/law_checks 테이블 기반)은 **미구현**이다.
-> 실제로는 **AI 기반 GO/NO-GO**가 대신 구현되어 있다:
+> ✅ `src/lib/engines/lawEngine.ts` — checkAllLaws(), checkSingleLaw() (17개 법령)
+> ✅ `src/lib/engines/riskEngine.ts` — calculateAndSaveRiskScore()
+> ✅ API: POST /api/projects/:id/law-check, GET /api/projects/:id/risk
+> ✅ 법령 현황 탭: /projects/:id/law-check (UI 구현 완료)
 
-### 실제 구현: AI GO/NO-GO ✅
+### 소방 법령 판정 특수 규칙 ✅
+
+```
+소방 카테고리 (FIRE_FACILITY, FIRE_PREVENTION, BUILDING_FIRE):
+  → 체크리스트 미존재 → violated (다른 법령은 not_applicable)
+  → fire_checklist_check 타입으로 판정
+
+중대재해처벌법 (SERIOUS_ACCIDENT):
+  → compound_check: fire_facility + fire_prevention + 안전 모두 80% 이상 필요
+  → 하나라도 미달 → violated
+
+다중이용업소법 (MULTI_USE):
+  → multi_use_check: 카페/식당/bar/bakery/beauty/fitness/retail만 적용
+  → fire_certificate 체크리스트 90% 이상 필요
+```
+
+> ✅ 소방 법령 risk_weight: 1.3~1.5 (다른 법령 0.7~1.2 대비 높음)
+> ✅ 소방 위반 시 리스크 점수 큰 폭 상승 (가중 평균 계산)
+> ✅ /projects/:id/fire-safety 소방 전용 페이지 (UI 구현 완료)
+
+### 실제 구현: AI 리스크 판정 ✅
+
+### 실제 구현: AI 리스크 판정 ✅
 
 **경로:** `/api/ai/check`
 
@@ -103,9 +133,9 @@ R = Fp × Wf + Oc × Wo + Ch × Wc
 - 페이지 로드 시
 - 수동 재계산 요청 시
 
-### 저장 ⚠️
-- 실제: `projects.risk_score`, `projects.risk_grade`에 최신값만 저장
-- 설계: `risk_scores` 테이블에 이력 저장 → **미구현**
+### 저장 ✅
+- `projects.risk_score`, `projects.risk_grade` — 최신값 빠른 조회용
+- `risk_scores` 테이블 — 매 계산마다 새 row INSERT (이력 저장, 30일 추이 그래프 지원)
 
 ---
 
@@ -275,3 +305,42 @@ R = Fp × Wf + Oc × Wo + Ch × Wc
 - [SCHEMA.md](./SCHEMA.md) — 각 로직의 데이터 저장 구조
 - [API_SPEC.md](./API_SPEC.md) — 각 로직을 호출하는 API
 - [BUILDER_SPEC.md](./BUILDER_SPEC.md) — 기능 구현 상태
+
+---
+
+## 8. SHA-256 증거 무결성 시스템 ✅ (Prompt 4 구현 완료)
+
+### 핵심 엔진
+
+**파일:** `src/lib/engines/evidenceEngine.ts`
+
+| 함수 | 설명 |
+|------|------|
+| `generateSHA256(buffer)` | Node.js crypto, 동기, 64자 hex 반환 |
+| `buildMerkleRoot(hashes[])` | 재귀 Merkle Tree, 홀수 시 마지막 복제 |
+| `generateAndSaveMerkleRoot(projectId)` | is_evidence=true 파일 전체 루트 계산 + DB 저장 |
+| `verifyFileIntegrity(fileId)` | Storage 다운로드 → 재해시 → 비교 |
+| `verifyMerkleTree(projectId)` | sha256_hash로 루트 재계산 → 저장값 비교 |
+| `uploadEvidenceFile(projectId, file)` | 업로드 + SHA-256 자동 생성 |
+
+### API 엔드포인트
+
+| 엔드포인트 | 역할 |
+|---|---|
+| `POST /api/projects/:id/photos` | 파일 업로드 + SHA-256 해시 자동 생성 |
+| `POST /api/projects/:id/evidence/merkle` | Merkle Root 생성/갱신 |
+| `GET /api/photos/:id/verify` | 개별 파일 SHA-256 무결성 검증 |
+| `GET /api/projects/:id/evidence/verify` | 전체 Merkle Tree 검증 |
+
+### 테스트 결과 (7/7 PASS)
+
+- SHA-256: 64자 hex ✅
+- 동일 파일 → 동일 해시 ✅
+- 다른 파일 → 다른 해시 ✅
+- Merkle Root 결정론적 ✅
+- 변조 감지 ✅
+- 파일 1개 엣지케이스 ✅
+- 빈 배열 엣지케이스 ✅
+
+> 기존 `src/lib/utils/merkleTree.ts`는 브라우저용(Web Crypto API).
+> evidenceEngine.ts는 서버 API용(Node.js crypto).

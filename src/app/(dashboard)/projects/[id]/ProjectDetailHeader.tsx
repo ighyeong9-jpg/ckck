@@ -11,12 +11,14 @@ interface ProjectDetailHeaderProps {
   projectId: string
   projectName: string
   tabStatuses: Record<string, TabStatus>
+  tabBadges?: Record<string, number>
 }
 
 export default function ProjectDetailHeader({
   projectId,
   projectName,
   tabStatuses,
+  tabBadges,
 }: ProjectDetailHeaderProps) {
   const router = useRouter()
   const supabase = createClient()
@@ -59,6 +61,7 @@ export default function ProjectDetailHeader({
         <ProjectTabs
           projectId={projectId}
           tabStatuses={tabStatuses}
+          tabBadges={tabBadges}
         />
       </div>
 

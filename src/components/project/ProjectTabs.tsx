@@ -15,6 +15,7 @@ interface Tab {
 interface ProjectTabsProps {
   projectId: string
   tabStatuses?: Record<string, TabStatus>
+  tabBadges?: Record<string, number>
 }
 
 const tabs: Tab[] = [
@@ -28,6 +29,8 @@ const tabs: Tab[] = [
   { key: 'process', label: '공정관리', icon: '🔧', path: 'process' },
   { key: 'workforce', label: '인력관리', icon: '👷', path: 'workforce' },
   { key: 'materials', label: '자재관리', icon: '📦', path: 'materials' },
+  { key: 'law-check', label: '법령', icon: '⚖️', path: 'law-check' },
+  { key: 'fire-safety', label: '소방안전', icon: '🔥', path: 'fire-safety' },
   { key: 'certificate', label: '인증서', icon: '🤖', path: 'certificate' },
 ]
 
@@ -37,7 +40,7 @@ const statusIcons: Record<TabStatus, string> = {
   not_started: '⭕',
 }
 
-export default function ProjectTabs({ projectId, tabStatuses = {} }: ProjectTabsProps) {
+export default function ProjectTabs({ projectId, tabStatuses = {}, tabBadges = {} }: ProjectTabsProps) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -59,6 +62,8 @@ export default function ProjectTabs({ projectId, tabStatuses = {} }: ProjectTabs
           const isActive = pathname === `/projects/${projectId}/${tab.path}`
           const status = tabStatuses[tab.key] || 'not_started'
 
+          const badge = tabBadges[tab.key] ?? 0
+
           return (
             <button
               key={tab.key}
@@ -67,6 +72,9 @@ export default function ProjectTabs({ projectId, tabStatuses = {} }: ProjectTabs
             >
               <span className={styles.tabIcon}>{tab.icon}</span>
               <span className={styles.tabLabel}>{tab.label}</span>
+              {badge > 0 && (
+                <span className={styles.tabBadge}>{badge}</span>
+              )}
               <span className={styles.statusIcon}>{statusIcons[status]}</span>
             </button>
           )

@@ -1,6 +1,6 @@
 # BUILDER_SPEC.md — 체크인 기능 명세
 
-> 최종 업데이트: 2026-02-26
+> 최종 업데이트: 2026-02-27
 > 상태: 코드 대조 완료
 
 ---
@@ -88,15 +88,16 @@
 
 | 기능 | 설명 | 페이지 | 실제 구현 | 상태 |
 |------|------|--------|-----------|------|
-| 점수 계산 | R = Fp×Wf + Oc×Wo + Ch×Wc | /diagnostic | riskCalculator.ts | ✅ |
-| 대시보드 표시 | 현재 점수 + 등급 | /dashboard | projects.risk_score 조회 | ✅ |
+| 점수 계산 | R = Fp×Wf + Oc×Wo + Ch×Wc | /diagnostic | riskCalculator.ts (프론트) | ✅ |
+| 서버사이드 계산 | calculateAndSaveRiskScore() | API 자동 트리거 | riskEngine.ts (Prompt 2) | ✅ |
+| 대시보드 표시 | 현재 점수 + 등급 + 추이 | /dashboard | summary API + recharts | ✅ |
 | 리스크 게이지 | SVG 게이지 차트 | 여러 페이지 | RiskGauge.tsx 컴포넌트 | ✅ |
-| 추세 분석 | 점수 변화 추세 | /diagnostic | analyzeRiskTrend() | ✅ |
-| 점수 이력 | 날짜별 그래프 | - | 📋 risk_scores 테이블 없음 | 📋 |
+| 점수 이력 저장 | risk_scores 테이블 이력 | 자동 | riskEngine.ts INSERT | ✅ |
+| 점수 추이 차트 | 최근 30일 Area Chart | /dashboard | recharts AreaChart | ✅ |
 | 등급 알림 | 위험 등급 시 알림 | - | 📋 알림 시스템 미구현 | 📋 |
 
-> [GAP] 실제 가중치: 코드(Wf=0.40, Wo=0.35, Wc=0.25) vs 설계(Wf=0.45, Wo=0.25, Wc=0.30)
-> 이력 저장용 risk_scores 테이블 없음 — projects.risk_score에 최신값만 저장.
+> ✅ Prompt 2: risk_scores 테이블 이력 저장 구현 완료 (Wf=0.45, Wo=0.25, Wc=0.30)
+> ✅ Prompt 5: 대시보드에 recharts 추이 차트 연결 완료
 
 ---
 
@@ -104,15 +105,20 @@
 
 | 기능 | 설명 | 상태 |
 |------|------|------|
-| 12개 법령 체크 | 프로젝트에 12개 법령 자동 적용 | 📋 |
-| GO/NO-GO 판정 | 법령 기반 최종 판정 | 📋 |
-| 법령 상세 | 각 법령 조문 + 판정 근거 | 📋 |
-| 위반 알림 | 법령 위반 감지 시 알림 | 📋 |
-| 법령 DB | laws/law_checks 테이블 | 📋 |
+| **17개** 법령 체크 | 건설 12 + 소방 5개 법령 자동 적용 | ✅ |
+| 리스크 등급 판정 | 법령 기반 safe/caution/warning/danger | ✅ |
+| 법령 상세 | 각 법령 조문 + 판정 근거 | ✅ |
+| 위반 배지 | 대시보드 프로젝트 카드 "법령 미충족 N건" 배지 | ✅ |
+| 법령 현황 탭 | /projects/:id/law-check 전용 탭 페이지 | ✅ |
+| 소방 안전 탭 | /projects/:id/fire-safety 전용 탭 페이지 | ✅ |
+| 법령 DB | laws (17개) / law_checks 테이블 | ✅ |
+| 소방 완비증명 가이드 | 5단계 소방완비증명서 발급 가이드 | ✅ |
 
-> [GAP] 법령 룰 엔진은 **전체 미구현**이다.
-> 랜딩페이지에 "12개 법령 자동 적용" 홍보 중이나 실제 DB/로직 없음.
-> 체크리스트 항목에 법령 관련 내용이 포함되어 있어 간접적으로만 다룬다.
+> ✅ lawEngine.ts 완전 구현: 건설 12개 + 소방 5개 체크 로직
+> ✅ fire_checklist_check / compound_check / multi_use_check 소방 전용 판정 로직
+> ✅ 소방 카테고리는 체크리스트 미존재 시 `violated` (다른 법령은 `not_applicable`)
+> ✅ 프로젝트 탭에 "⚖️ 법령" + "🔥 소방안전" 탭 추가, violated 건수 빨간 배지 표시
+> ✅ 대시보드 프로젝트 카드에 "법령 미충족 N건" 빨간 배지
 
 ---
 
@@ -124,10 +130,11 @@
 | 기간 계산 | 법령별 담보기간 계산 | /warranty | 클라이언트 계산 | ✅ |
 | 하자관리 | 하자 보고 및 추적 | /defects | defects 테이블 | ✅ |
 | 자동 등록 | 준공 시 자동 생성 | - | 📋 미구현 | 📋 |
-| 만료 알림 | 30일전/7일전 알림 | - | 📋 알림 시스템 미구현 | 📋 |
+| 만료 알림 대시보드 | 90일 내 만료 예정 표시 | /dashboard | summary API 연동 | ✅ |
+| 만료 푸시 알림 | 30일전/7일전 알림 | - | 📋 알림 시스템 미구현 | 📋 |
 
-> [GAP] 설계의 warranties 테이블 확인 안 됨. 현재 warranty 페이지는 UI만 있고
-> DB 저장 여부 불명확. defects 테이블은 별도로 구현됨.
+> ✅ warranties 테이블 Prompt 1에서 생성 완료 (20260226 마이그레이션)
+> ✅ Prompt 5: 대시보드에 90일 내 만료 예정 하자담보 실시간 표시
 
 ---
 
@@ -201,12 +208,17 @@
 
 | 기능 | 설명 | 상태 |
 |------|------|------|
-| KPI 요약 | 프로젝트 수, 위험 현황 | ✅ |
-| 프로젝트 카드 | 현장별 리스크 + 진행률 | ✅ |
-| AI 브리핑 | 체크인 AI 브리핑 섹션 | ✅ |
-| 공정 현황 | 공정별 진행 상태 | ✅ |
+| KPI 요약 | 프로젝트 수, NO-GO 건수, 진행률 | ✅ |
+| 등급별 현황 | safe/caution/warning/danger 카운트 | ✅ |
+| 프로젝트 카드 | 현장별 리스크 + GO/NO-GO 배지 | ✅ |
+| AI 브리핑 | 법령 위반/리스크 기반 AI 브리핑 | ✅ |
+| 긴급 이슈 카드 | 법령 위반 이슈 목록 (실시간) | ✅ |
+| 하자담보 만료 | 90일 내 만료 예정 (실데이터) | ✅ |
+| 리스크 추이 차트 | 최근 30일 recharts Area Chart | ✅ |
 | 알림 배지 | 미읽은 알림 수 | 📋 |
 | 최근 활동 타임라인 | 최근 체크/사진/판정 | 📋 |
+
+> ✅ Prompt 5: GET /api/dashboard/summary API 구현 + 대시보드 완전 연결
 
 ---
 
@@ -236,7 +248,7 @@
 | "리스크 점수 실시간 계산" | riskCalculator.ts 구현됨 | ✅ 구현됨 |
 | "하자담보 자동 등록" | warranty 페이지만 있음 | ⚠️ 자동 등록 미구현 |
 | "법정용 증거 패키지" | PDF 생성 구현됨 | ✅ 구현됨 |
-| "12개 법령 자동 적용" | law_checks DB 없음 | ⚠️ 미구현 |
+| "12개 법령 자동 적용" | lawEngine.ts + law_checks DB 완전 구현 | ✅ 구현됨 |
 | "SHA-256 Merkle Tree" | merkleTree.ts 완전 구현 | ✅ 구현됨 |
 | "AI 체크" | /api/ai/check 구현됨 | ✅ 구현됨 |
 | "오프라인 모드" | 미구현 | 📋 미구현 |

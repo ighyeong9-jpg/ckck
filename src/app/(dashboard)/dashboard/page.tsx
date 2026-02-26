@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import AlertBanner from '@/components/ui/AlertBanner'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface Project {
   id: string
@@ -14,12 +15,15 @@ interface Project {
   end_date: string | null
 }
 
-interface Issue {
-  id: string
-  title: string
-  status: string
-  project_id: string
-  created_at: string
+interface SummaryData {
+  total_projects: number
+  projects_by_risk: { safe: number; caution: number; warning: number; danger: number }
+  average_risk_score: number
+  urgent_issues: { project_id: string; project_name: string; issue: string; risk_grade: string }[]
+  upcoming_warranty_expiries: { project_name: string; category: string; days_remaining: number; end_date: string }[]
+  recent_go_nogo: { go: number; nogo: number }
+  risk_trend: { date: string; avg_score: number }[]
+  violated_by_project: Record<string, number>
 }
 
 // ──── countUp 훅 ────
@@ -75,16 +79,22 @@ function KpiCard({ label, value, unit = '', color = 'text-navy-800', badge, dela
   )
 }
 
+const GRADE_CONFIG = {
+  safe:    { label: '안전',   color: 'text-green-600',  bg: 'bg-green-50',  border: 'border-green-200' },
+  caution: { label: '주의',   color: 'text-amber-600',  bg: 'bg-amber-50',  border: 'border-amber-200' },
+  warning: { label: '경고',   color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200' },
+  danger:  { label: '위험',   color: 'text-red-600',    bg: 'bg-red-50',    border: 'border-red-200' },
+}
+
 export default function DashboardPage() {
   const supabase = createClient()
   const [projects, setProjects] = useState<Project[]>([])
-  const [issues, setIssues] = useState<Issue[]>([])
   const [loading, setLoading] = useState(true)
   const [userName, setUserName] = useState('소장님')
+  const [summary, setSummary] = useState<SummaryData | null>(null)
 
   const highestRisk = projects.reduce((max, p) => Math.max(max, p.risk_score ?? 0), 0)
   const activeProjects = projects.filter(p => p.status !== 'completed').length
-  const pendingIssues = issues.filter(i => i.status === 'open' || i.status === 'reviewing').length
   const avgProgress = projects.length > 0
     ? Math.round(projects.reduce((s, p) => s + (p.progress ?? 0), 0) / projects.length)
     : 0
@@ -102,13 +112,19 @@ export default function DashboardPage() {
           .single()
         if (settings?.display_name) setUserName(settings.display_name)
 
-        const [{ data: projectData }, { data: issueData }] = await Promise.all([
-          supabase.from('projects').select('id,name,status,risk_score,progress,end_date').eq('user_id', user.id).limit(10),
-          supabase.from('issues').select('id,title,status,project_id,created_at').eq('user_id', user.id).limit(20),
-        ])
-
+        const { data: projectData } = await supabase
+          .from('projects')
+          .select('id,name,status,risk_score,progress,end_date')
+          .eq('user_id', user.id)
+          .limit(10)
         setProjects(projectData ?? [])
-        setIssues(issueData ?? [])
+
+        // 대시보드 요약 API (법령 위반 이슈 + 하자담보 + 추이)
+        const res = await fetch('/api/dashboard/summary')
+        if (res.ok) {
+          const json = await res.json()
+          if (json.success) setSummary(json.data)
+        }
       } finally {
         setLoading(false)
       }
@@ -117,8 +133,9 @@ export default function DashboardPage() {
   }, [])
 
   const riskColor =
-    highestRisk >= 61 ? 'text-red-500' :
-    highestRisk >= 31 ? 'text-amber-500' :
+    highestRisk >= 76 ? 'text-red-500' :
+    highestRisk >= 51 ? 'text-orange-500' :
+    highestRisk >= 26 ? 'text-amber-500' :
     'text-green-500'
 
   if (loading) {
@@ -133,9 +150,11 @@ export default function DashboardPage() {
     )
   }
 
+  const nogoCount = summary?.recent_go_nogo.nogo ?? 0
+
   return (
     <div className="p-7 space-y-6">
-      {/* 알림 배너 (리스크 61+) */}
+      {/* 알림 배너 */}
       <AlertBanner score={highestRisk} />
 
       {/* 인사 */}
@@ -150,13 +169,42 @@ export default function DashboardPage() {
           label="최고 리스크"
           value={highestRisk}
           color={riskColor}
-          badge={highestRisk >= 61 ? { text: '⚡ HIGH', variant: 'red' } : highestRisk >= 31 ? { text: '주의', variant: 'amber' } : { text: '안전', variant: 'green' }}
+          badge={
+            highestRisk >= 76 ? { text: '⚡ 위험', variant: 'red' } :
+            highestRisk >= 51 ? { text: '경고', variant: 'amber' } :
+            highestRisk >= 26 ? { text: '주의', variant: 'amber' } :
+            { text: '안전', variant: 'green' }
+          }
           delay={0}
         />
         <KpiCard label="진행 중 현장" value={activeProjects} unit="개" badge={{ text: '진행 중', variant: 'blue' }} delay={0.1} />
-        <KpiCard label="미처리 이슈" value={pendingIssues} unit="건" color={pendingIssues > 0 ? 'text-amber-500' : 'text-green-500'} badge={pendingIssues > 0 ? { text: '처리 필요', variant: 'amber' } : { text: '이상 없음', variant: 'green' }} delay={0.2} />
+        <KpiCard
+          label="NO-GO 현황"
+          value={nogoCount}
+          unit="건"
+          color={nogoCount > 0 ? 'text-red-500' : 'text-green-500'}
+          badge={nogoCount > 0 ? { text: '법령 위반', variant: 'red' } : { text: '이상 없음', variant: 'green' }}
+          delay={0.2}
+        />
         <KpiCard label="평균 진행률" value={avgProgress} unit="%" badge={{ text: '전체', variant: 'blue' }} delay={0.3} />
       </div>
+
+      {/* 등급별 현황 (summary API) */}
+      {summary && (
+        <div className="grid grid-cols-4 gap-3 fade-up" style={{ animationDelay: '0.15s' }}>
+          {(Object.keys(GRADE_CONFIG) as (keyof typeof GRADE_CONFIG)[]).map(grade => {
+            const cfg = GRADE_CONFIG[grade]
+            const count = summary.projects_by_risk[grade]
+            return (
+              <div key={grade} className={`rounded-xl border p-4 ${cfg.bg} ${cfg.border}`}>
+                <div className={`text-[11px] font-semibold uppercase tracking-wider ${cfg.color} mb-1`}>{cfg.label}</div>
+                <div className={`text-[28px] font-black leading-none ${cfg.color}`}>{count}</div>
+                <div className="text-[10px] text-gray-400 mt-0.5">개 현장</div>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* 2칸 그리드 */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-5">
@@ -172,22 +220,24 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className="text-sm text-white/75 leading-[1.8]">
-              {highestRisk >= 61 ? (
-                <>현재 리스크 점수가 <strong className="text-orange-500">{highestRisk}점</strong>으로 분쟁 위험 구간입니다. 즉시 증빙 패키지를 확보하고 현장 기록을 보강하세요.</>
+              {nogoCount > 0 ? (
+                <>현재 <strong className="text-red-400">{nogoCount}개</strong> 현장이 NO-GO 상태입니다. 법령 위반 사항을 즉시 해소하고 증빙을 보강하세요.</>
+              ) : highestRisk >= 76 ? (
+                <>리스크 점수 <strong className="text-orange-500">{highestRisk}점</strong> — 위험 등급. 즉시 증빙 패키지를 확보하고 법령 체크를 실행하세요.</>
               ) : activeProjects === 0 ? (
-                <>현재 진행 중인 현장이 없습니다. <strong className="text-orange-500">새 현장을 추가</strong>하고 체크인으로 관리를 시작하세요.</>
+                <>진행 중인 현장이 없습니다. <strong className="text-orange-500">새 현장을 추가</strong>하고 체크인으로 관리를 시작하세요.</>
               ) : (
-                <>현재 <strong className="text-orange-500">{activeProjects}개</strong> 현장이 진행 중입니다. 리스크 점수가 양호한 상태입니다. 꾸준한 기록으로 분쟁을 예방하세요.</>
+                <>현재 <strong className="text-orange-500">{activeProjects}개</strong> 현장이 진행 중입니다. 평균 리스크 {summary?.average_risk_score ?? 0}점 — 꾸준한 기록으로 분쟁을 예방하세요.</>
               )}
             </p>
-            {highestRisk >= 61 && (
+            {highestRisk >= 51 && (
               <Link href="/projects" className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-bold text-orange-400 hover:text-orange-300 transition-colors">
                 🛡 증빙 패키지 확보 →
               </Link>
             )}
           </div>
 
-          {/* 현장 목록 */}
+          {/* 현장 목록 (GO/NO-GO 배지 포함) */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-card fade-up" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <h3 className="text-[14px] font-bold text-gray-900">진행 중 현장</h3>
@@ -203,13 +253,21 @@ export default function DashboardPage() {
                 {projects.slice(0, 5).map((project) => {
                   const risk = project.risk_score ?? 0
                   const prog = project.progress ?? 0
-                  const riskCls = risk >= 61 ? 'text-red-500' : risk >= 31 ? 'text-amber-500' : 'text-green-500'
+                  const riskCls = risk >= 76 ? 'text-red-500' : risk >= 51 ? 'text-orange-500' : risk >= 26 ? 'text-amber-500' : 'text-green-500'
                   const barCls = prog >= 70 ? 'bg-green-500' : prog >= 40 ? 'bg-amber-500' : 'bg-red-400'
+                  const violatedCount = summary?.violated_by_project?.[project.id] ?? 0
                   return (
                     <li key={project.id}>
-                      <Link href={`/projects/${project.id}/diagnostic`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors">
+                      <Link href={`/projects/${project.id}/law-check`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors">
                         <div className="flex-1 min-w-0">
-                          <div className="text-[13px] font-semibold text-gray-900 truncate">{project.name}</div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-[13px] font-semibold text-gray-900 truncate">{project.name}</div>
+                            {violatedCount > 0 && (
+                              <span className="flex-shrink-0 text-[9px] font-black px-1.5 py-0.5 rounded bg-red-100 text-red-600">
+                                법령 미충족 {violatedCount}건
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 mt-1">
                             <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden max-w-[120px]">
                               <div className={`h-full ${barCls} rounded-full transition-all`} style={{ width: `${prog}%` }} />
@@ -231,24 +289,23 @@ export default function DashboardPage() {
         <div className="space-y-5">
           {/* 리스크 점수 카드 */}
           <div className="bg-gradient-to-br from-navy-800 to-navy-700 border border-white/[0.08] rounded-xl p-5 fade-up" style={{ animationDelay: '0.15s' }}>
-            <div className="text-xs font-mono text-white/30 uppercase tracking-widest mb-3">리스크 점수</div>
+            <div className="text-xs font-mono text-white/30 uppercase tracking-widest mb-3">평균 리스크</div>
             <div
               className={`text-[56px] font-black leading-none text-center mb-1.5 ${riskColor}`}
-              style={{ textShadow: highestRisk >= 61 ? '0 0 30px rgba(239,68,68,0.4)' : undefined }}
+              style={{ textShadow: highestRisk >= 76 ? '0 0 30px rgba(239,68,68,0.4)' : undefined }}
             >
-              {highestRisk}
+              {summary?.average_risk_score ?? highestRisk}
             </div>
             <div className="text-center text-sm text-white/50 mb-4">
               분쟁 위험{' '}
               <strong className={riskColor}>
-                {highestRisk >= 61 ? '높음' : highestRisk >= 31 ? '보통' : '낮음'}
+                {highestRisk >= 76 ? '위험' : highestRisk >= 51 ? '경고' : highestRisk >= 26 ? '주의' : '안전'}
               </strong>
             </div>
-            {/* 리스크 바 */}
             <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-4">
               <div
-                className={`h-full rounded-full transition-all ${highestRisk >= 61 ? 'bg-red-500' : highestRisk >= 31 ? 'bg-amber-500' : 'bg-green-500'}`}
-                style={{ width: `${highestRisk}%` }}
+                className={`h-full rounded-full transition-all ${highestRisk >= 76 ? 'bg-red-500' : highestRisk >= 51 ? 'bg-orange-500' : highestRisk >= 26 ? 'bg-amber-500' : 'bg-green-500'}`}
+                style={{ width: `${summary?.average_risk_score ?? highestRisk}%` }}
               />
             </div>
             <Link
@@ -259,30 +316,94 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          {/* 하자담보 현황 */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-card fade-up" style={{ animationDelay: '0.25s' }}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[14px] font-bold text-gray-900">🛡️ 하자담보</h3>
-              <Link href="/warranty" className="text-xs font-semibold text-orange-500 hover:text-orange-400 transition-colors">관리 →</Link>
+          {/* 긴급 이슈 (법령 위반) */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-card fade-up" style={{ animationDelay: '0.22s' }}>
+            <h3 className="text-[14px] font-bold text-gray-900 mb-3">⚠️ 긴급 이슈</h3>
+            {!summary || summary.urgent_issues.length === 0 ? (
+              <div className="text-xs text-gray-400 py-2">법령 위반 이슈 없음 ✅</div>
+            ) : (
+              <ul className="space-y-2">
+                {summary.urgent_issues.map((issue, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="text-red-500 text-[11px] font-black mt-0.5 flex-shrink-0">✗</span>
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-semibold text-gray-800 truncate">{issue.issue}</div>
+                      <div className="text-[10px] text-gray-400 truncate">{issue.project_name}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* 하자담보 만료 임박 (실데이터) */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-card fade-up" style={{ animationDelay: '0.28s' }}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-[14px] font-bold text-gray-900">🛡️ 하자담보 만료임박</h3>
             </div>
-            <div className="space-y-2.5">
-              {[
-                { label: '방수', months: 36, status: '정상', color: 'text-green-500' },
-                { label: '타일', months: 12, status: '주의', color: 'text-amber-500' },
-                { label: '도장', months: 6, status: '만료임박', color: 'text-red-500' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between py-1.5">
-                  <div>
-                    <div className="text-xs font-semibold text-gray-700">{item.label}</div>
-                    <div className="text-[10px] text-gray-400">{item.months}개월</div>
-                  </div>
-                  <span className={`text-[10px] font-bold ${item.color}`}>{item.status}</span>
-                </div>
-              ))}
-            </div>
+            {!summary || summary.upcoming_warranty_expiries.length === 0 ? (
+              <div className="text-xs text-gray-400 py-2">90일 내 만료 예정 없음 ✅</div>
+            ) : (
+              <div className="space-y-2.5">
+                {summary.upcoming_warranty_expiries.slice(0, 4).map((w, i) => {
+                  const color = w.days_remaining <= 14 ? 'text-red-500' : w.days_remaining <= 30 ? 'text-amber-500' : 'text-green-600'
+                  return (
+                    <div key={i} className="flex items-center justify-between py-1">
+                      <div>
+                        <div className="text-xs font-semibold text-gray-700 truncate max-w-[110px]">{w.category}</div>
+                        <div className="text-[10px] text-gray-400 truncate max-w-[110px]">{w.project_name}</div>
+                      </div>
+                      <span className={`text-[11px] font-bold ${color}`}>{w.days_remaining}일 후</span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* 리스크 점수 추이 차트 (최근 30일) */}
+      {summary && summary.risk_trend.length > 1 && (
+        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-card fade-up" style={{ animationDelay: '0.3s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[14px] font-bold text-gray-900">📈 리스크 점수 추이 (최근 30일)</h3>
+            <span className="text-[11px] text-gray-400">전체 프로젝트 평균</span>
+          </div>
+          <ResponsiveContainer width="100%" height={140}>
+            <AreaChart data={summary.risk_trend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="riskGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 10, fill: '#9ca3af' }}
+                tickFormatter={v => v.slice(5)}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+              <Tooltip
+                contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
+                labelFormatter={v => `날짜: ${v}`}
+                formatter={(v: number) => [`${v}점`, '평균 리스크']}
+              />
+              <Area
+                type="monotone"
+                dataKey="avg_score"
+                stroke="#f97316"
+                strokeWidth={2}
+                fill="url(#riskGrad)"
+                dot={false}
+                activeDot={{ r: 4, fill: '#f97316' }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   )
 }

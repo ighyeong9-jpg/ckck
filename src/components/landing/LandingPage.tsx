@@ -8,18 +8,23 @@ interface LandingPageProps {
 }
 
 const lawItems = [
-  { no: '01', title: '건설산업기본법', desc: '제28조 하자담보책임' },
-  { no: '02', title: '민법 제667조', desc: '수급인의 담보책임' },
-  { no: '03', title: '건산법 시행령', desc: '별표4 하자담보기간' },
-  { no: '04', title: '공정거래법', desc: '하도급 부당감액 금지' },
-  { no: '05', title: '민법 제580조', desc: '매도인의 하자담보' },
-  { no: '06', title: '건설분쟁조정', desc: '분쟁조정위원회 절차' },
-  { no: '07', title: '소비자기본법', desc: '소비자 분쟁해결기준' },
-  { no: '08', title: '전자서명법', desc: '전자문서 법적 효력' },
-  { no: '09', title: '근로기준법', desc: '임금 지급 의무' },
-  { no: '10', title: '산업안전법', desc: '현장 안전 관리' },
-  { no: '11', title: '건축법', desc: '사용승인 기준' },
-  { no: '12', title: '민사소송법', desc: '증거보전 절차' },
+  { no: '01', title: '건설산업기본법', desc: '제28조 하자담보책임', fire: false },
+  { no: '02', title: '민법 제667조', desc: '수급인의 담보책임', fire: false },
+  { no: '03', title: '건산법 시행령', desc: '별표4 하자담보기간', fire: false },
+  { no: '04', title: '공정거래법', desc: '하도급 부당감액 금지', fire: false },
+  { no: '05', title: '민법 제580조', desc: '매도인의 하자담보', fire: false },
+  { no: '06', title: '건설분쟁조정', desc: '분쟁조정위원회 절차', fire: false },
+  { no: '07', title: '소비자기본법', desc: '소비자 분쟁해결기준', fire: false },
+  { no: '08', title: '전자서명법', desc: '전자문서 법적 효력', fire: false },
+  { no: '09', title: '근로기준법', desc: '임금 지급 의무', fire: false },
+  { no: '10', title: '산업안전법', desc: '현장 안전 관리', fire: false },
+  { no: '11', title: '건축법', desc: '사용승인 기준', fire: false },
+  { no: '12', title: '민사소송법', desc: '증거보전 절차', fire: false },
+  { no: '13', title: '🔥 소방시설법', desc: '소방시설 설치 및 관리', fire: true },
+  { no: '14', title: '🔥 화재예방법', desc: '화재 예방 및 안전관리', fire: true },
+  { no: '15', title: '🔥 중대재해처벌법', desc: '사업주 안전보건 확보 의무', fire: true },
+  { no: '16', title: '🔥 건축법 방화', desc: '방화구획 및 피난시설', fire: true },
+  { no: '17', title: '🔥 다중이용업소법', desc: '소방완비증명서 의무', fire: true },
 ]
 
 const problems = [
@@ -44,7 +49,7 @@ const problems = [
 ]
 
 const solutions = [
-  { icon: '📸', tag: 'AI 자동', title: '사진 한 장으로 GO/NO-GO', desc: '현장 사진을 올리면 AI가 법령 기준으로 즉시 판정. 법적 증거로 자동 잠금.' },
+  { icon: '📸', tag: 'AI 자동', title: '사진 한 장으로 리스크 분석', desc: '현장 사진을 올리면 AI가 법령 기준으로 즉시 분석. 법적 증거로 자동 잠금.' },
   { icon: '📋', tag: '특허 기술', title: '리스크 점수 실시간 계산', desc: '특허 공식 R = Fp×Wf + Oc×Wo + Ch×Wc로 분쟁 확률을 수치화합니다.' },
   { icon: '🛡️', tag: '법령 자동', title: '하자담보 자동 등록', desc: '공종 완료 시 건산법 기준 담보기간 자동 계산. 만료 30일 전 경고 알림.' },
   { icon: '⚖️', tag: '증빙 패키지', title: '법정용 증거 패키지', desc: 'SHA-256 Merkle Tree로 무결성 보장. 변호사가 바로 쓸 수 있는 형식.' },
@@ -105,7 +110,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
               </Link>
             </div>
             <div className="flex flex-wrap gap-6">
-              {['🔒 특허 3건 등록', '⚖️ 법령 12개 자동', '🛡️ 분쟁 예방 보장'].map((t) => (
+              {['🔒 특허 3건 등록', '⚖️ 법령 17개 자동', '🛡️ 분쟁 예방 보장'].map((t) => (
                 <div key={t} className="flex items-center gap-2 text-xs font-medium" style={{ color: 'rgba(255,255,255,0.90)' }}>{t}</div>
               ))}
             </div>
@@ -151,7 +156,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
       {/* ──── STATS STRIP ──── */}
       <section className="border-y py-10" style={{ backgroundColor: '#0A1628', borderColor: 'rgba(255,255,255,0.06)' }}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
-          {[{ num: '12', label: '건설 법령 자동 적용' }, { num: '526', label: '체크리스트 항목' }, { num: '3', label: '특허 등록 확정' }, { num: '700만', label: '평균 분쟁 비용' }].map((stat) => (
+          {[{ num: '17', label: '건설·소방 법령 자동 적용' }, { num: '526', label: '체크리스트 항목' }, { num: '3', label: '특허 등록 확정' }, { num: '700만', label: '평균 분쟁 비용' }].map((stat) => (
             <div key={stat.label}>
               <div className="font-mono text-[32px] font-black leading-none" style={{ color: '#E8651A' }}>{stat.num}</div>
               <div className="text-xs mt-1.5 font-medium" style={{ color: 'rgba(255,255,255,0.35)' }}>{stat.label}</div>
@@ -211,17 +216,31 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
               <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
               자동 적용 법령
             </div>
-            <h2 className="text-heading text-white mb-3">12개 법령 자동 적용</h2>
-            <p className="text-base max-w-[480px] mx-auto" style={{ color: 'rgba(255,255,255,0.5)' }}>건설·인테리어 관련 핵심 법령을 체크인이 자동으로 적용합니다.</p>
+            <h2 className="text-heading text-white mb-3">17개 법령 자동 적용</h2>
+            <p className="text-base max-w-[480px] mx-auto" style={{ color: 'rgba(255,255,255,0.5)' }}>건설·인테리어·소방 관련 핵심 법령을 체크인이 자동으로 적용합니다.</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {lawItems.map((law, i) => (
-              <div key={law.no} className="rounded-xl p-4 transition-all duration-200 cursor-pointer fade-up" style={{ backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', animationDelay: `${i * 0.05}s` }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.10)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(232,101,26,0.30)' }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.10)' }}
+              <div key={law.no}
+                className="rounded-xl p-4 transition-all duration-200 cursor-pointer fade-up"
+                style={{
+                  backgroundColor: law.fire ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.06)',
+                  border: `1px solid ${law.fire ? 'rgba(239,68,68,0.30)' : 'rgba(255,255,255,0.10)'}`,
+                  animationDelay: `${i * 0.05}s`,
+                }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.backgroundColor = law.fire ? 'rgba(239,68,68,0.22)' : 'rgba(255,255,255,0.10)'
+                  el.style.borderColor = law.fire ? 'rgba(239,68,68,0.50)' : 'rgba(232,101,26,0.30)'
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.backgroundColor = law.fire ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.06)'
+                  el.style.borderColor = law.fire ? 'rgba(239,68,68,0.30)' : 'rgba(255,255,255,0.10)'
+                }}
               >
-                <div className="font-mono text-[10px] tracking-widest mb-1.5" style={{ color: '#E8651A' }}>{law.no}</div>
-                <div className="text-sm font-bold text-white leading-tight mb-1">{law.title}</div>
+                <div className="font-mono text-[10px] tracking-widest mb-1.5" style={{ color: law.fire ? '#fca5a5' : '#E8651A' }}>{law.no}</div>
+                <div className="text-sm font-bold leading-tight mb-1" style={{ color: law.fire ? '#fca5a5' : '#fff' }}>{law.title}</div>
                 <div className="text-[11px]" style={{ color: 'rgba(255,255,255,0.80)' }}>{law.desc}</div>
               </div>
             ))}
