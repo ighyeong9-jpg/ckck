@@ -116,7 +116,11 @@ const STATS = [
   { value: 700, suffix: '만원', label: '평균 피해액', desc: '1건당 기준' },
 ]
 
-export default function LandingPage() {
+interface LandingPageProps {
+  isLoggedIn?: boolean
+}
+
+export default function LandingPage({ isLoggedIn = false }: LandingPageProps) {
   const [pricingTab, setPricingTab] = useState<'b2c' | 'b2b'>('b2c')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -143,8 +147,14 @@ export default function LandingPage() {
           <div className={`${styles.navLinks} ${mobileMenuOpen ? styles.navOpen : ''}`}>
             <a href="#features">기능</a>
             <a href="#pricing">요금</a>
-            <a href="/login" className={styles.navLogin}>로그인</a>
-            <a href="/login" className={styles.navCta}>무료로 시작</a>
+            {isLoggedIn ? (
+              <a href="/projects" className={styles.navCta}>대시보드 →</a>
+            ) : (
+              <>
+                <a href="/login" className={styles.navLogin}>로그인</a>
+                <a href="/login" className={styles.navCta}>무료로 시작</a>
+              </>
+            )}
           </div>
           <button
             className={styles.hamburger}
