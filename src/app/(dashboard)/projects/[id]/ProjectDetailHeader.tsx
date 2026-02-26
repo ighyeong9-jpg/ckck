@@ -69,7 +69,7 @@ export default function ProjectDetailHeader({
             <div className={styles.deleteBoxIcon}>🗑️</div>
             <h3 className={styles.deleteBoxTitle}>현장을 삭제하시겠습니까?</h3>
             <p className={styles.deleteBoxDesc}>
-              <strong>"{projectName}"</strong> 현장의 모든 데이터<br />
+              <strong>&quot;{projectName}&quot;</strong> 현장의 모든 데이터<br />
               (진단, 견적, 사진, 리포트 등)가<br />
               영구적으로 삭제됩니다.
             </p>
