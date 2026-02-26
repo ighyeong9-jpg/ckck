@@ -4,14 +4,13 @@ import { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import styles from './Sidebar.module.scss'
-import { Badge } from '@/components/ui/Badge'
 
 interface NavItem {
   icon: string
   label: string
   href: string
-  badge?: number
+  badge?: number | string
+  section?: string
 }
 
 interface SubMenuItem {
@@ -22,11 +21,11 @@ interface SubMenuItem {
 }
 
 const mainNavItems: NavItem[] = [
-  { icon: '🏠', label: '대시보드', href: '/dashboard' },
+  { icon: '🏠', label: '대시보드', href: '/dashboard', section: '메인' },
   { icon: '📁', label: '현장 관리', href: '/projects' },
   { icon: '💰', label: '예산 가이드', href: '/quotes' },
   { icon: '📡', label: '현장 이슈', href: '/issues' },
-  { icon: '🛡️', label: '하자담보', href: '/warranty' },
+  { icon: '🛡️', label: '하자담보', href: '/warranty', section: '관리' },
   { icon: '🤖', label: 'AI 채팅', href: '/ai-chat' },
   { icon: '📒', label: 'AI 노트북', href: '/notebook' },
   { icon: '📊', label: '리포트', href: '/reports' },
@@ -60,29 +59,9 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const router = useRouter()
   const supabase = createClient()
   const [userName, setUserName] = useState('사용자')
-  const [userPlan, setUserPlan] = useState('Free')
   const [subMenuOpen, setSubMenuOpen] = useState(true)
   const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({})
   const [globalBadge, setGlobalBadge] = useState(0)
-  const [collapsed, setCollapsed] = useState(false)
-
-  // Hydration-safe: read localStorage after mount
-  useEffect(() => {
-    const saved = localStorage.getItem('sidebar-collapsed') === 'true'
-    setCollapsed(saved)
-    document.documentElement.style.setProperty(
-      '--sidebar-width',
-      saved ? '56px' : '260px'
-    )
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem('sidebar-collapsed', String(collapsed))
-    document.documentElement.style.setProperty(
-      '--sidebar-width',
-      collapsed ? '56px' : '260px'
-    )
-  }, [collapsed])
 
   // 모바일에서 페이지 이동 시 사이드바 닫기
   useEffect(() => {
@@ -100,14 +79,13 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           .single()
         if (data) {
           setUserName(data.display_name || user.email?.split('@')[0] || '사용자')
-          // subscription_plan 컬럼이 아직 DB에 없으므로 기본값 유지 (Free)
         }
       }
     }
     loadUser()
   }, [])
 
-  // 글로벌 미확인 뱃지 (분쟁 징후 + 하자담보 만료 + 변경 승인 대기)
+  // 글로벌 미확인 뱃지
   useEffect(() => {
     const loadGlobalBadge = async () => {
       try {
@@ -130,48 +108,36 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     return () => clearInterval(interval)
   }, [])
 
-  // Load badge counts for current project
   const projectMatch = pathname.match(/^\/projects\/([^/]+)/)
   const currentProjectId = projectMatch ? projectMatch[1] : null
   const isOnProjectPage = !!currentProjectId && currentProjectId !== 'new'
 
   useEffect(() => {
     if (!currentProjectId || currentProjectId === 'new') return
-
     const loadBadges = async () => {
       try {
-        // Count incomplete diagnostic items
         const { count: diagTotal } = await supabase
           .from('diagnostic_responses')
           .select('*', { count: 'exact', head: true })
           .eq('project_id', currentProjectId)
           .eq('checked', false)
-
-        // Count pending processes
         const { count: pendingProcesses } = await supabase
           .from('processes')
           .select('*', { count: 'exact', head: true })
           .eq('project_id', currentProjectId)
           .neq('status', 'completed')
-
-        // Count change orders (status 'requested' = 승인 대기)
         const { count: changeOrders } = await supabase
           .from('change_orders')
           .select('*', { count: 'exact', head: true })
           .eq('project_id', currentProjectId)
           .eq('status', 'requested')
-
         const counts: Record<string, number> = {}
         if (diagTotal && diagTotal > 0) counts['diagnostic'] = diagTotal
         if (pendingProcesses && pendingProcesses > 0) counts['process'] = pendingProcesses
         if (changeOrders && changeOrders > 0) counts['changes'] = changeOrders
-
         setBadgeCounts(counts)
-      } catch (err) {
-        // Silently fail badge counts
-      }
+      } catch { /* 조용히 실패 */ }
     }
-
     loadBadges()
   }, [currentProjectId])
 
@@ -182,10 +148,11 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   }
 
   const isActive = (href: string) => {
-    if (href === '/projects' && pathname.startsWith('/projects')) return true
-    if (href === '/quotes' && pathname.startsWith('/quotes')) return true
-    if (href === '/issues' && pathname.startsWith('/issues')) return true
-    if (href === '/warranty' && pathname.startsWith('/warranty')) return true
+    if (href === '/dashboard') return pathname === '/dashboard'
+    if (href === '/projects') return pathname.startsWith('/projects')
+    if (href === '/issues') return pathname.startsWith('/issues')
+    if (href === '/warranty') return pathname.startsWith('/warranty')
+    if (href === '/quotes') return pathname.startsWith('/quotes')
     return pathname === href
   }
 
@@ -194,136 +161,137 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     return pathname === `/projects/${currentProjectId}/${path}`
   }
 
+  const navItemClass = (active: boolean) =>
+    [
+      'flex items-center gap-2.5 px-3 py-2.5 mx-2.5 rounded-lg',
+      'text-[13px] font-medium cursor-pointer transition-all duration-150',
+      active
+        ? 'text-white bg-white/10 border-l-2 border-orange-500'
+        : 'text-white/50 hover:text-white/85 hover:bg-white/[0.06]',
+    ].join(' ')
+
+  let lastSection = ''
+
   return (
-    <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
-      {/* Logo */}
-      <div className={styles.logoSection}>
-        <div className={styles.logoRow}>
-          <Link href="/" className={styles.logo}>
-            <span className={styles.logoIcon}>✓</span>
-            {!collapsed && <span className={styles.logoText}>Check-In</span>}
-          </Link>
-          <button
-            className={styles.toggleBtn}
-            onClick={() => setCollapsed(!collapsed)}
-            title={collapsed ? '사이드바 펼치기' : '사이드바 접기'}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              {collapsed ? (
+    <aside className="w-60 flex-shrink-0 bg-navy-800 flex flex-col border-r border-white/[0.05] h-screen fixed left-0 top-0 z-50 overflow-y-auto">
+      {/* 로고 */}
+      <div className="px-5 py-[22px] text-[18px] font-black text-white border-b border-white/[0.06] flex items-center justify-between flex-shrink-0">
+        <Link href="/" className="text-white no-underline">
+          체<span className="text-orange-500">키</span>
+        </Link>
+        <span className="text-[10px] font-normal text-white/25">v2.0</span>
+      </div>
+
+      {/* 현재 프로젝트 */}
+      {isOnProjectPage && (
+        <div className="mx-2.5 my-3 bg-white/[0.06] border border-white/[0.08] rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
+          <div className="text-xs font-bold text-white">🏗 현재 현장</div>
+          <div className="text-[10px] text-white/35 mt-0.5">프로젝트 작업 중</div>
+        </div>
+      )}
+
+      {/* 메인 내비게이션 */}
+      <nav className="flex-1 py-2">
+        {mainNavItems.map((item) => {
+          const showSection = item.section && item.section !== lastSection
+          if (showSection) lastSection = item.section!
+          return (
+            <div key={item.href}>
+              {showSection && (
+                <div className="font-mono text-[9px] tracking-[0.12em] text-white/25 uppercase px-5 pt-3.5 pb-1.5">
+                  {item.section}
+                </div>
+              )}
+              <Link
+                href={item.href}
+                className={navItemClass(isActive(item.href))}
+              >
+                <span className="text-[18px] w-5 text-center flex-shrink-0">{item.icon}</span>
+                <span className="flex-1">{item.label}</span>
+                {item.href === '/projects' && globalBadge > 0 && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">
+                    {globalBadge > 99 ? '99+' : globalBadge}
+                  </span>
+                )}
+              </Link>
+
+              {/* 프로젝트 서브메뉴 */}
+              {item.href === '/projects' && isOnProjectPage && (
                 <>
-                  <line x1="3" y1="12" x2="21" y2="12"/>
-                  <line x1="3" y1="6" x2="21" y2="6"/>
-                  <line x1="3" y1="18" x2="21" y2="18"/>
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="12" x2="21" y2="12"/>
-                  <line x1="3" y1="6" x2="21" y2="6"/>
-                  <line x1="3" y1="18" x2="21" y2="18"/>
+                  <button
+                    className="flex items-center justify-between w-full px-5 py-1.5 text-[11px] font-semibold text-white/30 hover:text-white/60 transition-colors"
+                    onClick={() => setSubMenuOpen(!subMenuOpen)}
+                  >
+                    <span>현장 메뉴</span>
+                    <span className={`transition-transform duration-200 ${subMenuOpen ? '' : '-rotate-90'}`}>▾</span>
+                  </button>
+                  {subMenuOpen && (
+                    <ul className="list-none p-0 m-0 mb-1">
+                      {projectSubMenuItems.map((subItem) => (
+                        <li key={subItem.path}>
+                          <Link
+                            href={`/projects/${currentProjectId}/${subItem.path}`}
+                            className={[
+                              'flex items-center gap-2 py-[7px] pl-11 pr-3 mx-2.5 rounded-lg',
+                              'text-[12px] font-medium transition-all duration-150',
+                              isSubMenuActive(subItem.path)
+                                ? 'text-white bg-white/[0.08] border-l-2 border-orange-500'
+                                : 'text-white/40 hover:text-white/75 hover:bg-white/[0.05]',
+                            ].join(' ')}
+                          >
+                            <span className="text-sm w-4 text-center">{subItem.icon}</span>
+                            <span className="flex-1">{subItem.label}</span>
+                            {badgeCounts[subItem.path] > 0 && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">
+                                {badgeCounts[subItem.path] > 99 ? '99+' : badgeCounts[subItem.path]}
+                              </span>
+                            )}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </>
               )}
+            </div>
+          )
+        })}
+
+        {/* 하단 메뉴 */}
+        <div className="font-mono text-[9px] tracking-[0.12em] text-white/25 uppercase px-5 pt-3.5 pb-1.5">
+          계정
+        </div>
+        {bottomNavItems.map((item) => (
+          <Link key={item.href} href={item.href} className={navItemClass(isActive(item.href))}>
+            <span className="text-[18px] w-5 text-center flex-shrink-0">{item.icon}</span>
+            <span className="flex-1">{item.label}</span>
+          </Link>
+        ))}
+      </nav>
+
+      {/* 유저 섹션 */}
+      <div className="border-t border-white/[0.06] p-3 flex-shrink-0">
+        <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-white/[0.06] transition-colors">
+          <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-orange">
+            {userName.charAt(0).toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-semibold text-white truncate">{userName}</div>
+            <div className="text-[10px] text-white/35">Free Plan</div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="p-1.5 rounded-lg text-white/30 hover:bg-red-500/20 hover:text-red-400 transition-all"
+            title="로그아웃"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
             </svg>
           </button>
         </div>
-        {!collapsed && <span className={styles.tagline}>AI 인테리어 비서</span>}
       </div>
-
-      {/* Main Navigation */}
-      <nav className={styles.mainNav}>
-        <ul className={styles.navList}>
-          {mainNavItems.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className={`${styles.navItem} ${isActive(item.href) ? styles.active : ''}`}
-                title={collapsed ? item.label : undefined}
-              >
-                <span className={styles.navIcon}>{item.icon}</span>
-                {!collapsed && <span className={styles.navLabel}>{item.label}</span>}
-                {!collapsed && item.href === '/projects' && globalBadge > 0 && (
-                  <Badge count={globalBadge} size="sm" />
-                )}
-                {collapsed && <span className={styles.tooltip}>{item.label}</span>}
-              </Link>
-
-              {/* Project Submenu - Accordion */}
-              {item.href === '/projects' && isOnProjectPage && !collapsed && (
-                <>
-                  <button
-                    className={styles.accordionToggle}
-                    onClick={() => setSubMenuOpen(!subMenuOpen)}
-                  >
-                    <span className={styles.accordionLabel}>현장 메뉴</span>
-                    <span className={`${styles.accordionArrow} ${subMenuOpen ? styles.open : ''}`}>▾</span>
-                  </button>
-                  <ul className={`${styles.subMenu} ${subMenuOpen ? styles.subMenuOpen : ''}`}>
-                    {projectSubMenuItems.map((subItem) => (
-                      <li key={subItem.path}>
-                        <Link
-                          href={`/projects/${currentProjectId}/${subItem.path}`}
-                          className={`${styles.subMenuItem} ${
-                            isSubMenuActive(subItem.path) ? styles.active : ''
-                          }`}
-                        >
-                          <span className={styles.subMenuIcon}>{subItem.icon}</span>
-                          <span className={styles.subMenuLabel}>{subItem.label}</span>
-                          {badgeCounts[subItem.path] && badgeCounts[subItem.path] > 0 && (
-                            <span className={styles.badge}>
-                              {badgeCounts[subItem.path] > 99 ? '99+' : badgeCounts[subItem.path]}
-                            </span>
-                          )}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* Bottom Navigation */}
-      <nav className={styles.bottomNav}>
-        <ul className={styles.navList}>
-          {bottomNavItems.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className={`${styles.navItem} ${isActive(item.href) ? styles.active : ''}`}
-                title={collapsed ? item.label : undefined}
-              >
-                <span className={styles.navIcon}>{item.icon}</span>
-                {!collapsed && <span className={styles.navLabel}>{item.label}</span>}
-                {collapsed && <span className={styles.tooltip}>{item.label}</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        {/* User Section */}
-        <div className={styles.userSection}>
-          <div className={styles.userAvatar}>
-            {userName.charAt(0).toUpperCase()}
-          </div>
-          {!collapsed && (
-            <>
-              <div className={styles.userInfo}>
-                <span className={styles.userName}>{userName}</span>
-                <span className={styles.userPlan}>{userPlan} Plan</span>
-              </div>
-              <button onClick={handleLogout} className={styles.logoutBtn} title="로그아웃">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                  <polyline points="16 17 21 12 16 7"/>
-                  <line x1="21" y1="12" x2="9" y2="12"/>
-                </svg>
-              </button>
-            </>
-          )}
-          {collapsed && <span className={styles.tooltip}>{userName}</span>}
-        </div>
-      </nav>
     </aside>
   )
 }
