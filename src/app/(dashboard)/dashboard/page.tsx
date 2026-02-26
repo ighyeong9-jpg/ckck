@@ -167,7 +167,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2.5 mb-3.5">
               <div className="w-9 h-9 rounded-xl bg-orange-500/20 flex items-center justify-center text-lg animate-pulse-glow">🤖</div>
               <div>
-                <div className="text-sm font-bold">체키 AI 브리핑</div>
+                <div className="text-sm font-bold">체크인 AI 브리핑</div>
                 <div className="text-[10px] text-white/40 mt-0.5">자동 생성</div>
               </div>
             </div>
@@ -175,7 +175,7 @@ export default function DashboardPage() {
               {highestRisk >= 61 ? (
                 <>현재 리스크 점수가 <strong className="text-orange-500">{highestRisk}점</strong>으로 분쟁 위험 구간입니다. 즉시 증빙 패키지를 확보하고 현장 기록을 보강하세요.</>
               ) : activeProjects === 0 ? (
-                <>현재 진행 중인 현장이 없습니다. <strong className="text-orange-500">새 현장을 추가</strong>하고 체키로 관리를 시작하세요.</>
+                <>현재 진행 중인 현장이 없습니다. <strong className="text-orange-500">새 현장을 추가</strong>하고 체크인으로 관리를 시작하세요.</>
               ) : (
                 <>현재 <strong className="text-orange-500">{activeProjects}개</strong> 현장이 진행 중입니다. 리스크 점수가 양호한 상태입니다. 꾸준한 기록으로 분쟁을 예방하세요.</>
               )}
