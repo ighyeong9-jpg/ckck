@@ -1,9 +1,9 @@
 // ─── 토큰 ─────────────────────────────────────────────────
-$navy:       #1E3A5F;
-$navy-dark:  #0F2137;
-$navy-mid:   #163354;
-$surface:    rgba(255,255,255,0.05);
-$surface2:   rgba(255,255,255,0.08);
+$navy:       #4f46e5;
+$navy-dark:  #1a0533;
+$navy-mid:   #2d1254;
+$surface:    rgba(255,255,255,0.08);
+$surface2:   rgba(255,255,255,0.12);
 $accent:     #FF6B2B;
 $accent2:    #4F8EF7;
 $text:       #FFFFFF;
@@ -14,7 +14,7 @@ $max:        1120px;
 
 // ─── 공통 ─────────────────────────────────────────────────
 .page {
-  background: $navy-dark;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
   color: $text;
   font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
   overflow-x: hidden;
@@ -33,7 +33,7 @@ $max:        1120px;
 // ─── NAV ──────────────────────────────────────────────────
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(15,33,55,0.9); backdrop-filter: blur(16px);
+  background: rgba(26,5,51,0.88); backdrop-filter: blur(16px);
   border-bottom: 1px solid $border;
 }
 .navInner {
@@ -71,7 +71,7 @@ $max:        1120px;
 @media (max-width: 700px) {
   .navLinks {
     display: none; flex-direction: column; align-items: flex-start; gap: 0; position: absolute;
-    top: 64px; left: 0; right: 0; background: $navy-dark; border-bottom: 1px solid $border;
+    top: 64px; left: 0; right: 0; background: #1a0533; border-bottom: 1px solid $border;
     padding: 1rem 1.5rem 1.5rem;
     a { padding: 0.75rem 0; width: 100%; border-bottom: 1px solid $border; color: $text !important; font-size: 1rem !important; }
     &.navOpen { display: flex; }
@@ -88,9 +88,9 @@ $max:        1120px;
 .heroBg {
   position: absolute; inset: 0; z-index: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(79,142,247,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(219,39,119,0.22) 0%, transparent 70%),
     radial-gradient(ellipse 50% 40% at 80% 80%, rgba(255,107,43,0.12) 0%, transparent 60%),
-    linear-gradient(180deg, #0F2137 0%, #1E3A5F 100%);
+    linear-gradient(180deg, #1a0533 0%, #2d1254 100%);
 }
 .heroInner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
 
@@ -319,8 +319,8 @@ $max:        1120px;
 .finalCta { position: relative; padding: 8rem 1.5rem; text-align: center; overflow: hidden; }
 .finalBg {
   position: absolute; inset: 0; z-index: 0;
-  background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(255,107,43,0.15) 0%, transparent 70%),
-              linear-gradient(180deg, $navy-dark, $navy-mid);
+  background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(255,107,43,0.18) 0%, transparent 70%),
+              linear-gradient(180deg, #1a0533, #2d1254);
 }
 .finalInner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
 .finalEye { @extend .sectionEye; display: block; }
