@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Process, ProcessStatus } from '@/types/process'
 import { PROCESS_STATUS, DEFAULT_PROCESSES } from '@/types/process'
+import type { RiskPrediction } from '@/lib/ai/prediction-engine'
 import QuickActions from '@/components/ui/QuickActions'
 import { logActivity } from '@/lib/activity/logger'
 import { useToast } from '@/components/ui/Toast'
@@ -25,6 +26,8 @@ export default function ProcessPage() {
   const [editingProcess, setEditingProcess] = useState<Process | null>(null)
   const [saving, setSaving] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [prediction, setPrediction] = useState<RiskPrediction | null>(null)
+  const [predicting, setPredicting] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -182,13 +185,21 @@ export default function ProcessPage() {
         p.id === process.id ? { ...p, status: newStatus as any, progress: newProgress } : p
       ))
 
-      // 공정 완료 시 다음 공종 리스크 예측 (fire-and-forget)
+      // 공정 완료 시 다음 공종 리스크 예측
       if (newStatus === 'completed') {
+        setPredicting(true)
+        setPrediction(null)
         fetch('/api/ai/predict', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ projectId, completedProcessId: process.id }),
-        }).catch(() => { /* 예측 실패해도 UI 무관 */ })
+        })
+          .then(r => r.ok ? r.json() : null)
+          .then((data: RiskPrediction | null) => {
+            if (data && !('error' in data)) setPrediction(data)
+          })
+          .catch(() => {})
+          .finally(() => setPredicting(false))
       }
 
       // 활동 로그 (fire-and-forget)
@@ -369,6 +380,66 @@ export default function ProcessPage() {
             </div>
           </div>
         </section>
+
+        {/* 다음 공종 리스크 예측 카드 */}
+        {(predicting || prediction) && (
+          <section className={styles.predictionSection}>
+            {predicting ? (
+              <div className={styles.predictionLoading}>
+                <div className={styles.predictionSpinner} />
+                <span>다음 공종 리스크 예측 중...</span>
+              </div>
+            ) : prediction && (
+              <div className={`${styles.predictionCard} ${styles[`risk${prediction.riskLevel}`]}`}>
+                <div className={styles.predictionHeader}>
+                  <div className={styles.predictionTitle}>
+                    <span className={styles.predictionIcon}>🔮</span>
+                    <div>
+                      <h3>다음 공종 리스크 예측</h3>
+                      <p className={styles.predictionNext}>다음 공종: <strong>{prediction.nextProcess}</strong></p>
+                    </div>
+                  </div>
+                  <div className={styles.predictionBadge}>
+                    <span className={styles.riskLabel}>{prediction.riskLevel}</span>
+                    <span className={styles.riskScore}>{prediction.riskScore}점</span>
+                  </div>
+                  <button className={styles.predictionClose} onClick={() => setPrediction(null)}>✕</button>
+                </div>
+
+                {prediction.reasons.length > 0 && (
+                  <div className={styles.predictionBlock}>
+                    <h4>📋 리스크 근거</h4>
+                    <ul>
+                      {prediction.reasons.map((r, i) => <li key={i}>{r}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {prediction.suggestions.length > 0 && (
+                  <div className={styles.predictionBlock}>
+                    <h4>💡 대응 방안</h4>
+                    <ul>
+                      {prediction.suggestions.map((s, i) => <li key={i}>{s}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {prediction.warnings.length > 0 && (
+                  <div className={`${styles.predictionBlock} ${styles.predictionWarning}`}>
+                    <h4>⚠️ 주의사항</h4>
+                    <ul>
+                      {prediction.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                <div className={styles.predictionFooter}>
+                  AI 분석 ({prediction.model === 'gemini' ? 'Gemini' : 'Claude'})
+                </div>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Progress Encouragement */}
         {processes.length > 0 && (() => {
