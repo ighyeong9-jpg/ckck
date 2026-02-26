@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { enterDemoMode } from '@/lib/demo/demoData'
 // import { createClient } from '@/lib/supabase/client'  // ── 인증 꺼짐
 
 export default function LoginPage() {
@@ -167,6 +168,20 @@ export default function LoginPage() {
             <path fillRule="evenodd" clipRule="evenodd" d="M9 1.5C4.858 1.5 1.5 4.134 1.5 7.367c0 2.07 1.373 3.887 3.44 4.908l-.875 3.25a.281.281 0 0 0 .43.305L8.12 13.54c.288.04.584.06.88.06 4.142 0 7.5-2.634 7.5-5.867C16.5 4.134 13.142 1.5 9 1.5z" fill="currentColor"/>
           </svg>
           카카오로 시작하기
+        </button>
+
+        {/* 데모 버튼 */}
+        <button
+          type="button"
+          onClick={() => { enterDemoMode(); router.push('/projects?demo=true') }}
+          className="w-full h-10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 hover:opacity-80"
+          style={{
+            color: 'rgba(255,255,255,0.70)',
+            backgroundColor: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.12)',
+          }}
+        >
+          🎮 데모 체험 (가입 없이)
         </button>
 
         <p className="text-center text-xs mt-5" style={{ color: 'rgba(255,255,255,0.30)' }}>

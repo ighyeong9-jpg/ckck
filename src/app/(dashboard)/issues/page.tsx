@@ -36,6 +36,18 @@ export default function IssuesPage() {
 
   useEffect(() => {
     loadIssues()
+
+    // Realtime: 이슈 변경 즉시 반영
+    const channel = supabase
+      .channel('issues-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'site_issues' },
+        () => { loadIssues() }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
   }, [loadIssues])
 
   const handleClassified = useCallback((issueId: string | null, classification: IssueClassifyResult) => {

@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import PhotoGallery from '@/components/gallery/PhotoGallery'
 import BeforeAfterSlider from '@/components/gallery/BeforeAfterSlider'
+import DrawingCanvas, { type Marker } from '@/components/gallery/DrawingCanvas'
+import AutoCaptureButton from '@/components/AutoCaptureButton'
 import type { GalleryPhoto } from '@/types/photoGallery'
 import QuickActions from '@/components/ui/QuickActions'
 import { useToast } from '@/components/ui/Toast'
@@ -23,9 +25,29 @@ export default function GalleryPage() {
   const [comparePhotos, setComparePhotos] = useState<{ before: string; after: string }>({ before: '', after: '' })
   const [checkingPhotoId, setCheckingPhotoId] = useState<string | null>(null)
   const [checkResult, setCheckResult] = useState<{ photoId: string; result: any } | null>(null)
+  const [markingPhoto, setMarkingPhoto] = useState<GalleryPhoto | null>(null)
 
   useEffect(() => {
     loadPhotos()
+
+    // Realtime: 새 파일 업로드 시 갤러리 즉시 반영
+    const channel = supabase
+      .channel(`gallery-${projectId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'files', filter: `project_id=eq.${projectId}` },
+        (payload) => {
+          const f = payload.new as { id: string; file_url: string; file_name: string; file_type: string; created_at: string }
+          if (!f.file_type?.startsWith('image/') && !f.file_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) return
+          setPhotos(prev => {
+            if (prev.some(p => p.id === f.id)) return prev
+            return [{ id: f.id, url: f.file_url, file_name: f.file_name || 'photo', category: '', description: null, uploaded_at: f.created_at }, ...prev]
+          })
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
   }, [projectId])
 
   const loadPhotos = async () => {
@@ -171,6 +193,14 @@ export default function GalleryPage() {
               비교
             </button>
           </div>
+          <AutoCaptureButton
+            projectId={projectId}
+            onResult={result => {
+              toast[result.goNoGo === 'GO' ? 'success' : result.goNoGo === 'NO-GO' ? 'error' : 'warning'](
+                `${result.goNoGo === 'GO' ? '✅' : result.goNoGo === 'NO-GO' ? '❌' : '⚠️'} ${result.detectedProcess} — ${result.goNoGo}`
+              )
+            }}
+          />
           <label className={styles.uploadBtn}>
             <input
               type="file"
@@ -217,7 +247,32 @@ export default function GalleryPage() {
 
         {/* Gallery View */}
         {viewMode === 'gallery' && (
-          <PhotoGallery photos={photos} onAutoCheck={handleAutoCheck} checkingPhotoId={checkingPhotoId} />
+          <>
+            <PhotoGallery photos={photos} onAutoCheck={handleAutoCheck} checkingPhotoId={checkingPhotoId} />
+            {/* 도면 마킹 버튼 — 사진 있을 때만 표시 */}
+            {photos.length > 0 && (
+              <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 13, color: '#6b7280', alignSelf: 'center' }}>도면 마킹:</span>
+                {photos.slice(0, 6).map(photo => (
+                  <button
+                    key={photo.id}
+                    type="button"
+                    onClick={() => setMarkingPhoto(photo)}
+                    style={{
+                      padding: '5px 10px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: 8,
+                      background: '#fff',
+                      fontSize: 12,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🖊 {photo.file_name.length > 12 ? photo.file_name.slice(0, 12) + '…' : photo.file_name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Compare View */}
@@ -267,6 +322,26 @@ export default function GalleryPage() {
           </div>
         )}
       </main>
+
+      {/* 도면 마킹 모달 */}
+      {markingPhoto && (
+        <DrawingCanvas
+          imageUrl={markingPhoto.url}
+          onSave={async (markers: Marker[]) => {
+            try {
+              await supabase
+                .from('files')
+                .update({ ai_check_result: { markers } })
+                .eq('id', markingPhoto.id)
+              toast.success(`마킹 ${markers.length}개 저장됐습니다.`)
+            } catch {
+              toast.error('마킹 저장 실패')
+            }
+            setMarkingPhoto(null)
+          }}
+          onClose={() => setMarkingPhoto(null)}
+        />
+      )}
     </div>
   )
 }

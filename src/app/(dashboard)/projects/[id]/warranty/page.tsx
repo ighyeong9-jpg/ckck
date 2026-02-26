@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/ui/Toast'
 import type { Project, WarrantyRecord } from '@/types/project'
+import { exportWarrantyClaimPDF, type WarrantyClaimData } from '@/lib/export/pdfExporter'
 import styles from './page.module.scss'
 
 // 공종별 하자담보 기간 (건산법 시행령 별표4)
@@ -61,6 +62,7 @@ export default function WarrantyPage() {
   const [warranties, setWarranties] = useState<WarrantyRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [completing, setCompleting] = useState(false)
+  const [exportingPdf, setExportingPdf] = useState(false)
 
   const loadData = useCallback(async () => {
     try {
@@ -146,6 +148,50 @@ export default function WarrantyPage() {
       toast.error(msg)
     } finally {
       setCompleting(false)
+    }
+  }
+
+  const handleExportClaimPDF = async () => {
+    if (!project) return
+    setExportingPdf(true)
+    try {
+      const expiredOrSoon = warranties.filter(w => w.status !== 'active')
+      const defects = expiredOrSoon.map(w => ({
+        location: w.trade_label,
+        description: `${w.trade_label} 하자담보 기간(${w.duration_years}년) ${w.status === 'expired' ? '만료됨' : '만료 임박'}`,
+        discoveryDate: new Date().toISOString().split('T')[0],
+      }))
+
+      if (defects.length === 0) {
+        // 하자 없으면 전체 공종 목록으로 생성
+        warranties.forEach(w => {
+          defects.push({
+            location: w.trade_label,
+            description: `${w.trade_label} — 담보기간 ${w.start_date} ~ ${w.end_date}`,
+            discoveryDate: w.start_date,
+          })
+        })
+      }
+
+      const deadline = new Date()
+      deadline.setDate(deadline.getDate() + 14)
+
+      const claimData: WarrantyClaimData = {
+        projectName: project.name,
+        contractorName: (project as Project & { client_name?: string }).client_name || '시공사',
+        claimantName: '현장 소장',
+        claimantContact: '-',
+        completionDate: (project as Project & { actual_end_date?: string }).actual_end_date || project.end_date || '-',
+        defects,
+        requestDeadline: deadline.toISOString().split('T')[0],
+      }
+      exportWarrantyClaimPDF(claimData)
+      toast.success('내용증명 PDF가 다운로드됐습니다.')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '다운로드 실패'
+      toast.error(msg)
+    } finally {
+      setExportingPdf(false)
     }
   }
 
@@ -293,8 +339,8 @@ export default function WarrantyPage() {
       {/* 내보내기 */}
       {warranties.length > 0 && (
         <div className={styles.exportSection}>
-          <button type="button" className={styles.exportBtn} onClick={() => toast.info('PDF 내보내기는 곧 지원 예정입니다.')}>
-            📄 하자담보 현황 내보내기 (예정)
+          <button type="button" className={styles.exportBtn} onClick={handleExportClaimPDF} disabled={exportingPdf}>
+            {exportingPdf ? '생성 중...' : '📄 내용증명 다운로드'}
           </button>
         </div>
       )}

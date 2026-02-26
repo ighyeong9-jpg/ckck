@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Project, ProjectStatus, CreateProjectInput } from '@/types/project'
 import QuickStart from '@/components/onboarding/QuickStart'
 import { DEFAULT_PROCESSES } from '@/types/process'
 import { logActivity } from '@/lib/activity/logger'
 import { useToast } from '@/components/ui/Toast'
+import { exitDemoMode } from '@/lib/demo/demoData'
 import styles from './page.module.scss'
 
 const INDUSTRY_ICONS: Record<string, string> = {
@@ -19,6 +21,8 @@ const INDUSTRY_ICONS: Record<string, string> = {
 export default function ProjectsPage() {
   const supabase = createClient()
   const toast = useToast()
+  const searchParams = useSearchParams()
+  const isDemo = searchParams.get('demo') === 'true'
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
@@ -235,6 +239,28 @@ export default function ProjectsPage() {
 
   return (
     <div className={styles.container}>
+      {/* 데모 모드 배너 */}
+      {isDemo && (
+        <div style={{
+          background: 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)',
+          color: '#fff',
+          padding: '10px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: '13px',
+          fontWeight: 600,
+          gap: 12,
+        }}>
+          <span>🎮 데모 모드입니다. 데이터는 저장되지 않습니다.</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Link href="/login" style={{ color: '#fff', textDecoration: 'underline' }}
+              onClick={() => exitDemoMode()}>
+              회원가입하기
+            </Link>
+          </div>
+        </div>
+      )}
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div>

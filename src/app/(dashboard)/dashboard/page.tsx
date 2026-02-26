@@ -100,10 +100,13 @@ export default function DashboardPage() {
     : 0
 
   useEffect(() => {
+    let userId: string | null = null
+
     const load = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
+        userId = user.id
 
         const { data: settings } = await supabase
           .from('user_settings')
@@ -130,6 +133,18 @@ export default function DashboardPage() {
       }
     }
     load()
+
+    // Realtime: 프로젝트 변경 시 대시보드 자동 갱신
+    const channel = supabase
+      .channel('dashboard-projects')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'projects' },
+        () => { load() }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
   }, [])
 
   const riskColor =

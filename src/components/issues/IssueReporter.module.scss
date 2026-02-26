@@ -110,3 +110,40 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+.textareaWrap {
+  position: relative;
+  display: flex;
+}
+
+.micBtn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: #f3f4f6;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  z-index: 1;
+
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+
+.micRecording {
+  background: #fee2e2;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+}
