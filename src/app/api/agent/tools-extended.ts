@@ -1602,7 +1602,7 @@ export async function paymentRequest(params: { projectId: string }): Promise<Too
       `정산을 요청하려면:\n` +
       `1. 작업 완료 사진을 업로드하세요\n` +
       `2. 체크리스트를 완료하세요\n` +
-      `3. 체키가 자동으로 정산 근거를 생성합니다\n\n` +
+      `3. 체크인가 자동으로 정산 근거를 생성합니다\n\n` +
       `작업 완료 기록 + 사진 = 정산의 객관적 근거`,
   }
 }

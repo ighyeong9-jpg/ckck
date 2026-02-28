@@ -91,7 +91,7 @@ const PAGE_SUGGESTIONS: Record<string, SuggestionChip[]> = {
   ],
 }
 
-// 시간대별 체키 인사말
+// 시간대별 체크인 인사말
 function getChekiGreeting(): string {
   const hour = new Date().getHours()
   const greetings = [
@@ -113,7 +113,7 @@ export default function AgentChat() {
   const toast = useToast()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'ai', content: `${getChekiGreeting()}\n체키입니다 🤖 무엇을 도와드릴까요?\n\n인테리어는 물론 무엇이든 물어보세요!\n• "카페 20평 견적 알려줘"\n• "리스크 분석해줘"\n• 일반 질문도 OK!` },
+    { role: 'ai', content: `${getChekiGreeting()}\n체크인입니다 🤖 무엇을 도와드릴까요?\n\n인테리어는 물론 무엇이든 물어보세요!\n• "카페 20평 견적 알려줘"\n• "리스크 분석해줘"\n• 일반 질문도 OK!` },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -179,7 +179,7 @@ export default function AgentChat() {
     }
   }, [open])
 
-  // Ctrl+K 단축키로 체키 열기/닫기 (deps 없이 ref로 처리)
+  // Ctrl+K 단축키로 체크인 열기/닫기 (deps 없이 ref로 처리)
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -425,8 +425,8 @@ export default function AgentChat() {
       <button
         className={styles.floatingBtn}
         onMouseDown={handleDragStart}
-        aria-label="AI 비서 체키"
-        title="체키 AI 비서 (Ctrl+K) — 드래그로 이동"
+        aria-label="AI 비서 체크인"
+        title="체크인 AI 비서 (Ctrl+K) — 드래그로 이동"
         style={{ bottom: btnPos.bottom, right: btnPos.right }}
       >
         {open ? '✕' : '🤖'}
@@ -442,7 +442,7 @@ export default function AgentChat() {
           <div className={styles.header}>
             <div className={styles.headerTitle}>
               <span className={styles.headerIcon}>🤖</span>
-              체키 AI 비서
+              체크인 AI 비서
             </div>
             <button className={styles.closeBtn} onClick={() => setOpen(false)}>✕</button>
           </div>
@@ -471,7 +471,7 @@ export default function AgentChat() {
             })}
             {loading && (
               <div className={styles.loading}>
-                체키가 분석 중
+                체크인가 분석 중
                 <span className={styles.dots}>
                   <span /><span /><span />
                 </span>
@@ -526,7 +526,7 @@ export default function AgentChat() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={imagePreview ? "이미지에 대해 질문하세요..." : "체키에게 물어보세요..."}
+              placeholder={imagePreview ? "이미지에 대해 질문하세요..." : "체크인에게 물어보세요..."}
               disabled={loading}
             />
             <button

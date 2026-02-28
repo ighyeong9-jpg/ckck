@@ -1,5 +1,5 @@
 /**
- * pdfExporter.ts — 체키 PDF 출력 유틸리티
+ * pdfExporter.ts — 체크인 PDF 출력 유틸리티
  *
  * 출력 가능 문서 4종:
  * 1. 안전 확인 보고서
@@ -12,7 +12,7 @@
 
 import { jsPDF } from 'jspdf'
 
-const WATERMARK = '체키 (Check-In) — 기록의 편'
+const WATERMARK = '체크인 (Check-In) — 기록의 편'
 const TODAY = () => new Date().toLocaleDateString('ko-KR', {
   year: 'numeric', month: 'long', day: 'numeric',
 })
@@ -29,7 +29,7 @@ function addHeader(doc: jsPDF, title: string) {
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(13)
   doc.setFont('helvetica', 'bold')
-  doc.text('체키 CHECK-IN', 14, 10)
+  doc.text('체크인 CHECK-IN', 14, 10)
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
   doc.text(title, 14, 16)
@@ -338,7 +338,7 @@ export function exportDisputeSummaryPDF(data: DisputeSummaryData): void {
   doc.setFontSize(7.5)
   doc.setTextColor(150, 150, 150)
   doc.setFont('helvetica', 'italic')
-  doc.text('⚠ 이 요약서는 체키 AI가 생성한 참고용 문서입니다. 법적 조언은 전문 변호사에게 확인하세요.', 14, y)
+  doc.text('⚠ 이 요약서는 체크인 AI가 생성한 참고용 문서입니다. 법적 조언은 전문 변호사에게 확인하세요.', 14, y)
 
   addFooter(doc)
   doc.save(`기록 관리대응요약_${data.projectName}_${new Date().toISOString().split('T')[0]}.pdf`)

@@ -59,7 +59,7 @@ const competitorAdvantages = [
   {
     icon: '🏗',
     title: '건설 공종 특화 DB',
-    desc: '기존 안전관리 솔루션은 전부 범용입니다. 체키만 건설 현장 전용 체크리스트와 공종별 DB를 제공합니다.',
+    desc: '기존 안전관리 솔루션은 전부 범용입니다. 체크인만 건설 현장 전용 체크리스트와 공종별 DB를 제공합니다.',
     tag: '업계 유일',
   },
   {
@@ -95,7 +95,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
             <h1 className="text-hero text-white mb-6">
               공사 기록 관리,<br />이제{' '}
               <em className="not-italic text-orange-500" style={{ textShadow: '0 0 40px rgba(232,101,26,0.5)' }}>
-                체키
+                체크인
               </em>가<br />막습니다
             </h1>
             <p className="text-[16px] text-white/60 max-w-[480px] leading-[1.8] mb-10">
@@ -198,7 +198,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
       <section className="bg-gray-50 py-24 px-8">
         <div className="max-w-[1280px] mx-auto">
           <div className="text-center mb-14">
-            <div className="inline-block text-[11px] font-bold tracking-[0.06em] text-orange-500 bg-orange-100 px-3.5 py-1.5 rounded-full mb-4">체키가 해결합니다</div>
+            <div className="inline-block text-[11px] font-bold tracking-[0.06em] text-orange-500 bg-orange-100 px-3.5 py-1.5 rounded-full mb-4">체크인가 해결합니다</div>
             <h2 className="text-heading text-navy-800 mb-3">4가지 핵심 기능</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -224,7 +224,7 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
               자동 적용 법령
             </div>
             <h2 className="text-heading text-white mb-3">12개 법령 자동 적용</h2>
-            <p className="text-base text-white/50 max-w-[480px] mx-auto">건설·인테리어 관련 핵심 법령을 체키가 자동으로 적용합니다.</p>
+            <p className="text-base text-white/50 max-w-[480px] mx-auto">건설·인테리어 관련 핵심 법령을 체크인가 자동으로 적용합니다.</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {lawItems.map((law, i) => (
@@ -277,9 +277,9 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
       <section className="bg-gray-50 py-24 px-8">
         <div className="max-w-[1280px] mx-auto">
           <div className="text-center mb-14">
-            <div className="inline-block text-[11px] font-bold tracking-[0.06em] text-orange-500 bg-orange-100 px-3.5 py-1.5 rounded-full mb-4">왜 체키인가요?</div>
-            <h2 className="text-heading text-navy-800 mb-3">체키만의 차별점</h2>
-            <p className="text-sm text-gray-400">기존 솔루션에 없던 3가지, 체키가 처음 만들었습니다</p>
+            <div className="inline-block text-[11px] font-bold tracking-[0.06em] text-orange-500 bg-orange-100 px-3.5 py-1.5 rounded-full mb-4">왜 체크인인가요?</div>
+            <h2 className="text-heading text-navy-800 mb-3">체크인만의 차별점</h2>
+            <p className="text-sm text-gray-400">기존 솔루션에 없던 3가지, 체크인가 처음 만들었습니다</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {competitorAdvantages.map((adv, i) => (

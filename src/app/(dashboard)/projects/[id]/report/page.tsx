@@ -320,7 +320,7 @@ export default function ReportPage() {
               cursor: 'pointer', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
             }}
             onClick={() => {
-              const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+              const btn = document.querySelector('[aria-label="AI 비서 체크인"]') as HTMLButtonElement
               if (btn) btn.click()
             }}
           >

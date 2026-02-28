@@ -49,7 +49,7 @@ export default function AIFeatures() {
             <span className={styles.accent}>AI 비서 4종</span>
           </h2>
           <p className={styles.subtitle}>
-            각각 별도 앱이 아닙니다. 체키 하나로 전부 됩니다.
+            각각 별도 앱이 아닙니다. 체크인 하나로 전부 됩니다.
           </p>
         </div>
 

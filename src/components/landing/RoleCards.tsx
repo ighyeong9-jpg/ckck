@@ -90,7 +90,7 @@ export default function RoleCards() {
             </div>
             <div className={styles.arrowDown}>↓</div>
             <div className={styles.solutionBubble}>
-              <span className={styles.solveLabel}>체키의 답변</span>
+              <span className={styles.solveLabel}>체크인의 답변</span>
               <ul className={styles.featureList}>
                 {activeRole.features.map(f => (
                   <li key={f}>

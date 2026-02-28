@@ -25,7 +25,7 @@ const SDK_INTEGRITY = 'sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0
 
 export default function KakaoShare({
   title,
-  description = '체키로 현장을 안전하게 관리하고 있어요.',
+  description = '체크인로 현장을 안전하게 관리하고 있어요.',
   imageUrl,
   linkUrl,
   buttonText = '카카오톡으로 공유',
@@ -108,7 +108,7 @@ export default function KakaoShare({
       const ogImage = imageUrl ?? `${appUrl}/og-image.png`
 
       const buttons: Array<{ title: string; link: { mobileWebUrl: string; webUrl: string } }> = [
-        { title: '체키에서 확인하기', link: { mobileWebUrl: url, webUrl: url } },
+        { title: '체크인에서 확인하기', link: { mobileWebUrl: url, webUrl: url } },
       ]
 
       extraButtons.slice(0, 1).forEach((btn) => {

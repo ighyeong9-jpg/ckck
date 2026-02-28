@@ -1,5 +1,5 @@
 /**
- * GET  /api/ai/proactive  — 체키 프로액티브 브리핑 (사용자 요청)
+ * GET  /api/ai/proactive  — 체크인 프로액티브 브리핑 (사용자 요청)
  * POST /api/ai/proactive  — Vercel Cron 트리거 (CRON_SECRET 인증)
  *
  * 5가지 트리거를 병렬 체크:
@@ -48,7 +48,7 @@ async function generateAIBriefing(
       .map(n => `[${n.severity}] ${n.projectName}: ${n.title} — ${n.message}`)
       .join('\n')
 
-    const prompt = `당신은 체키, 인테리어/건설 현장 AI 비서입니다.
+    const prompt = `당신은 체크인, 인테리어/건설 현장 AI 비서입니다.
 ${userName}님에게 오늘 아침 브리핑을 한국어로 3~5문장으로 작성하세요.
 친근하고 전문적인 어조로, 구체적인 행동을 제안하세요.
 

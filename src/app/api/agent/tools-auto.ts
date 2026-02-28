@@ -1,6 +1,6 @@
 /**
  * 자동화 도구 모음 - 자동견적, AI 디자인, AI 도면, 자동공정표, 자동보고서, 자동법규체크
- * Check-In 체키의 자동 실행 시스템
+ * Check-In 체크인의 자동 실행 시스템
  */
 
 import { createClient } from '@/lib/supabase/server'

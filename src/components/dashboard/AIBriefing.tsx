@@ -1,12 +1,12 @@
 'use client'
 
 /**
- * AIBriefing.tsx — 앱 진입 시 체키 AI 브리핑
+ * AIBriefing.tsx — 앱 진입 시 체크인 AI 브리핑
  *
- * 사용자가 앱을 열면 체키가 먼저 오늘 상황을 브리핑한다.
+ * 사용자가 앱을 열면 체크인가 먼저 오늘 상황을 브리핑한다.
  * 알림이 없으면 표시하지 않음.
  *
- * 체키 AI 비서 원칙:
+ * 체크인 AI 비서 원칙:
  * 물어보지 않아도 알아서 감지한다. 먼저 말을 건다.
  */
 
@@ -84,7 +84,7 @@ export default function AIBriefing() {
         <div className={styles.headerLeft}>
           <span className={styles.botIcon}>🤖</span>
           <div className={styles.headerText}>
-            <span className={styles.title}>체키 브리핑</span>
+            <span className={styles.title}>체크인 브리핑</span>
             <span className={styles.subtitle}>
               {data.criticalCount > 0 && (
                 <span className={styles.badge} style={{ background: '#FF3B5C' }}>

@@ -103,7 +103,7 @@ export const FEATURE_SETS: FeatureSet[] = [
       { name: '안전보건계획서', desc: '법정 서류 자동 생성 및 이력 관리', priority: '중요', icon: '📄', href: '/features/safety-plan', slug: 'safety-plan' },
       { name: '감리 점검 연동', desc: '감리자 점검 결과 연동 및 조치 확인', priority: '중요', icon: '🔗', href: '/features/inspection-link', slug: 'inspection-link' },
       { name: '기록 보관 패키지', desc: '사진+서명+로그 PDF 일괄 출력', priority: '일반', icon: '📁', href: '/features/dispute-package', slug: 'dispute-package' },
-      { name: 'AI 법규 비서(체키)', desc: '법규 질문 시 원문 인용 답변', priority: '일반', icon: '🤖', href: '/features/ai-legal-assistant', slug: 'ai-legal-assistant' },
+      { name: 'AI 법규 비서(체크인)', desc: '법규 질문 시 원문 인용 답변', priority: '일반', icon: '🤖', href: '/features/ai-legal-assistant', slug: 'ai-legal-assistant' },
     ],
   },
 ]

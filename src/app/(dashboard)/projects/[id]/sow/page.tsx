@@ -342,7 +342,7 @@ export default function WorkOrderPage() {
             className={styles.addBtn}
             style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }}
             onClick={() => {
-              const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+              const btn = document.querySelector('[aria-label="AI 비서 체크인"]') as HTMLButtonElement
               if (btn) btn.click()
             }}
           >

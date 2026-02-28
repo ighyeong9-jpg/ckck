@@ -21,9 +21,9 @@ interface ContractorBadgeProps {
 }
 
 const BADGE_CONFIG = {
-  gold:   { icon: '🥇', label: '체키 Gold 인증 업체',   color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',   borderColor: 'rgba(245,158,11,0.4)' },
-  silver: { icon: '🥈', label: '체키 Silver 인증 업체', color: '#6B7280', bg: 'rgba(107,114,128,0.1)', borderColor: 'rgba(107,114,128,0.4)' },
-  bronze: { icon: '🥉', label: '체키 Bronze 인증 업체', color: '#92400E', bg: 'rgba(146,64,14,0.08)',  borderColor: 'rgba(146,64,14,0.35)' },
+  gold:   { icon: '🥇', label: '체크인 Gold 인증 업체',   color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',   borderColor: 'rgba(245,158,11,0.4)' },
+  silver: { icon: '🥈', label: '체크인 Silver 인증 업체', color: '#6B7280', bg: 'rgba(107,114,128,0.1)', borderColor: 'rgba(107,114,128,0.4)' },
+  bronze: { icon: '🥉', label: '체크인 Bronze 인증 업체', color: '#92400E', bg: 'rgba(146,64,14,0.08)',  borderColor: 'rgba(146,64,14,0.35)' },
   none:   { icon: '',   label: '',                       color: '#9CA3AF', bg: 'transparent',            borderColor: 'transparent' },
 }
 
@@ -112,7 +112,7 @@ export default function ContractorBadge({ userId, showDetail = false, size = 'md
     if (!showDetail) return null
     return (
       <div className={`${styles.progressBox} ${styles[size]}`}>
-        <p className={styles.progressTitle}>체키 인증 업체 조건</p>
+        <p className={styles.progressTitle}>체크인 인증 업체 조건</p>
         {(Object.keys(BADGE_CONDITIONS) as BadgeLevel[]).filter(k => k !== 'none').map(level => (
           <div key={level} className={styles.conditionRow}>
             <span>{BADGE_CONFIG[level].icon}</span>

@@ -26,6 +26,7 @@
     "sass": "^1.97.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/node": "20.10.5",
     "@types/react": "18.2.45",
     "@typescript-eslint/eslint-plugin": "^8.56.1",

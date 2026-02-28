@@ -71,7 +71,7 @@ export default function HeroSection() {
               <span className={styles.previewDot} style={{ background: '#ef4444' }} />
               <span className={styles.previewDot} style={{ background: '#f59e0b' }} />
               <span className={styles.previewDot} style={{ background: '#10b981' }} />
-              <span className={styles.previewTitle}>체키 — 현장 체크</span>
+              <span className={styles.previewTitle}>체크인 — 현장 체크</span>
             </div>
 
             {/* 가상 사진 업로드 영역 */}

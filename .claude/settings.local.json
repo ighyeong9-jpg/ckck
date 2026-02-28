@@ -5,7 +5,10 @@
       "Bash(netstat:*)",
       "Bash(src/app/api/ai/check/route.ts:*)",
       "Bash(test:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(taskkill:*)"
     ]
   }
 }

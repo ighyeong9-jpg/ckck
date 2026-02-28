@@ -345,8 +345,8 @@ function answerGeneralQuestion(message: string, industry: string, area: number):
         `4. 📸 시공 기록 남기기\n` +
         `  • 공사 전/중/후 사진 촬영\n` +
         `  • 변경 사항은 문서로 남기기\n` +
-        `  • 체키가 이 모든 걸 자동으로 해드립니다!\n\n` +
-        `💡 체키로 프로젝트를 관리하면 이 모든 과정이 자동 기록됩니다.`,
+        `  • 체크인가 이 모든 걸 자동으로 해드립니다!\n\n` +
+        `💡 체크인로 프로젝트를 관리하면 이 모든 과정이 자동 기록됩니다.`,
     }
   }
 
@@ -367,7 +367,7 @@ function answerGeneralQuestion(message: string, industry: string, area: number):
         `  • 영업신고/허가: 업종별 관할 관청\n` +
         `  • 간판 허가: 구청 옥외광고물 신고\n` +
         `  • 소방시설 완비확인원: 영업허가 시 필요\n\n` +
-        `⚠️ 업종과 면적에 따라 요건이 다릅니다.\n체키가 업종별 체크리스트로 자동 확인해드립니다.`,
+        `⚠️ 업종과 면적에 따라 요건이 다릅니다.\n체크인가 업종별 체크리스트로 자동 확인해드립니다.`,
     }
   }
 
@@ -391,7 +391,7 @@ function answerGeneralQuestion(message: string, industry: string, area: number):
         `1️⃣1️⃣ 간판/외부 → 간판, 출입문\n` +
         `1️⃣2️⃣ 준공 점검 → 소방, 전기, 최종 클리닝\n\n` +
         `⚠️ 핵심: 배관→전기→방수→목공→도배→가구 순서!\n` +
-        `체키가 공정 순서를 자동으로 관리해드립니다.`,
+        `체크인가 공정 순서를 자동으로 관리해드립니다.`,
     }
   }
 
@@ -413,7 +413,7 @@ function answerGeneralQuestion(message: string, industry: string, area: number):
         `  2. 계약서 (하자보수 기간 확인)\n` +
         `  3. 시공 완료 확인서\n` +
         `  4. 하자보수 요청 내용통지\n\n` +
-        `💡 체키를 사용하면:\n` +
+        `💡 체크인를 사용하면:\n` +
         `  • 모든 사진에 SHA-256 해시 자동 생성\n` +
         `  • 타임스탬프 위변조 불가\n` +
         `  • 공종별 작업 완료 기록 = 책임 소재 시공 기록\n` +
@@ -438,7 +438,7 @@ function answerGeneralQuestion(message: string, industry: string, area: number):
         `  • 실크 벽지: 일반적, 롤당 ₩15,000~30,000\n` +
         `  • 합지 벽지: 저가, 롤당 ₩8,000~15,000\n` +
         `  • 페인트(친환경): 리터당 ₩15,000~40,000\n\n` +
-        `💡 체키로 프로젝트를 관리하면 자재 입출고, 단가 비교가 자동으로 됩니다.`,
+        `💡 체크인로 프로젝트를 관리하면 자재 입출고, 단가 비교가 자동으로 됩니다.`,
     }
   }
 
@@ -536,7 +536,7 @@ export async function routeMessage(
       success: true,
       message: `🔄 변경 관리 안내\n\n` +
         `인테리어 공사 중 변경은 기록 관리의 가장 큰 원인입니다.\n\n` +
-        `체키의 변경 관리 기능:\n` +
+        `체크인의 변경 관리 기능:\n` +
         `  • 변경 요청 자동 기록 (누가, 언제, 뭘 변경)\n` +
         `  • 추가 비용 자동 산출\n` +
         `  • 양측 서명으로 합의 확인\n` +
@@ -552,7 +552,7 @@ export async function routeMessage(
       tool: 'general_answer',
       success: true,
       message: `📊 리포트 기능 안내\n\n` +
-        `체키의 종합 리포트에는 다음이 포함됩니다:\n` +
+        `체크인의 종합 리포트에는 다음이 포함됩니다:\n` +
         `  • 프로젝트 개요 및 진행률\n` +
         `  • 리스크 분석 결과\n` +
         `  • 견적/비용 분석\n` +
@@ -595,7 +595,7 @@ export async function routeMessage(
       tool: 'general_answer',
       success: true,
       message: `📦 시공 기록 패키징 안내\n\n` +
-        `체키는 모든 시공 기록를 위변조 불가능하게 보관합니다:\n\n` +
+        `체크인는 모든 시공 기록를 위변조 불가능하게 보관합니다:\n\n` +
         `🔐 SHA-256 해시\n` +
         `  • 모든 파일에 고유 해시값 생성\n` +
         `  • 1비트라도 변경되면 해시가 달라짐\n\n` +
@@ -617,7 +617,7 @@ export async function routeMessage(
       tool: 'general_answer',
       success: true,
       message: `📝 전자서명/합의 안내\n\n` +
-        `체키의 3자 합의 시스템:\n` +
+        `체크인의 3자 합의 시스템:\n` +
         `  👤 발주자 (고객)\n` +
         `  🏗️ 작업자 (인테리어 업체)\n` +
         `  📊 감리자 (제3자)\n\n` +
@@ -698,7 +698,7 @@ export async function routeMessage(
   }
 
   // 인사/현황
-  if (matchKeywords(msg, ['안녕', '현황', '상태', '요약', '도움', 'hello', 'hi', '뭐', '체키'])) {
+  if (matchKeywords(msg, ['안녕', '현황', '상태', '요약', '도움', 'hello', 'hi', '뭐', '체크인'])) {
     return getProjectSummary(ctx || { project: null, diagnosticCount: 0, quoteItems: [], costAnalysis: null, changeOrders: [], evidenceFiles: [], agreements: [], reports: [], processes: [], workforce: [], materials: [] })
   }
 
@@ -720,7 +720,7 @@ async function fallbackToGemini(message: string): Promise<ToolResult> {
     return {
       tool: 'general_answer',
       success: true,
-      message: `🤖 안녕하세요! 체키입니다.\n\n` +
+      message: `🤖 안녕하세요! 체크인입니다.\n\n` +
         `무엇이든 물어보세요! 인테리어뿐만 아니라 어떤 질문이든 답변해드립니다.\n\n` +
         `🏗️ 인테리어 전문 기능:\n` +
         `  • "카페 20평 인테리어 얼마야?"\n` +
@@ -752,7 +752,7 @@ async function fallbackToGemini(message: string): Promise<ToolResult> {
 
       const result = await model.generateContent(message)
       const response = result.response.text()
-      console.log(`[체키 폴백] ${FALLBACK_MODELS[i]} 응답 성공`)
+      console.log(`[체크인 폴백] ${FALLBACK_MODELS[i]} 응답 성공`)
 
       return {
         tool: 'gemini_answer',
@@ -764,7 +764,7 @@ async function fallbackToGemini(message: string): Promise<ToolResult> {
       const isRateLimit = error?.status === 429 || msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota')
 
       if (isRateLimit && i < FALLBACK_MODELS.length - 1) {
-        console.warn(`[체키 폴백] ${FALLBACK_MODELS[i]} 할당량 초과 → ${FALLBACK_MODELS[i + 1]}로 전환`)
+        console.warn(`[체크인 폴백] ${FALLBACK_MODELS[i]} 할당량 초과 → ${FALLBACK_MODELS[i + 1]}로 전환`)
         continue
       }
 
@@ -787,7 +787,7 @@ async function fallbackToGemini(message: string): Promise<ToolResult> {
   return {
     tool: 'general_answer',
     success: true,
-    message: `🤖 체키입니다. AI 엔진이 일시적으로 바쁩니다. 잠시 후 다시 시도해주세요.`,
+    message: `🤖 체크인입니다. AI 엔진이 일시적으로 바쁩니다. 잠시 후 다시 시도해주세요.`,
   }
 }
 

@@ -31,7 +31,7 @@ export interface DisputeSignal {
   severity: 'warning' | 'danger'   // warning: 주의, danger: 즉각 대응 필요
   legalBasis: string                // 관련 법조문
   recommendedAction: string         // 권장 조치
-  warningMessage: string            // 체키 경고 메시지
+  warningMessage: string            // 체크인 경고 메시지
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -178,7 +178,7 @@ export function buildDisputeContext(alert: DisputeAlert): string {
   )
   const top = sorted.slice(0, 2) // 최대 2개
 
-  const lines: string[] = ['\n\n[체키 기록 관리 감지 컨텍스트 — 아래 내용을 답변에 반드시 포함]']
+  const lines: string[] = ['\n\n[체크인 기록 관리 감지 컨텍스트 — 아래 내용을 답변에 반드시 포함]']
   for (const sig of top) {
     lines.push(`${sig.warningMessage}`)
     lines.push(`📌 법적 근거: ${sig.legalBasis}`)

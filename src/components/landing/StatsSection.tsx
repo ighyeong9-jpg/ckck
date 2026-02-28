@@ -58,7 +58,7 @@ export default function StatsSection() {
   return (
     <section ref={ref} className={styles.section}>
       <div className={styles.inner}>
-        <div className={styles.eyebrow}>숫자로 보는 체키</div>
+        <div className={styles.eyebrow}>숫자로 보는 체크인</div>
         <h2 className={styles.title}>
           인테리어 기록 관리은 <span className={styles.accent}>운</span>이 아니라<br />
           <span className={styles.accent}>기록</span>의 문제입니다

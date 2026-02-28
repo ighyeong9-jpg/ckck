@@ -6,6 +6,5 @@
   - Local:        http://localhost:3000
   - Environments: .env.local
 
- ✓ Ready in 1418ms
- ✓ Compiled /src/middleware in 395ms (106 modules)
- ✓ Compiled /page in 1797ms (525 modules)
+ ✓ Ready in 1422ms
+[?25h

@@ -1,6 +1,6 @@
 /**
  * Gemini AI Provider
- * 체키 AI 비서의 두뇌 역할 - Gemini Flash 모델 사용
+ * 체크인 AI 비서의 두뇌 역할 - Gemini Flash 모델 사용
  * Function Calling으로 100+개 도구를 자연어로 연결
  *
  * 모델 폴백 체인:
@@ -36,16 +36,16 @@ import * as ext from '@/app/api/agent/tools-extended'
 import * as auto from '@/app/api/agent/tools-auto'
 
 /**
- * 체키 마스터 시스템 프롬프트
+ * 체크인 마스터 시스템 프롬프트
  *
- * 체키는 단순 챗봇이 아니다.
+ * 체크인는 단순 챗봇이 아니다.
  * 대한민국 인테리어·건설 현장의 법적 책임을 AI와 함께 지는 신뢰 파트너다.
  */
-export const CHEKI_SYSTEM_PROMPT = `당신은 체키(Cheki)입니다.
+export const CHEKI_SYSTEM_PROMPT = `당신은 체크인(Cheki)입니다.
 대한민국 인테리어·건설 현장 전담 AI 법률·시공 비서입니다.
 15년 현장 경력 전문가 수준으로 답변하며, 법적 책임을 함께 지는 신뢰할 수 있는 조언자입니다.
 
-■ 체키의 핵심 가치
+■ 체크인의 핵심 가치
 1. 법적 근거 필수: 모든 실무 답변에 법령명·조문·KCS시방서 출처를 명시합니다. 출처 없이 추측하지 않습니다.
 2. 기록 관리 예방 우선: 싸움이 날 징후(구두 합의·서면 없음·애매한 범위)를 먼저 알려줍니다.
 3. 현장 맥락 인식: 등록된 현장 정보(공종·리스크·변경사항)를 바탕으로 맞춤 조언을 드립니다.
@@ -729,15 +729,15 @@ export async function callGemini(
   for (let i = 0; i < GEMINI_MODELS.length; i++) {
     const modelName = GEMINI_MODELS[i]
     try {
-      console.log(`[체키] ${modelName} 시도 중...`)
+      console.log(`[체크인] ${modelName} 시도 중...`)
       const result = await callGeminiWithModel(genAI, modelName, userMessage, ctx, conversationHistory, image)
-      console.log(`[체키] ${modelName} 응답 성공 ✓`)
+      console.log(`[체크인] ${modelName} 응답 성공 ✓`)
       return result
     } catch (error: any) {
       lastError = error
-      console.error(`[체키] ${modelName} 실패:`, error?.message?.substring(0, 200))
+      console.error(`[체크인] ${modelName} 실패:`, error?.message?.substring(0, 200))
       if (isRateLimitError(error) && i < GEMINI_MODELS.length - 1) {
-        console.warn(`[체키] → ${GEMINI_MODELS[i + 1]}로 자동 전환`)
+        console.warn(`[체크인] → ${GEMINI_MODELS[i + 1]}로 자동 전환`)
         continue
       }
       throw error

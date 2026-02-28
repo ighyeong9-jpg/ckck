@@ -23,45 +23,32 @@ interface SubMenuItem {
   requiredSet?: FeatureSetId
 }
 
-const mainNavItems: NavItem[] = [
-  { icon: '🏠', label: '대시보드', href: '/dashboard', section: '메인' },
-  { icon: '📁', label: '현장 관리', href: '/projects', requiredSet: 'process' },
-  { icon: '💰', label: '예산 가이드', href: '/quotes', requiredSet: 'materials' },
-  { icon: '📡', label: '현장 이슈', href: '/issues', requiredSet: 'safety' },
-  { icon: '🛡️', label: '하자담보', href: '/warranty', section: '관리', requiredSet: 'compliance' },
+// 메인 메뉴 (항상 보임) - 핵심 8가지 기능
+const coreMenuItems: NavItem[] = [
+  { icon: '📁', label: '현장목록', href: '/projects' },
+  { icon: '📋', label: '사전진단', href: '/dashboard' },
+  { icon: '🤝', label: '분쟁예방', href: '/projects' },
+  { icon: '💰', label: '비용절감', href: '/quotes' },
+  { icon: '🔧', label: '공정현황', href: '/projects' },
+  { icon: '⚠️', label: '하자보수', href: '/warranty' },
+  { icon: '📄', label: '서류/PDF', href: '/reports' },
+  { icon: '📊', label: '리스크현황', href: '/dashboard' },
+]
+
+// 더보기 메뉴 (기본 접혀있음)
+const moreMenuItems: NavItem[] = [
   { icon: '🤖', label: 'AI 채팅', href: '/ai-chat' },
   { icon: '📒', label: 'AI 노트북', href: '/notebook' },
-  { icon: '📊', label: '리포트', href: '/reports', requiredSet: 'compliance' },
-  { icon: '👥', label: '고객관리', href: '/clients', requiredSet: 'process' },
-  { icon: '🏢', label: '프로필', href: '/profile' },
-]
-
-const projectSubMenuItems: SubMenuItem[] = [
-  { icon: '📋', label: '진단', path: 'diagnostic', requiredSet: 'safety' },
-  { icon: '✅', label: '사전점검', path: 'precheck', requiredSet: 'safety' },
-  { icon: '💰', label: '견적서', path: 'sow', requiredSet: 'materials' },
-  { icon: '📊', label: '비용분석', path: 'cost-analysis', requiredSet: 'materials' },
-  { icon: '🔄', label: '변경관리', path: 'changes', requiredSet: 'process' },
-  { icon: '📁', label: '증빙', path: 'evidence-package', requiredSet: 'compliance' },
-  { icon: '🤝', label: '합의', path: 'agreement', requiredSet: 'compliance' },
-  { icon: '📄', label: '리포트', path: 'report', requiredSet: 'compliance' },
-  { icon: '🔧', label: '공정관리', path: 'process', requiredSet: 'process' },
-  { icon: '👷', label: '인력관리', path: 'workforce', requiredSet: 'workforce' },
-  { icon: '📦', label: '자재관리', path: 'materials', requiredSet: 'materials' },
-  { icon: '🤖', label: '인증서', path: 'certificate', requiredSet: 'compliance' },
-  { icon: '🔧', label: '하자요청', path: 'defects', requiredSet: 'compliance' },
-  { icon: '🖼️', label: '현장사진', path: 'gallery', requiredSet: 'process' },
-]
-
-const extraNavItems: NavItem[] = [
-  { icon: '🛡️', label: '안전 현황', href: '/features/safety-status' },
-  { icon: '💳', label: '플랜 선택', href: '/pricing' },
-]
-
-const bottomNavItems: NavItem[] = [
-  { icon: '💎', label: '결제', href: '/payment' },
+  { icon: '👥', label: '고객관리', href: '/clients' },
+  { icon: '📡', label: '현장 이슈', href: '/issues' },
   { icon: '⚙️', label: '설정', href: '/settings' },
 ]
+
+// 프로젝트 서브메뉴는 사용하지 않음 (핵심 메뉴로 통합)
+const projectSubMenuItems: SubMenuItem[] = []
+
+const extraNavItems: NavItem[] = []
+const bottomNavItems: NavItem[] = []
 
 export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
@@ -80,8 +67,10 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const filterByRole = <T extends { requiredSet?: FeatureSetId }>(items: T[]): T[] =>
     items.filter(item => !item.requiredSet || allowedSets.includes(item.requiredSet))
 
-  const filteredMainNav = filterByRole(mainNavItems)
+  const filteredMainNav = filterByRole(coreMenuItems)
   const filteredSubMenu = filterByRole(projectSubMenuItems)
+  const filteredMoreNav = filterByRole(moreMenuItems)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
 
   // 모바일에서 페이지 이동 시 사이드바 닫기
   useEffect(() => {
@@ -198,7 +187,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       {/* 로고 */}
       <div className="px-5 py-[22px] text-[18px] font-black text-white border-b border-white/[0.06] flex items-center justify-between flex-shrink-0">
         <Link href="/" className="text-white no-underline">
-          체<span className="text-orange-500">키</span>
+          체크<span className="text-orange-500">인</span>
         </Link>
         <span className="text-[10px] font-normal text-white/25">v2.0</span>
       </div>
@@ -278,24 +267,29 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           )
         })}
 
-        {/* 추가 메뉴 */}
-        {extraNavItems.map((item) => (
-          <Link key={item.href} href={item.href} className={navItemClass(isActive(item.href))}>
-            <span className="text-[18px] w-5 text-center flex-shrink-0">{item.icon}</span>
-            <span className="flex-1">{item.label}</span>
-          </Link>
-        ))}
-
-        {/* 하단 메뉴 */}
-        <div className="font-mono text-[9px] tracking-[0.12em] text-white/25 uppercase px-5 pt-3.5 pb-1.5">
-          계정
+        {/* 더보기 메뉴 */}
+        <div className="mt-2">
+          <button
+            className="flex items-center justify-between w-full px-5 py-2 text-[13px] font-semibold text-white/40 hover:text-white/70 transition-colors"
+            onClick={() => setShowMoreMenu(!showMoreMenu)}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="text-[18px] w-5 text-center flex-shrink-0">⋮</span>
+              <span>더보기</span>
+            </div>
+            <span className={`transition-transform duration-200 ${showMoreMenu ? '' : '-rotate-90'}`}>▾</span>
+          </button>
+          {showMoreMenu && (
+            <div className="pb-2">
+              {filteredMoreNav.map((item) => (
+                <Link key={item.href} href={item.href} className={navItemClass(isActive(item.href))}>
+                  <span className="text-[18px] w-5 text-center flex-shrink-0">{item.icon}</span>
+                  <span className="flex-1">{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
-        {bottomNavItems.map((item) => (
-          <Link key={item.href} href={item.href} className={navItemClass(isActive(item.href))}>
-            <span className="text-[18px] w-5 text-center flex-shrink-0">{item.icon}</span>
-            <span className="flex-1">{item.label}</span>
-          </Link>
-        ))}
       </nav>
 
       {/* 유저 섹션 */}

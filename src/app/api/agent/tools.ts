@@ -244,7 +244,7 @@ export async function costAnalyze(ctx: ProjectContext): Promise<ToolResult> {
     material_weight: 0.12, material_factor: factors[2].factor,
     labor_weight: 0.08, labor_factor: factors[3].factor,
     risk_weight: 0.10, risk_factor: factors[4].factor,
-    notes: 'AI 체키 자동 분석',
+    notes: 'AI 체크인 자동 분석',
     updated_at: new Date().toISOString(),
   }, { onConflict: 'project_id' })
 
@@ -317,7 +317,7 @@ export async function changeRecord(ctx: ProjectContext, params: {
       project_id: ctx.project.id,
       title: params.title || 'AI 생성 변경요청',
       type: 'addition',
-      reason: params.reason || '체키 AI에 의한 변경 등록',
+      reason: params.reason || '체크인 AI에 의한 변경 등록',
       cost_change: params.costChange || 0,
       status: 'requested',
     }])
@@ -541,7 +541,7 @@ export async function getProjectSummary(ctx: ProjectContext): Promise<ToolResult
       return {
         tool: 'get_project_summary',
         success: true,
-        message: `안녕하세요! 체키입니다 🤖\n\n` +
+        message: `안녕하세요! 체크인입니다 🤖\n\n` +
           `아직 프로젝트가 없습니다.\n` +
           `"카페 20평 프로젝트 만들어줘"라고 말해보세요!`,
       }
@@ -550,7 +550,7 @@ export async function getProjectSummary(ctx: ProjectContext): Promise<ToolResult
     return {
       tool: 'get_project_summary',
       success: true,
-      message: `안녕하세요! 체키입니다 🤖\n\n` +
+      message: `안녕하세요! 체크인입니다 🤖\n\n` +
         `📁 프로젝트 ${projects.length}개:\n` +
         projects.map((p: any) => {
           const { grade } = getRiskGradeAndLevel(p.risk_score || 0)

@@ -150,12 +150,12 @@ export default function ProjectsPage() {
   }) => {
     setShowQuickStart(false)
     // Trigger AI Agent to create the project
-    const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+    const btn = document.querySelector('[aria-label="AI 비서 체크인"]') as HTMLButtonElement
     if (btn) {
       btn.click()
       // Send message to Agent after panel opens
       setTimeout(() => {
-        const input = document.querySelector('input[placeholder="체키에게 물어보세요..."]') as HTMLInputElement
+        const input = document.querySelector('input[placeholder="체크인에게 물어보세요..."]') as HTMLInputElement
         if (input) {
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
             window.HTMLInputElement.prototype, 'value'
@@ -246,7 +246,7 @@ export default function ProjectsPage() {
             + 새 현장
           </button>
           <button type="button" className={styles.newProjectBtn} style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }} onClick={() => {
-            const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+            const btn = document.querySelector('[aria-label="AI 비서 체크인"]') as HTMLButtonElement
             if (btn) btn.click()
           }}>
             ⚡ AI 빠른 생성
