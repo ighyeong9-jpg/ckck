@@ -83,12 +83,11 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       if (user) {
         const { data } = await supabase
           .from('user_settings')
-          .select('display_name, role')
-          .eq('user_id', user.id)
+          .select('display_name')
+          .eq('user_id', user.id.toString())
           .maybeSingle()
         if (data) {
           setUserName(data.display_name || user.email?.split('@')[0] || '사용자')
-          if (data.role) setUserRole(data.role as UserRole)
         }
       }
     }
@@ -99,12 +98,15 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   useEffect(() => {
     const loadGlobalBadge = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
         const thirtyDaysLater = new Date(Date.now() + 30 * 86400000).toISOString()
         const now = new Date().toISOString()
         const results = await Promise.all([
-          supabase.from('dispute_signals').select('*', { count: 'exact', head: true }).eq('resolved', false),
-          supabase.from('change_orders').select('*', { count: 'exact', head: true }).eq('status', 'requested'),
-          supabase.from('warranty_tracking').select('*', { count: 'exact', head: true }).lt('warranty_expires_date', thirtyDaysLater).gt('warranty_expires_date', now),
+          supabase.from('dispute_signals').select('*, projects!inner(user_id)', { count: 'exact', head: true }).eq('projects.user_id', user.id.toString()).eq('resolved', false),
+          supabase.from('change_orders').select('*, projects!inner(user_id)', { count: 'exact', head: true }).eq('projects.user_id', user.id.toString()).eq('status', 'requested'),
+          supabase.from('warranty_tracking').select('*, projects!inner(user_id)', { count: 'exact', head: true }).eq('projects.user_id', user.id.toString()).lt('warranty_expires_date', thirtyDaysLater).gt('warranty_expires_date', now),
         ])
         const disputes = results[0]?.count ?? 0
         const changes = results[1]?.count ?? 0

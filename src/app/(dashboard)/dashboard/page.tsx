@@ -17,8 +17,8 @@ interface Project {
 
 interface Issue {
   id: string
-  title: string
-  status: string
+  제목: string
+  현황: string
   project_id: string
   created_at: string
 }
@@ -85,7 +85,7 @@ export default function DashboardPage() {
 
   const highestRisk = projects.reduce((max, p) => Math.max(max, p.risk_score ?? 0), 0)
   const activeProjects = projects.filter(p => p.status !== 'completed').length
-  const pendingIssues = issues.filter(i => i.status === 'open' || i.status === 'reviewing').length
+  const pendingIssues = issues.filter(i => i.현황 === 'open' || i.현황 === 'reviewing').length
   const avgProgress = projects.length > 0
     ? Math.round(projects.reduce((s, p) => s + (p.progress ?? 0), 0) / projects.length)
     : 0
@@ -96,20 +96,54 @@ export default function DashboardPage() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
 
-        const { data: settings } = await supabase
+        console.log('[Dashboard] Fetching user_settings for user:', user.id)
+        const { data: settings, error: settingsError } = await supabase
           .from('user_settings')
           .select('display_name')
-          .eq('user_id', user.id)
+          .eq('user_id', user.id.toString())
           .maybeSingle()
-        if (settings?.display_name) setUserName(settings.display_name)
 
-        const [{ data: projectData }, { data: issueData }] = await Promise.all([
-          supabase.from('projects').select('id,name,status,risk_score,progress,end_date').eq('user_id', user.id).limit(10),
-          supabase.from('issues').select('id,title,status,project_id,created_at').eq('user_id', user.id).limit(20),
+        if (settingsError) {
+          console.error('[Dashboard] user_settings 400 Error:', settingsError)
+          console.error('[Dashboard] Query: user_settings?select=display_name&user_id=eq.' + user.id)
+          // 에러 무시하고 계속 진행
+        }
+
+        // settings가 null이거나 display_name이 없으면 user.email 사용
+        if (settings?.display_name) {
+          setUserName(settings.display_name)
+          console.log('[Dashboard] user_settings success:', settings)
+        } else {
+          const fallbackName = user.email?.split('@')[0] || '소장님'
+          setUserName(fallbackName)
+          console.log('[Dashboard] user_settings null, using fallback:', fallbackName)
+        }
+
+        console.log('[Dashboard] Fetching projects and site_issues for user:', user.id)
+        const [projectResult, issueResult] = await Promise.all([
+          supabase.from('projects').select('id,name,status,risk_score,progress,end_date').eq('user_id', user.id.toString()).limit(10),
+          supabase.from('site_issues').select('*').eq('created_by', user.id.toString()).limit(20),
         ])
 
-        setProjects(projectData ?? [])
-        setIssues(issueData ?? [])
+        if (projectResult.error) {
+          console.error('[Dashboard] projects 400 Error:', projectResult.error)
+          console.error('[Dashboard] Query: projects?select=id,name,status,risk_score,progress,end_date&user_id=eq.' + user.id)
+          // 에러 무시하고 빈 배열로 계속 진행
+        } else {
+          console.log('[Dashboard] projects success:', projectResult.data?.length, 'rows')
+        }
+
+        if (issueResult.error) {
+          console.error('[Dashboard] site_issues 400 Error:', issueResult.error)
+          console.error('[Dashboard] Query: site_issues?select=*&created_by=eq.' + user.id)
+          // 에러 무시하고 빈 배열로 계속 진행
+        } else {
+          console.log('[Dashboard] site_issues success:', issueResult.data?.length, 'rows')
+        }
+
+        // 에러가 있어도 빈 배열로 설정하여 대시보드 정상 작동
+        setProjects(projectResult.data ?? [])
+        setIssues(issueResult.data ?? [])
       } finally {
         setLoading(false)
       }

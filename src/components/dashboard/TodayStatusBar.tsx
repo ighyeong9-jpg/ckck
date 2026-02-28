@@ -79,18 +79,22 @@ export default function TodayStatusBar() {
         supabase
           .from('projects')
           .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id.toString())
           .eq('status', 'in_progress'),
         supabase
           .from('change_orders')
-          .select('*', { count: 'exact', head: true })
+          .select('*, projects!inner(user_id)', { count: 'exact', head: true })
+          .eq('projects.user_id', user.id.toString())
           .eq('status', 'requested'),
         supabase
           .from('dispute_signals')
-          .select('*', { count: 'exact', head: true })
+          .select('*, projects!inner(user_id)', { count: 'exact', head: true })
+          .eq('projects.user_id', user.id.toString())
           .eq('resolved', false),
         supabase
           .from('warranty_tracking')
-          .select('*', { count: 'exact', head: true })
+          .select('*, projects!inner(user_id)', { count: 'exact', head: true })
+          .eq('projects.user_id', user.id.toString())
           .lt('warranty_expires_date', thirtyDaysLater)
           .gt('warranty_expires_date', now),
       ])

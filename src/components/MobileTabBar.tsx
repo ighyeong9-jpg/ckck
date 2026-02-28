@@ -35,12 +35,15 @@ export default function MobileTabBar() {
     const supabase = createClient()
     const load = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
         const thirtyDaysLater = new Date(Date.now() + 30 * 86400000).toISOString()
         const now = new Date().toISOString()
         const results = await Promise.all([
-          supabase.from('change_orders').select('*', { count: 'exact', head: true }).eq('status', 'requested'),
-          supabase.from('dispute_signals').select('*', { count: 'exact', head: true }).eq('resolved', false),
-          supabase.from('warranty_tracking').select('*', { count: 'exact', head: true }).lt('warranty_expires_date', thirtyDaysLater).gt('warranty_expires_date', now),
+          supabase.from('change_orders').select('*, projects!inner(user_id)', { count: 'exact', head: true }).eq('projects.user_id', user.id.toString()).eq('status', 'requested'),
+          supabase.from('dispute_signals').select('*, projects!inner(user_id)', { count: 'exact', head: true }).eq('projects.user_id', user.id.toString()).eq('resolved', false),
+          supabase.from('warranty_tracking').select('*, projects!inner(user_id)', { count: 'exact', head: true }).eq('projects.user_id', user.id.toString()).lt('warranty_expires_date', thirtyDaysLater).gt('warranty_expires_date', now),
         ])
         const changes = results[0]?.count ?? 0
         const disputes = results[1]?.count ?? 0
