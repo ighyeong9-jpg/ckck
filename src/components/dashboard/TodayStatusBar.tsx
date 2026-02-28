@@ -91,8 +91,8 @@ export default function TodayStatusBar() {
         supabase
           .from('warranty_tracking')
           .select('*', { count: 'exact', head: true })
-          .lt('expires_date', thirtyDaysLater)
-          .gt('expires_date', now),
+          .lt('warranty_expires_date', thirtyDaysLater)
+          .gt('warranty_expires_date', now),
       ])
 
       const newCounts = {

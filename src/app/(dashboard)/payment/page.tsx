@@ -135,7 +135,7 @@ export default function PaymentPage() {
           .from('user_settings')
           .select('subscription_plan')
           .eq('user_id', user.id)
-          .single()
+          .maybeSingle()
         if (settings?.subscription_plan) setCurrentPlan(settings.subscription_plan)
       }
     } catch (err) {

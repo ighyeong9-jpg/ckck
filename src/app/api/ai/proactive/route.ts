@@ -107,7 +107,7 @@ export async function GET() {
       .from('user_settings')
       .select('display_name')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
     const userName = settings?.display_name || user.email?.split('@')[0] || '소장님'
 

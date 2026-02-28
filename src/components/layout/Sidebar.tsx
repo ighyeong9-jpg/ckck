@@ -101,15 +101,14 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       try {
         const thirtyDaysLater = new Date(Date.now() + 30 * 86400000).toISOString()
         const now = new Date().toISOString()
-        const [
-          { count: disputes },
-          { count: changes },
-          { count: warranty },
-        ] = await Promise.all([
+        const results = await Promise.all([
           supabase.from('dispute_signals').select('*', { count: 'exact', head: true }).eq('resolved', false),
           supabase.from('change_orders').select('*', { count: 'exact', head: true }).eq('status', 'requested'),
-          supabase.from('warranty_tracking').select('*', { count: 'exact', head: true }).lt('expires_date', thirtyDaysLater).gt('expires_date', now),
+          supabase.from('warranty_tracking').select('*', { count: 'exact', head: true }).lt('warranty_expires_date', thirtyDaysLater).gt('warranty_expires_date', now),
         ])
+        const disputes = results[0]?.count ?? 0
+        const changes = results[1]?.count ?? 0
+        const warranty = results[2]?.count ?? 0
         setGlobalBadge((disputes ?? 0) + (changes ?? 0) + (warranty ?? 0))
       } catch { /* 조용히 실패 */ }
     }

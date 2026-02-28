@@ -100,7 +100,7 @@ export default function DashboardPage() {
           .from('user_settings')
           .select('display_name')
           .eq('user_id', user.id)
-          .single()
+          .maybeSingle()
         if (settings?.display_name) setUserName(settings.display_name)
 
         const [{ data: projectData }, { data: issueData }] = await Promise.all([

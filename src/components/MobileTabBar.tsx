@@ -37,16 +37,15 @@ export default function MobileTabBar() {
       try {
         const thirtyDaysLater = new Date(Date.now() + 30 * 86400000).toISOString()
         const now = new Date().toISOString()
-        const [
-          { count: changes },
-          { count: disputes },
-          { count: warranty },
-        ] = await Promise.all([
+        const results = await Promise.all([
           supabase.from('change_orders').select('*', { count: 'exact', head: true }).eq('status', 'requested'),
           supabase.from('dispute_signals').select('*', { count: 'exact', head: true }).eq('resolved', false),
-          supabase.from('warranty_tracking').select('*', { count: 'exact', head: true }).lt('expires_date', thirtyDaysLater).gt('expires_date', now),
+          supabase.from('warranty_tracking').select('*', { count: 'exact', head: true }).lt('warranty_expires_date', thirtyDaysLater).gt('warranty_expires_date', now),
         ])
-        setBadges({ changes: changes ?? 0, disputes: disputes ?? 0, warranty: warranty ?? 0 })
+        const changes = results[0]?.count ?? 0
+        const disputes = results[1]?.count ?? 0
+        const warranty = results[2]?.count ?? 0
+        setBadges({ changes, disputes, warranty })
       } catch { /* 조용히 실패 */ }
     }
 
