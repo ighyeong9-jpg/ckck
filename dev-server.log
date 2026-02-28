@@ -1,0 +1,12 @@
+
+> check-in-stable@1.0.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+ ⚠ Port 3001 is in use, trying 3002 instead.
+  ▲ Next.js 13.5.6
+  - Local:        http://localhost:3002
+  - Environments: .env.local
+
+ ✓ Ready in 1325ms
+   Reload env: .env.local

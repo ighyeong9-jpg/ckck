@@ -1,0 +1,212 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  color: white;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.backBtn {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  color: #334155;
+  font-weight: 500;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+.title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.newBtn {
+  width: 100%;
+  padding: 1rem;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #667eea;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f8fafc;
+  }
+}
+
+.formCard {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.formTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1.5rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.5rem;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    color: #1e293b;
+    transition: border-color 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: #5a67d8;
+  }
+}
+
+.formHint {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 1rem 0 0;
+}
+
+.defectsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.defectCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.defectHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.severityBadge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+}
+
+.statusBadge {
+  padding: 0.375rem 0.75rem;
+  background: #f1f5f9;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.defectTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem;
+}
+
+.defectDesc {
+  font-size: 0.9375rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+}
+
+.defectLocation {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0 0 0.5rem;
+}
+
+.defectDate {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 16px;
+  color: #64748b;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}

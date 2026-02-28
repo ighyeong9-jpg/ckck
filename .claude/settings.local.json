@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(netstat:*)",
+      "Bash(src/app/api/ai/check/route.ts:*)",
+      "Bash(test:*)",
+      "Bash(node:*)"
+    ]
+  }
+}

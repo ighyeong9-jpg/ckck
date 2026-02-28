@@ -169,6 +169,20 @@ export default function DefectsPage() {
       setDefects(prev => prev.map(d =>
         d.id === defect.id ? { ...d, ...updates } : d
       ))
+
+      // 하자 해결 시 warranty_tracking에 기록
+      if (newStatus === 'resolved') {
+        try {
+          const { createWarrantyRecord } = await import('@/lib/ai/warranty-tracker')
+          await createWarrantyRecord({
+            projectId: projectId,
+            processName: defect.title,
+            completedDate: new Date().toISOString().split('T')[0]
+          })
+        } catch (warrantyErr) {
+          console.warn('Warranty tracking failed:', warrantyErr)
+        }
+      }
     } catch (err: any) {
       toast.error(`상태 변경 오류: ${err?.message}`)
     }

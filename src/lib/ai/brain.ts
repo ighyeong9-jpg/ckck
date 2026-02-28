@@ -14,6 +14,7 @@ import { injectPersonaContext } from '@/lib/ai/personas'
 import { retrieve, buildRAGPrompt } from '@/lib/knowledge/retriever'
 import { detectDisputeSignals, buildDisputeContext, type DisputeAlert } from '@/lib/ai/dispute-preventer'
 import { searchCases, needsCaseSearch, buildCaseContext } from '@/lib/knowledge/case-search'
+import { autoCheckFromPhoto } from '@/lib/ai/auto-checker'
 
 // ═══════════════════════════════════════════════════════════
 // 타입 정의
@@ -329,55 +330,35 @@ export async function brain(req: BrainRequest): Promise<BrainResponse> {
     }
 
     // ─── 사진 자동 체크 ───────────────────────────────────
-    // STEP 3에서 lib/ai/auto-checker.ts 구현 후 연결
     case 'vision-check': {
-      const prompt = imageData
-        ? `현장 사진을 분석해주세요. ${userMessage}`
-        : `현장 사진 분석 요청: ${userMessage}`
-      const { text, model } = await callWithFallback(
-        prompt,
-        task,
-        projectCtx,
-        conversationHistory,
-        imageData,
-      )
-      return { answer: text, sources: [], confidence: 0.7, model }
+      if (!imageData) {
+        return { answer: '사진이 필요합니다.', sources: [], confidence: 0, model: 'gemini' }
+      }
+      const result = await autoCheckFromPhoto(imageData, projectId || '')
+      return {
+        answer: JSON.stringify(result),
+        sources: [],
+        confidence: result.goNoGo === 'GO' ? 0.85 : 0.75,
+        model: 'gemini',
+      }
     }
 
     // ─── 일보 자동 작성 ───────────────────────────────────
-    // STEP 5에서 lib/ai/report-writer.ts 구현 후 연결
+    // Note: 이 케이스는 /api/ai/report 에서 직접 처리하므로 여기서는 기본 응답만
     case 'report-write': {
-      const { text, model } = await callWithFallback(
-        `일보 초안 작성 요청. 오늘 현황: ${userMessage}`,
-        task,
-        projectCtx,
-        conversationHistory,
-      )
-      return { answer: text, sources: [], confidence: 0.85, model }
+      return { answer: '일보 작성은 /api/ai/report에서 처리합니다.', sources: [], confidence: 1.0, model: 'gemini' }
     }
 
     // ─── 리스크 예측 ──────────────────────────────────────
-    // STEP 5에서 lib/ai/prediction-engine.ts 구현 후 연결
+    // Note: 이 케이스는 /api/ai/predict 에서 직접 처리하므로 여기서는 기본 응답만
     case 'risk-predict': {
-      const { text, model } = await callWithFallback(
-        `다음 공종 리스크 예측: ${userMessage}`,
-        task,
-        projectCtx,
-        conversationHistory,
-      )
-      return { answer: text, sources: [], confidence: 0.75, model }
+      return { answer: '리스크 예측은 /api/ai/predict에서 처리합니다.', sources: [], confidence: 1.0, model: 'gemini' }
     }
 
     // ─── 이상 감지 분석 ───────────────────────────────────
-    // STEP 5에서 lib/ai/alert-engine.ts 구현 후 연결
+    // Note: 이 케이스는 /api/ai/alerts 에서 직접 처리하므로 여기서는 기본 응답만
     case 'alert-analyze': {
-      const { text, model } = await callWithFallback(
-        `이상 감지 분석 요청: ${userMessage}`,
-        task,
-        projectCtx,
-        conversationHistory,
-      )
-      return { answer: text, sources: [], confidence: 0.8, model }
+      return { answer: '알림 분석은 /api/ai/alerts에서 처리합니다.', sources: [], confidence: 1.0, model: 'gemini' }
     }
 
     // ─── 노트북 문서 분석 ─────────────────────────────────

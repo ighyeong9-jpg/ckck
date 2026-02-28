@@ -266,6 +266,23 @@ export default function DiagnosticPage() {
 
       if (error) throw error
 
+      // risk_scores 이력 테이블에 저장
+      const { error: historyError } = await supabase
+        .from('risk_scores')
+        .insert({
+          project_id: projectId,
+          score: riskScores.total,
+          grade: riskGrade.grade,
+          level: riskGrade.level,
+          fp: riskScores.Fp,
+          oc: riskScores.Oc,
+          ch: riskScores.Ch,
+        })
+
+      if (historyError) {
+        console.warn('Risk score history save failed:', historyError)
+      }
+
       // 활동 로그
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
@@ -280,6 +297,21 @@ export default function DiagnosticPage() {
       }
 
       toast.success(`리스크 점수 ${riskScores.total}점(${riskGrade.grade}등급)이 저장되었어요.`)
+
+      // 공유 링크 자동 생성
+      try {
+        const shareRes = await fetch('/api/share', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project_id: projectId, expires_days: 7 })
+        })
+        const shareData = await shareRes.json()
+        if (shareData.share_url) {
+          console.log('Share link created:', shareData.share_url)
+        }
+      } catch (shareErr) {
+        console.warn('Share link generation failed:', shareErr)
+      }
     } catch (err) {
       console.error('Error saving risk score:', err)
       toast.error('저장 중 문제가 생겼어요. 잠시 후 다시 시도해주세요.')
