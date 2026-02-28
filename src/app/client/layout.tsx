@@ -1,30 +1,19 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import styles from './layout.module.scss'
 
-export default async function ClientLayout({
+export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <h1 className={styles.logo}>Check-In</h1>
-          <span className={styles.subtitle}>공사 현황 확인</span>
+        <div className={styles.logo}>
+          체크<span className={styles.accent}>인</span>
         </div>
+        <span className={styles.subtitle}>고객 포털</span>
       </header>
-      <main className={styles.main}>
-        {children}
-      </main>
+      <main className={styles.main}>{children}</main>
     </div>
   )
 }

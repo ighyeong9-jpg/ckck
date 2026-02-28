@@ -85,7 +85,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           .from('user_settings')
           .select('display_name, role')
           .eq('user_id', user.id)
-          .single()
+          .maybeSingle()
         if (data) {
           setUserName(data.display_name || user.email?.split('@')[0] || '사용자')
           if (data.role) setUserRole(data.role as UserRole)
@@ -202,11 +202,11 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       {/* 메인 내비게이션 */}
       <nav className="flex-1 py-2">
-        {filteredMainNav.map((item) => {
+        {filteredMainNav.map((item, idx) => {
           const showSection = item.section && item.section !== lastSection
           if (showSection) lastSection = item.section!
           return (
-            <div key={item.href}>
+            <div key={`main-${idx}-${item.href}`}>
               {showSection && (
                 <div className="font-mono text-[9px] tracking-[0.12em] text-white/25 uppercase px-5 pt-3.5 pb-1.5">
                   {item.section}
@@ -281,8 +281,8 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           </button>
           {showMoreMenu && (
             <div className="pb-2">
-              {filteredMoreNav.map((item) => (
-                <Link key={item.href} href={item.href} className={navItemClass(isActive(item.href))}>
+              {filteredMoreNav.map((item, idx) => (
+                <Link key={`more-${idx}-${item.href}`} href={item.href} className={navItemClass(isActive(item.href))}>
                   <span className="text-[18px] w-5 text-center flex-shrink-0">{item.icon}</span>
                   <span className="flex-1">{item.label}</span>
                 </Link>

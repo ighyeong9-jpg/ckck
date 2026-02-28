@@ -1,0 +1,240 @@
+
+> check-in-stable@1.0.0 dev
+> next dev
+
+  ▲ Next.js 13.5.6
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Ready in 2.8s
+ ✓ Compiled /src/middleware in 967ms (106 modules)
+ ○ Compiling /client/page ...
+ ✓ Compiled /client/page in 5.2s (457 modules)
+ ✓ Compiled /not-found in 342ms (444 modules)
+ ✓ Compiled /(dashboard)/quotes/page in 1864ms (672 modules)
+ ✓ Compiled /(dashboard)/dashboard/page in 301ms (627 modules)
+ ✓ Compiled /(dashboard)/projects/page in 717ms (666 modules)
+ ✓ Compiled /(dashboard)/warranty/page in 586ms (666 modules)
+ ✓ Compiled /(dashboard)/reports/page in 508ms (667 modules)
+ ✓ Compiled /page in 1018ms (718 modules)
+ ✓ Compiled /client/page in 183ms (389 modules)
+ ✓ Compiled /not-found in 1055ms (848 modules)
+ ⨯ Internal error: Error: The render was aborted by the server without a reason.
+    at eG (E:\dev\check-in-stable\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:11:330259)
+    at Object.cancel (E:\dev\check-in-stable\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:11:343583)
+    at invokePromiseCallback (node:internal/webstreams/util:172:10)
+    at Object.cancelAlgorithm (node:internal/webstreams/util:177:23)
+    at readableByteStreamControllerCancelSteps (node:internal/webstreams/readablestream:3171:37)
+    at [kCancel] (node:internal/webstreams/readablestream:1197:12)
+    at readableStreamCancel (node:internal/webstreams/readablestream:2018:39)
+    at node:internal/webstreams/readablestream:1549:15
+    at complete (node:internal/webstreams/readablestream:1438:9)
+    at shutdownWithAnAction (node:internal/webstreams/readablestream:1434:5)
+    at node:internal/webstreams/readablestream:1548:14
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+Demo share creation error: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find the 'address' column of 'projects' in the schema cache"
+}
+ ✓ Compiled in 475ms (756 modules)
+Demo share creation error: {
+  code: '42501',
+  details: null,
+  hint: null,
+  message: 'new row violates row-level security policy for table "shares"'
+}
+ ✓ Compiled in 341ms (349 modules)
+ ✓ Compiled /not-found in 277ms (662 modules)
+ ✓ Compiled /share/[shareId]/page in 610ms (743 modules)
+ ✓ Compiled in 734ms (676 modules)
+ ✓ Compiled /not-found in 185ms (667 modules)
+ ✓ Compiled in 382ms (681 modules)
+ ✓ Compiled in 515ms (687 modules)
+ ⨯ Internal error: Error: The render was aborted by the server without a reason.
+    at eG (E:\dev\check-in-stable\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:11:330259)
+    at Object.cancel (E:\dev\check-in-stable\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:11:343583)
+    at invokePromiseCallback (node:internal/webstreams/util:172:10)
+    at Object.cancelAlgorithm (node:internal/webstreams/util:177:23)
+    at readableByteStreamControllerCancelSteps (node:internal/webstreams/readablestream:3171:37)
+    at [kCancel] (node:internal/webstreams/readablestream:1197:12)
+    at readableStreamCancel (node:internal/webstreams/readablestream:2018:39)
+    at node:internal/webstreams/readablestream:1549:15
+    at complete (node:internal/webstreams/readablestream:1438:9)
+    at shutdownWithAnAction (node:internal/webstreams/readablestream:1434:5)
+    at node:internal/webstreams/readablestream:1548:14
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+ ✓ Compiled in 358ms (687 modules)
+ ✓ Compiled in 254ms (352 modules)
+ ✓ Compiled /not-found in 235ms (673 modules)
+ ✓ Compiled /_error in 1839ms (830 modules)
+ ⨯ Error: Cannot find module './657.js'
+Require stack:
+- E:\dev\check-in-stable\.next\server\webpack-runtime.js
+- E:\dev\check-in-stable\.next\server\pages\_document.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\require.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\load-components.js
+- E:\dev\check-in-stable\node_modules\next\dist\build\utils.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\dev\hot-middleware.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\lib\router-server.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1456:15)
+    at E:\dev\check-in-stable\node_modules\next\dist\server\require-hook.js:54:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1066:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1071:22)
+    at Module._load (node:internal/modules/cjs/loader:1242:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12)
+    at mod.require (E:\dev\check-in-stable\node_modules\next\dist\server\require-hook.js:64:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (E:\dev\check-in-stable\.next\server\webpack-runtime.js:198:28)
+    at E:\dev\check-in-stable\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (E:\dev\check-in-stable\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (E:\dev\check-in-stable\.next\server\webpack-runtime.js:162:22)
+    at E:\dev\check-in-stable\.next\server\app\client\page.js:1:2081
+    at Object.<anonymous> (E:\dev\check-in-stable\.next\server\app\client\page.js:1:2166)
+    at Module._compile (node:internal/modules/cjs/loader:1812:14)
+    at Object..js (node:internal/modules/cjs/loader:1943:10)
+    at Module.load (node:internal/modules/cjs/loader:1533:32)
+    at Module._load (node:internal/modules/cjs/loader:1335:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12)
+    at mod.require (E:\dev\check-in-stable\node_modules\next\dist\server\require-hook.js:64:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (E:\dev\check-in-stable\node_modules\next\dist\server\require.js:109:84)
+    at E:\dev\check-in-stable\node_modules\next\dist\server\load-components.js:59:84
+    at async loadComponentsImpl (E:\dev\check-in-stable\node_modules\next\dist\server\load-components.js:59:26)
+    at async DevServer.findPageComponentsImpl (E:\dev\check-in-stable\node_modules\next\dist\server\next-server.js:439:36) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'E:\\dev\\check-in-stable\\.next\\server\\webpack-runtime.js',
+    'E:\\dev\\check-in-stable\\.next\\server\\pages\\_document.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\require.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\load-components.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\build\\utils.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/client'
+}
+ ✓ Compiled /(dashboard)/warranty/page in 349ms (374 modules)
+ ⨯ Error: Cannot find module './657.js'
+Require stack:
+- E:\dev\check-in-stable\.next\server\webpack-runtime.js
+- E:\dev\check-in-stable\.next\server\app\(dashboard)\warranty\page.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\require.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\load-components.js
+- E:\dev\check-in-stable\node_modules\next\dist\build\utils.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\dev\hot-middleware.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\lib\router-server.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1456:15)
+    at E:\dev\check-in-stable\node_modules\next\dist\server\require-hook.js:54:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1066:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1071:22)
+    at Module._load (node:internal/modules/cjs/loader:1242:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12)
+    at mod.require (E:\dev\check-in-stable\node_modules\next\dist\server\require-hook.js:64:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (E:\dev\check-in-stable\.next\server\webpack-runtime.js:198:28)
+    at E:\dev\check-in-stable\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (E:\dev\check-in-stable\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (E:\dev\check-in-stable\.next\server\webpack-runtime.js:162:22)
+    at E:\dev\check-in-stable\.next\server\app\(dashboard)\warranty\page.js:1:13381
+    at Object.<anonymous> (E:\dev\check-in-stable\.next\server\app\(dashboard)\warranty\page.js:1:13470)
+    at Module._compile (node:internal/modules/cjs/loader:1812:14)
+    at Object..js (node:internal/modules/cjs/loader:1943:10)
+    at Module.load (node:internal/modules/cjs/loader:1533:32)
+    at Module._load (node:internal/modules/cjs/loader:1335:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12)
+    at mod.require (E:\dev\check-in-stable\node_modules\next\dist\server\require-hook.js:64:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (E:\dev\check-in-stable\node_modules\next\dist\server\require.js:109:84)
+    at E:\dev\check-in-stable\node_modules\next\dist\server\load-components.js:59:84
+    at async loadComponentsImpl (E:\dev\check-in-stable\node_modules\next\dist\server\load-components.js:59:26)
+    at async DevServer.findPageComponentsImpl (E:\dev\check-in-stable\node_modules\next\dist\server\next-server.js:439:36) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'E:\\dev\\check-in-stable\\.next\\server\\webpack-runtime.js',
+    'E:\\dev\\check-in-stable\\.next\\server\\app\\(dashboard)\\warranty\\page.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\require.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\load-components.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\build\\utils.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/warranty'
+}
+Error: Cannot find module './3310.js'
+Require stack:
+- E:\dev\check-in-stable\.next\server\webpack-runtime.js
+- E:\dev\check-in-stable\.next\server\app\(dashboard)\warranty\page.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\require.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\load-components.js
+- E:\dev\check-in-stable\node_modules\next\dist\build\utils.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\dev\hot-middleware.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\lib\router-server.js
+- E:\dev\check-in-stable\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1456:15)
+    at E:\dev\check-in-stable\node_modules\next\dist\server\require-hook.js:54:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1066:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1071:22)
+    at Module._load (node:internal/modules/cjs/loader:1242:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12)
+    at mod.require (E:\dev\check-in-stable\node_modules\next\dist\server\require-hook.js:64:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (E:\dev\check-in-stable\.next\server\webpack-runtime.js:198:28)
+    at E:\dev\check-in-stable\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (E:\dev\check-in-stable\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (E:\dev\check-in-stable\.next\server\webpack-runtime.js:162:22)
+    at E:\dev\check-in-stable\.next\server\pages\_document.js:1:276
+    at Object.<anonymous> (E:\dev\check-in-stable\.next\server\pages\_document.js:1:349)
+    at Module._compile (node:internal/modules/cjs/loader:1812:14)
+    at Object..js (node:internal/modules/cjs/loader:1943:10)
+    at Module.load (node:internal/modules/cjs/loader:1533:32)
+    at Module._load (node:internal/modules/cjs/loader:1335:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1556:12)
+    at mod.require (E:\dev\check-in-stable\node_modules\next\dist\server\require-hook.js:64:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (E:\dev\check-in-stable\node_modules\next\dist\server\require.js:109:84)
+    at E:\dev\check-in-stable\node_modules\next\dist\server\load-components.js:55:65
+    at async Promise.all (index 0)
+    at async loadComponentsImpl (E:\dev\check-in-stable\node_modules\next\dist\server\load-components.js:54:33)
+    at async DevServer.findPageComponentsImpl (E:\dev\check-in-stable\node_modules\next\dist\server\next-server.js:439:36) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'E:\\dev\\check-in-stable\\.next\\server\\webpack-runtime.js',
+    'E:\\dev\\check-in-stable\\.next\\server\\app\\(dashboard)\\warranty\\page.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\require.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\load-components.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\build\\utils.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'E:\\dev\\check-in-stable\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}

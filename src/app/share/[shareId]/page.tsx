@@ -50,6 +50,42 @@ export default function SharePage() {
   useEffect(() => {
     const loadShareData = async () => {
       try {
+        // 데모 모드 (demo123 입력 시)
+        if (shareId === 'demo123') {
+          setData({
+            project: {
+              id: 'demo',
+              name: '데모 카페 인테리어',
+              industry: 'cafe',
+              address: '서울시 강남구 테헤란로 123',
+              client_name: '김고객',
+              risk_score: 25,
+              risk_grade: 'B',
+              progress: 65,
+              status: 'in_progress',
+              start_date: new Date(Date.now() - 30 * 86400000).toISOString(),
+              end_date: new Date(Date.now() + 30 * 86400000).toISOString(),
+              created_at: new Date().toISOString(),
+            },
+            shareLink: {
+              expires_at: new Date(Date.now() + 90 * 86400000).toISOString(),
+              created_at: new Date().toISOString(),
+            },
+            processes: [
+              { id: '1', name: '철거', status: 'completed', progress: 100, start_date: null, end_date: null },
+              { id: '2', name: '목공', status: 'in_progress', progress: 70, start_date: null, end_date: null },
+              { id: '3', name: '전기', status: 'pending', progress: 0, start_date: null, end_date: null },
+              { id: '4', name: '도장', status: 'pending', progress: 0, start_date: null, end_date: null },
+            ],
+            quoteTotal: 5200000,
+            changeTotal: 300000,
+            checklistStats: { total: 25, completed: 18 },
+            certificate: { grade: 'A', score: 92 },
+          })
+          setLoading(false)
+          return
+        }
+
         // 1. shares 조회 + 검증
         const { data: shareLink, error: shareError } = await supabase
           .from('shares')
@@ -58,7 +94,7 @@ export default function SharePage() {
           .single()
 
         if (shareError || !shareLink) {
-          setError('유효하지 않은 공유 링크입니다.')
+          setError('유효하지 않은 공유 링크입니다. 데모를 보려면 "demo123"을 입력하세요.')
           return
         }
 

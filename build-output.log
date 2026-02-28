@@ -1,0 +1,19 @@
+
+> check-in-stable@1.0.0 build
+> next build
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./src/lib/automation/autoWorkflow.ts:26:7
+Type error: This comparison appears to be unintentional because the types 'GoNoGo' and '"NO-GO"' have no overlap.
+
+[0m [90m 24 | [39m[0m
+[0m [90m 25 | [39m  [90m// 1) 공정 완료 자동 기록 — GO + confidence > 0.8이면 해당 공종 progress 업데이트[39m[0m
+[0m[31m[1m>[22m[39m[90m 26 | [39m  [36mif[39m (checkResult[33m.[39mgoNoGo [33m!==[39m [32m'NO-GO'[39m [33m&&[39m checkResult[33m.[39mconfidence [33m>[39m [35m0.8[39m [33m&&[39m checkResult[33m.[39mdetectedProcess [33m!==[39m [32m'알 수 없음'[39m) {[0m
+[0m [90m    | [39m      [31m[1m^[22m[39m[0m
+[0m [90m 27 | [39m    [36mtry[39m {[0m
+[0m [90m 28 | [39m      [36mconst[39m { data[33m:[39m processes } [33m=[39m [36mawait[39m supabase[0m
+[0m [90m 29 | [39m        [33m.[39m[36mfrom[39m([32m'processes'[39m)[0m

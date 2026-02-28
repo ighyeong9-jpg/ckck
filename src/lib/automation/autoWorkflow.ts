@@ -23,7 +23,7 @@ export async function triggerPhotoWorkflow(
   const supabase = createClient()
 
   // 1) 공정 완료 자동 기록 — GO + confidence > 0.8이면 해당 공종 progress 업데이트
-  if (checkResult.goNoGo !== 'NO-GO' && checkResult.confidence > 0.8 && checkResult.detectedProcess !== '알 수 없음') {
+  if (checkResult.goNoGo === 'GO' && checkResult.confidence > 0.8 && checkResult.detectedProcess !== '알 수 없음') {
     try {
       const { data: processes } = await supabase
         .from('processes')
@@ -48,8 +48,8 @@ export async function triggerPhotoWorkflow(
     }
   }
 
-  // 2) 하자 자동 등록 — NO-GO이면 site_issues에 INSERT
-  if (checkResult.goNoGo === 'NO-GO' && checkResult.issues.length > 0) {
+  // 2) 하자 자동 등록 — 위험 확인이면 site_issues에 INSERT
+  if (checkResult.goNoGo === '위험 확인' && checkResult.issues.length > 0) {
     try {
       const issueText = checkResult.issues.join('\n')
       await supabase.from('site_issues').insert({
@@ -75,7 +75,7 @@ export async function triggerPhotoWorkflow(
   }
 
   // 3) 안전 위험 즉시 알림
-  if (checkResult.goNoGo === 'NO-GO') {
+  if (checkResult.goNoGo === '위험 확인') {
     const { data: project } = await supabase
       .from('projects')
       .select('name')
@@ -146,7 +146,7 @@ export async function triggerPhotoWorkflow(
         date: today,
         auto_check_count: 1,
         go_count: checkResult.goNoGo === 'GO' ? 1 : 0,
-        nogo_count: checkResult.goNoGo === 'NO-GO' ? 1 : 0,
+        nogo_count: checkResult.goNoGo === '위험 확인' ? 1 : 0,
       })
     }
   } catch (err) {
