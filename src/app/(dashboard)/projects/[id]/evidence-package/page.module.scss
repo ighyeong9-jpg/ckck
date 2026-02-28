@@ -592,7 +592,7 @@
   border: 1px solid #e9d5ff;
 }
 
-// Verdict Banner (GO/NO-GO 판정 — 친절 레이블 + 코드 병기)
+// Verdict Banner (안전 현황 확인 — 친절 레이블 + 코드 병기)
 .verdictBanner {
   display: flex;
   align-items: center;
@@ -623,13 +623,13 @@
   line-height: 1.6;
 }
 
-// 판정별 색상 (verdictBanner + 기존 checkedItem 공유)
+// 현황별 색상 (verdictBanner + 기존 checkedItem 공유)
 .goNoGoGO {
   background: #dcfce7;
   color: #16a34a;
 }
 
-.goNoGoNOGO {
+.goNoGo안전현황 {
   background: #fee2e2;
   color: #dc2626;
 }

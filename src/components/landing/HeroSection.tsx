@@ -7,7 +7,7 @@ import styles from './HeroSection.module.scss'
 export default function HeroSection() {
   const badgeRef = useRef<HTMLDivElement>(null)
 
-  // GO/NO-GO 판정 카드 루프 애니메이션
+  // 안전 현황 확인 카드 루프 애니메이션
   useEffect(() => {
     const items = document.querySelectorAll(`.${styles.checkItem}`)
     let i = 0
@@ -31,17 +31,17 @@ export default function HeroSection() {
         <div className={styles.copy}>
           <div className={styles.badge} ref={badgeRef}>
             <span className={styles.dot} />
-            AI 분쟁 예방 플랫폼
+            AI 기록 관리 예방 플랫폼
           </div>
 
           <h1 className={styles.headline}>
             현장 사진<br />
             <span className={styles.accent}>한 장</span>으로<br />
-            분쟁을 막는다
+            기록 관리을 막는다
           </h1>
 
           <p className={styles.sub}>
-            월 450건의 인테리어 분쟁.<br />
+            월 450건의 인테리어 기록 관리.<br />
             원인은 하나였습니다. <strong>기록이 없어서.</strong>
           </p>
 
@@ -64,14 +64,14 @@ export default function HeroSection() {
           <p className={styles.hint}>신용카드 불필요 · 첫 현장 무료</p>
         </div>
 
-        {/* 오른쪽: GO/NO-GO 미리보기 UI */}
+        {/* 오른쪽: 안전 현황 미리보기 UI */}
         <div className={styles.preview} aria-hidden>
           <div className={styles.previewCard}>
             <div className={styles.previewHeader}>
               <span className={styles.previewDot} style={{ background: '#ef4444' }} />
               <span className={styles.previewDot} style={{ background: '#f59e0b' }} />
               <span className={styles.previewDot} style={{ background: '#10b981' }} />
-              <span className={styles.previewTitle}>체키 — 현장 체크</span>
+              <span className={styles.previewTitle}>체크인 — 현장 체크</span>
             </div>
 
             {/* 가상 사진 업로드 영역 */}
@@ -91,7 +91,7 @@ export default function HeroSection() {
                 <span>도막 두께 2mm 이상 확인</span>
               </div>
               <div className={`${styles.checkItem} ${styles.fail}`}>
-                <span className={styles.checkBadge} data-result="NO-GO">NO-GO</span>
+                <span className={styles.checkBadge} data-result="위험 확인">위험 확인</span>
                 <span>코너부 보강 처리 미확인</span>
               </div>
               <div className={`${styles.checkItem} ${styles.pass}`}>
@@ -104,9 +104,9 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* 최종 판정 */}
+            {/* 최종 현황 */}
             <div className={styles.verdict}>
-              <span className={styles.verdictLabel}>최종 판정</span>
+              <span className={styles.verdictLabel}>최종 현황</span>
               <span className={styles.verdictResult}>
                 <span className={styles.verdictIcon}>⚠️</span>
                 조건부 통과

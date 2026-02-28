@@ -12,9 +12,9 @@ interface OnboardingWizardProps {
 // ─── 역할 정의 ────────────────────────────────────────────
 
 const ROLES = [
-  { key: 'customer',      icon: '🏠', label: '집주인 · 세입자',      desc: '내 공사, 분쟁 없이 끝내기' },
-  { key: 'designer',      icon: '✏️', label: '인테리어 디자이너',    desc: '시공사 귀책 증거 자동 확보' },
-  { key: 'contractor',    icon: '🔨', label: '시공사 · 시공자',      desc: '말 바꾸는 고객 대응 자동화' },
+  { key: 'customer',      icon: '🏠', label: '집주인 · 세입자',      desc: '내 공사, 기록 관리 없이 끝내기' },
+  { key: 'designer',      icon: '✏️', label: '인테리어 디자이너',    desc: '시공사 귀책 시공 기록 자동 확보' },
+  { key: 'contractor',    icon: '🔨', label: '시공사 · 작업자',      desc: '말 바꾸는 고객 대응 자동화' },
   { key: 'supervisor',    icon: '📋', label: '감리자 · 현장소장',    desc: '법령 근거 첨부 체크리스트' },
   { key: 'subcontractor', icon: '👷', label: '하도급 업체',          desc: '임금 체불 대응, 직불 청구' },
   { key: 'self',          icon: '🛠️', label: '셀프인테리어',         desc: '전문가 없이도 안전하게' },
@@ -42,23 +42,23 @@ const INDUSTRIES = [
 const AI_FEATURES = [
   {
     icon: '📸',
-    title: '사진 한 장 → GO / NO-GO',
-    desc: '현장 사진을 올리면 AI가 9개 공종 기준으로 즉시 판정합니다. 판정 근거는 법령과 함께 자동 저장됩니다.',
+    title: '사진 한 장 → 안전 현황',
+    desc: '현장 사진을 올리면 AI가 9개 공종 기준으로 즉시 확인합니다. 확인 근거는 법령과 함께 자동 저장됩니다.',
     badge: '핵심 기능',
     badgeColor: '#FF6B2B',
   },
   {
     icon: '⚠️',
-    title: '분쟁 징후 자동 감지',
-    desc: '"구두로 합의했어요"라고 입력하면 체키가 민법 조항과 함께 즉각 경고합니다. 7대 분쟁 유형 실시간 감지.',
+    title: '기록 관리 징후 자동 감지',
+    desc: '"구두로 합의했어요"라고 입력하면 체크인가 민법 조항과 함께 즉각 경고합니다. 7대 기록 관리 유형 실시간 감지.',
     badge: '자동 실행',
     badgeColor: '#FFB800',
   },
   {
     icon: '🔔',
     title: '하자담보 만료 자동 알림',
-    desc: '방수 3년, 타일 1년 — 공종별 담보기간을 자동으로 추적하고 만료 30일 전 알림을 드립니다.',
-    badge: '자동 추적',
+    desc: '방수 3년, 타일 1년 — 공종별 담보기간을 자동으로 현황 확인하고 만료 30일 전 알림을 드립니다.',
+    badge: '자동 현황 확인',
     badgeColor: '#00D084',
   },
 ]
@@ -180,15 +180,15 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
               <>
                 <div className={styles.logoMark}><span>🔨</span></div>
                 <h1 className={styles.bigTitle}>
-                  체키는<br />
+                  체크인는<br />
                   <span className={styles.accent}>시공사도</span> 보호해요
                 </h1>
                 <p className={styles.subtitle}>
-                  억울한 하자 클레임, 미지급 기성금<br />구두합의 분쟁에서 시공사의 권리를 지켜드려요.
+                  억울한 하자 클레임, 미지급 기성금<br />구두합의 기록 관리에서 시공사의 권리를 지켜드려요.
                 </p>
                 <div className={styles.contractorBenefits}>
                   {[
-                    { icon: '📸', text: '시공 완료 사진으로 증거 자동 확보' },
+                    { icon: '📸', text: '시공 완료 사진으로 시공 기록 자동 확보' },
                     { icon: '🛡️', text: '하자 클레임 대응 근거 자동 생성' },
                     { icon: '💰', text: '미지급 기성금 — 하도급법 근거 즉시 제시' },
                   ].map((b, i) => (
@@ -208,12 +208,12 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                 <div className={styles.logoMark}><span>✅</span></div>
                 <h1 className={styles.bigTitle}>
                   이런 상황에서<br />
-                  <span className={styles.accent}>체키</span>를 쓰세요
+                  <span className={styles.accent}>체크인</span>를 쓰세요
                 </h1>
                 <div className={styles.contractorScenarios}>
                   {[
-                    { title: '억울한 하자 클레임', desc: '시공 당시 사진이 없어서 억울하게 보수해준 적 있으세요? 체키는 날짜·위치 정보를 포함한 증거를 자동으로 쌓아줘요.' },
-                    { title: '구두합의 분쟁', desc: '고객이 나중에 말을 바꿨나요? AI가 대화를 분석해서 민법 근거와 함께 대응 방법을 알려줘요.' },
+                    { title: '억울한 하자 클레임', desc: '시공 당시 사진이 없어서 억울하게 보수해준 적 있으세요? 체크인는 날짜·위치 정보를 포함한 시공 기록를 자동으로 쌓아줘요.' },
+                    { title: '구두합의 기록 관리', desc: '고객이 나중에 말을 바꿨나요? AI가 대화를 분석해서 민법 근거와 함께 대응 방법을 알려줘요.' },
                     { title: '기성금 미지급', desc: '공사 완료 후 잔금을 안 주나요? 하도급법 제13조 기준과 지연이자 계산을 즉시 제공해요.' },
                   ].map((s, i) => (
                     <div key={i} className={styles.scenarioCard}>
@@ -252,15 +252,15 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
           </div>
         )}
 
-        {/* ─── STEP 0: 안녕하세요. 체키입니다. ─────────────── */}
+        {/* ─── STEP 0: 안녕하세요. 체크인입니다. ─────────────── */}
         {step === 0 && (
           <div className={styles.step} key="step0">
             <div className={styles.logoMark}>
-              <span>체키</span>
+              <span>체크인</span>
             </div>
             <h1 className={styles.bigTitle}>
               안녕하세요.<br />
-              <span className={styles.accent}>체키</span>입니다.
+              <span className={styles.accent}>체크인</span>입니다.
             </h1>
             <p className={styles.subtitle}>
               어떤 역할로 사용하시나요?<br />
@@ -372,7 +372,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
               AI가<br />준비됐어요.
             </h2>
             <p className={styles.stepDesc}>
-              체키의 3가지 핵심 기능을 소개합니다.
+              체크인의 3가지 핵심 기능을 소개합니다.
             </p>
 
             <div className={styles.featureCards}>

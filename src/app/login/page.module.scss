@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
+  background: linear-gradient(135deg, #0A1929 0%, #0F2744 60%, #1A3A5C 100%);
   padding: 1rem;
 }
 
@@ -36,10 +36,8 @@
 .logoText {
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--checkin-navy);
+  font-weight: 800;
 }
 
 .tagline {
@@ -130,19 +128,21 @@
 
 .submitBtn {
   padding: 1rem;
-  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
+  background: var(--checkin-orange);
   border: none;
   border-radius: var(--btn-radius);
   color: white;
   font-size: 1rem;
-  font-weight: var(--btn-font-weight);
+  font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
   margin-top: 0.5rem;
+  box-shadow: var(--shadow-cta);
 
   &:hover:not(:disabled) {
+    background: var(--checkin-orange-hot);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-purple);
+    box-shadow: 0 6px 24px rgba(232,101,26,0.45);
   }
 
   &:disabled {

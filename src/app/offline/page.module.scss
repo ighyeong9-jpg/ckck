@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--color-bg), rgba(124,58,237,0.06));
+  background: linear-gradient(135deg, #0F2744, #1A3A5C);
   padding: 2rem;
 }
 
@@ -13,7 +13,7 @@
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  max-width: 400px;
+  max-width: 420px;
 }
 
 .icon {
@@ -29,45 +29,80 @@
 .title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-text);
+  color: #ffffff;
 }
 
 .description {
   font-size: 0.95rem;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
 }
 
-.logo {
+.featureList {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.featureTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+}
+
+.featureItem {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 2rem;
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.logoIcon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: white;
-  font-weight: 700;
+.featureLabel {
+  flex: 1;
+  text-align: left;
+}
+
+.supported {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 8px;
+  border-radius: 1rem;
+}
+
+.unsupported {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: 1rem;
+}
+
+.logo {
+  margin-top: 1.5rem;
 }
 
 .logoText {
   font-size: 1.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #4f46e5, var(--color-primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.logoAccent {
+  color: #E8651A;
 }
 
 .tagline {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.25);
 }

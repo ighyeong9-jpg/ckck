@@ -54,7 +54,7 @@ export function searchCases(query: string, topK = 3): CaseResult[] {
     .slice(0, topK)
 }
 
-/** 분쟁 유형 키워드 → 판례 자동 매칭 */
+/** 기록 관리 유형 키워드 → 판례 자동 매칭 */
 export const DISPUTE_KEYWORDS = [
   '하자', '누수', '방수', '곰팡이', '균열', '들뜸',        // 하자 계열
   '추가비용', '추가공사', '구두', '과다청구', '사기',       // 비용 계열

@@ -1,0 +1,70 @@
+
+> check-in-stable@1.0.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+ ⚠ Port 3001 is in use, trying 3002 instead.
+ ⚠ Port 3002 is in use, trying 3003 instead.
+ ⚠ Port 3003 is in use, trying 3004 instead.
+ ⚠ Port 3004 is in use, trying 3005 instead.
+ ⚠ Port 3005 is in use, trying 3006 instead.
+  ▲ Next.js 13.5.6
+  - Local:        http://localhost:3006
+  - Environments: .env.local
+
+ ✓ Ready in 1310ms
+ ✓ Compiled /src/middleware in 377ms (106 modules)
+ ✓ Compiled /page in 1838ms (525 modules)
+ ✓ Compiled /(dashboard)/dashboard/page in 1150ms (735 modules)
+ ✓ Compiled /(dashboard)/projects/page in 410ms (713 modules)
+ ✓ Compiled /(dashboard)/projects/[id]/diagnostic/page in 466ms (871 modules)
+ ✓ Compiled /not-found in 155ms (829 modules)
+ ✓ Compiled /offline/page in 210ms (846 modules)
+ ✓ Compiled in 295ms (850 modules)
+ ✓ Compiled /_error in 628ms (993 modules)
+ ⨯ Internal error: Error: The render was aborted by the server without a reason.
+    at eG (E:\dev\check-in-stable\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:11:330259)
+    at Object.cancel (E:\dev\check-in-stable\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:11:343583)
+    at invokePromiseCallback (node:internal/webstreams/util:172:10)
+    at Object.cancelAlgorithm (node:internal/webstreams/util:177:23)
+    at readableByteStreamControllerCancelSteps (node:internal/webstreams/readablestream:3171:37)
+    at [kCancel] (node:internal/webstreams/readablestream:1197:12)
+    at readableStreamCancel (node:internal/webstreams/readablestream:2018:39)
+    at node:internal/webstreams/readablestream:1549:15
+    at complete (node:internal/webstreams/readablestream:1438:9)
+    at shutdownWithAnAction (node:internal/webstreams/readablestream:1434:5)
+    at node:internal/webstreams/readablestream:1548:14
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+ ⨯ Internal error: Error: The render was aborted by the server without a reason.
+    at eG (E:\dev\check-in-stable\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:11:330259)
+    at Object.cancel (E:\dev\check-in-stable\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:11:343583)
+    at invokePromiseCallback (node:internal/webstreams/util:172:10)
+    at Object.cancelAlgorithm (node:internal/webstreams/util:177:23)
+    at readableByteStreamControllerCancelSteps (node:internal/webstreams/readablestream:3171:37)
+    at [kCancel] (node:internal/webstreams/readablestream:1197:12)
+    at readableStreamCancel (node:internal/webstreams/readablestream:2018:39)
+    at node:internal/webstreams/readablestream:1549:15
+    at complete (node:internal/webstreams/readablestream:1438:9)
+    at shutdownWithAnAction (node:internal/webstreams/readablestream:1434:5)
+    at node:internal/webstreams/readablestream:1548:14
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+ ✓ Compiled in 325ms (1007 modules)
+ ✓ Compiled /(dashboard)/reports/page in 338ms (1012 modules)
+ ✓ Compiled /(dashboard)/warranty/page in 295ms (1021 modules)
+ ✓ Compiled /(dashboard)/quotes/page in 255ms (1030 modules)
+ ✓ Compiled in 291ms (1021 modules)
+ ✓ Compiled in 271ms (1016 modules)
+ ✓ Compiled /not-found in 113ms (1006 modules)
+ ✓ Compiled /(dashboard)/reports/page in 129ms (492 modules)
+ ✓ Compiled /(dashboard)/ai-chat/page in 315ms (1032 modules)
+ ✓ Compiled /(dashboard)/issues/page in 1412ms (1588 modules)
+ ✓ Compiled /(dashboard)/clients/page in 262ms (1563 modules)
+ ✓ Compiled /(dashboard)/warranty/page in 150ms (809 modules)
+ ✓ Compiled /pricing/page in 264ms (1562 modules)
+ ✓ Compiled /(dashboard)/projects/[id]/sow/page in 399ms (1575 modules)
+ ✓ Compiled /(dashboard)/projects/[id]/cost-analysis/page in 326ms (1588 modules)
+ ✓ Compiled /(dashboard)/projects/[id]/changes/page in 284ms (1593 modules)
+ ✓ Compiled /(dashboard)/projects/[id]/agreement/page in 324ms (1620 modules)
+ ✓ Compiled in 288ms (1277 modules)
+ ✓ Compiled /not-found in 158ms (1267 modules)
+[?25h

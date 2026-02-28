@@ -1,12 +1,12 @@
 /**
  * action-guide.ts — 상황별 자동 행동 안내
  *
- * 어떤 상황이 감지되면 체키가 다음 행동을 자동으로 안내한다.
+ * 어떤 상황이 감지되면 체크인가 다음 행동을 자동으로 안내한다.
  * 복잡한 AI 호출 없이 규칙 기반으로 즉시 응답.
  *
  * 사용 예:
  * - 공정 완료 감지 → 다음 공정 안내
- * - 분쟁 감지 → 법적 대응 순서 안내
+ * - 기록 관리 감지 → 법적 대응 순서 안내
  * - 하자 발생 → 보수 요청 절차 안내
  * - 견적 검토 → 시세 확인 체크리스트
  */
@@ -22,7 +22,7 @@ export type ActionGuideSituation =
   | 'electrical_done'         // 전기 완료
   | 'plumbing_done'           // 배관 완료
   | 'tiling_done'             // 타일 완료
-  | 'dispute_detected'        // 분쟁 징후 감지
+  | 'dispute_detected'        // 기록 관리 징후 감지
   | 'defect_occurred'         // 하자 발생
   | 'quote_review'            // 견적 검토
   | 'contract_missing'        // 계약서 없음
@@ -210,7 +210,7 @@ const ACTION_GUIDES: Record<ActionGuideSituation, ActionGuide> = {
     steps: [
       {
         order: 1,
-        title: '공동음(Hollow) 검사',
+        title: '공동음(Hollow) 확인',
         description: '고무 망치로 두드려 들뜬 타일이 없는지 확인합니다.',
         urgent: true,
       },
@@ -231,8 +231,8 @@ const ACTION_GUIDES: Record<ActionGuideSituation, ActionGuide> = {
 
   dispute_detected: {
     situation: 'dispute_detected',
-    title: '분쟁 징후 감지 — 즉시 행동',
-    summary: '분쟁으로 번지기 전에 지금 바로 이 순서대로 행동하세요.',
+    title: '기록 관리 징후 감지 — 즉시 행동',
+    summary: '기록 관리으로 번지기 전에 지금 바로 이 순서대로 행동하세요.',
     steps: [
       {
         order: 1,
@@ -255,8 +255,8 @@ const ACTION_GUIDES: Record<ActionGuideSituation, ActionGuide> = {
       },
       {
         order: 4,
-        title: '내용증명 발송 검토',
-        description: '상황이 심각하다면 내용증명으로 공식 입장을 전달합니다.',
+        title: '내용통지 발송 검토',
+        description: '상황이 심각하다면 내용통지으로 공식 입장을 전달합니다.',
         urgent: false,
         legalBasis: '우편법 제15조',
       },
@@ -273,13 +273,13 @@ const ACTION_GUIDES: Record<ActionGuideSituation, ActionGuide> = {
       {
         order: 1,
         title: '즉시 사진/영상 촬영',
-        description: '하자 발생 즉시 날짜 스탬프 포함 사진/영상을 촬영합니다. 지체하면 증거 무효.',
+        description: '하자 발생 즉시 날짜 스탬프 포함 사진/영상을 촬영합니다. 지체하면 시공 기록 무효.',
         urgent: true,
       },
       {
         order: 2,
         title: '서면으로 하자 보수 요청',
-        description: '문자, 이메일, 내용증명으로 하자 내용과 보수 요청을 서면 발송합니다.',
+        description: '문자, 이메일, 내용통지으로 하자 내용과 보수 요청을 서면 발송합니다.',
         urgent: true,
         legalBasis: '민법 제667조',
       },
@@ -368,8 +368,8 @@ const ACTION_GUIDES: Record<ActionGuideSituation, ActionGuide> = {
         legalBasis: '건설산업기본법 제28조',
       },
     ],
-    warningMessage: '계약서 없이 공사 진행 시 분쟁 시 100% 불리합니다.',
-    relatedLaw: '건설산업기본법 제22조 (건설공사 시공자)',
+    warningMessage: '계약서 없이 공사 진행 시 기록 관리 시 100% 불리합니다.',
+    relatedLaw: '건설산업기본법 제22조 (건설공사 작업자)',
   },
 
   verbal_agreement: {
@@ -495,8 +495,8 @@ const ACTION_GUIDES: Record<ActionGuideSituation, ActionGuide> = {
     steps: [
       {
         order: 1,
-        title: '내용증명 발송',
-        description: '지급 기한을 명시한 내용증명을 발송합니다. 법적 대응의 시작점.',
+        title: '내용통지 발송',
+        description: '지급 기한을 명시한 내용통지을 발송합니다. 법적 대응의 시작점.',
         urgent: true,
         legalBasis: '민법 제544조 (이행의 최고)',
       },

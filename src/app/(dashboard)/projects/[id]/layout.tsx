@@ -58,7 +58,7 @@ export default async function ProjectDetailLayout({
 
   return (
     <div className={styles.projectLayout}>
-      {/* AI 채팅 컨텍스트 추적: 현재 프로젝트를 localStorage에 저장 */}
+      {/* AI 채팅 컨텍스트 현황 확인: 현재 프로젝트를 localStorage에 저장 */}
       <ProjectContextTracker
         projectId={projectId}
         projectName={project?.name || '프로젝트'}

@@ -533,13 +533,13 @@ export async function scheduleCheckOrder(params: { projectId: string }): Promise
   }
 
   if (violations.length === 0) {
-    return { tool: 'schedule_check_order', success: true, message: '✅ 공정 순서가 정상입니다. 위반 사항 없음.' }
+    return { tool: 'schedule_check_order', success: true, message: '✅ 공정 순서가 정상입니다. 미충족 사항 없음.' }
   }
 
   return {
     tool: 'schedule_check_order',
     success: true,
-    message: `🚨 공정 순서 위반 감지! (${violations.length}건)\n\n${violations.join('\n')}\n\n공정 순서: 철거→설비→전기→방수→목공→타일→도배→가구→마감`,
+    message: `🚨 공정 순서 미충족 감지! (${violations.length}건)\n\n${violations.join('\n')}\n\n공정 순서: 철거→설비→전기→방수→목공→타일→도배→가구→마감`,
     data: { violations },
   }
 }
@@ -606,7 +606,7 @@ export async function scheduleGantt(params: { projectId: string }): Promise<Tool
   return {
     tool: 'schedule_gantt',
     success: true,
-    message: `📊 공정 현황 (간트차트)\n\n${gantt}`,
+    message: `📊 공정 현황 (공정 일정표)\n\n${gantt}`,
     data: { processes },
   }
 }
@@ -673,7 +673,7 @@ export async function photoAnalyze(): Promise<ToolResult> {
   return {
     tool: 'photo_analyze',
     success: true,
-    message: '🤖 사진 AI 분석 기능은 곧 업데이트 예정입니다.\n\n향후 기능:\n  • 공종 자동 판별\n  • 하자/불량 자동 감지\n  • 진행률 자동 측정\n  • Before/After 자동 매칭',
+    message: '🤖 사진 AI 분석 기능은 곧 업데이트 예정입니다.\n\n향후 기능:\n  • 공종 자동 확인\n  • 하자/불량 자동 감지\n  • 진행률 자동 측정\n  • Before/After 자동 매칭',
   }
 }
 
@@ -975,14 +975,14 @@ export async function materialCost(params: { projectId: string }): Promise<ToolR
 }
 
 // ═══════════════════════════════════════════════
-// 증거/인증 (6개)
+// 시공 기록/인증 (6개)
 // ═══════════════════════════════════════════════
 
 export async function evidenceCreate(params: { projectId: string; description: string }): Promise<ToolResult> {
   return {
     tool: 'evidence_create',
     success: true,
-    message: `📸 증거 생성은 증빙 패키지 페이지에서 파일을 업로드하면 자동으로 SHA-256 해시가 생성됩니다.\n\n프로젝트 > 증빙패키지 > 파일 업로드`,
+    message: `📸 시공 기록 생성은 증빙 패키지 페이지에서 파일을 업로드하면 자동으로 SHA-256 해시가 생성됩니다.\n\n프로젝트 > 증빙패키지 > 파일 업로드`,
   }
 }
 
@@ -997,10 +997,10 @@ export async function evidenceVerify(params: { projectId: string }): Promise<Too
   return {
     tool: 'evidence_verify',
     success: true,
-    message: `🔐 증거 무결성 검증\n\n` +
-      `📎 총 증거 파일: ${(files || []).length}개\n` +
+    message: `🔐 시공 기록 무결성 검증\n\n` +
+      `📎 총 시공 기록 파일: ${(files || []).length}개\n` +
       `🔑 SHA-256 해시 보유: ${hasHash}개\n` +
-      `${hasHash === (files || []).length ? '✅ 모든 증거의 무결성이 확인되었습니다.' : `⚠️ ${(files || []).length - hasHash}개 파일에 해시가 없습니다.`}`,
+      `${hasHash === (files || []).length ? '✅ 모든 시공 기록의 무결성이 확인되었습니다.' : `⚠️ ${(files || []).length - hasHash}개 파일에 해시가 없습니다.`}`,
   }
 }
 
@@ -1008,7 +1008,7 @@ export async function evidenceExport(params: { projectId: string }): Promise<Too
   return {
     tool: 'evidence_export',
     success: true,
-    message: '📦 증거 패키지 내보내기는 증빙 패키지 페이지에서 가능합니다.\n\n프로젝트 > 증빙패키지 > "패키지 다운로드"',
+    message: '📦 시공 기록 패키지 내보내기는 증빙 패키지 페이지에서 가능합니다.\n\n프로젝트 > 증빙패키지 > "패키지 다운로드"',
   }
 }
 
@@ -1177,7 +1177,7 @@ export async function contractCreate(params: { projectId: string }): Promise<Too
   return {
     tool: 'contract_create',
     success: true,
-    message: '📝 계약서 생성은 합의 페이지에서 가능합니다.\n\n프로젝트 > 합의 > "합의서 생성"\n\n3자(발주자/시공자/감리자) 전자서명이 지원됩니다.',
+    message: '📝 계약서 생성은 합의 페이지에서 가능합니다.\n\n프로젝트 > 합의 > "합의서 생성"\n\n3자(발주자/작업자/감리자) 전자서명이 지원됩니다.',
   }
 }
 
@@ -1216,7 +1216,7 @@ export async function contractStatus(params: { projectId: string }): Promise<Too
       `상태: ${latest.status}\n` +
       `💰 합의 금액: ${formatKRW(latest.total_amount || 0)}\n` +
       `👤 발주자: ${latest.client_agreed ? '✅ 서명 완료' : '⏳ 대기중'}\n` +
-      `🏗️ 시공자: ${latest.contractor_agreed ? '✅ 서명 완료' : '⏳ 대기중'}\n` +
+      `🏗️ 작업자: ${latest.contractor_agreed ? '✅ 서명 완료' : '⏳ 대기중'}\n` +
       `📊 감리자: ${latest.manager_agreed ? '✅ 서명 완료' : '⏳ 대기중'}`,
     data: latest,
   }
@@ -1375,7 +1375,7 @@ export async function adminPermitCheck(params: { industry?: string; area?: numbe
   const info = industryInfo[industry as keyof typeof industryInfo]
 
   const permits: string[] = []
-  permits.push('✅ 소방시설 완비증명원 (필수)')
+  permits.push('✅ 소방시설 완비확인원 (필수)')
   permits.push('✅ 건축물 용도 확인 (필수)')
   if (area > 100) permits.push('⚠️ 건축 허가/신고 필요 가능')
   if (['restaurant', 'cafe', 'bar', 'bakery'].includes(industry)) {
@@ -1602,7 +1602,7 @@ export async function paymentRequest(params: { projectId: string }): Promise<Too
       `정산을 요청하려면:\n` +
       `1. 작업 완료 사진을 업로드하세요\n` +
       `2. 체크리스트를 완료하세요\n` +
-      `3. 체키가 자동으로 정산 근거를 생성합니다\n\n` +
+      `3. 체크인가 자동으로 정산 근거를 생성합니다\n\n` +
       `작업 완료 기록 + 사진 = 정산의 객관적 근거`,
   }
 }

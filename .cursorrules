@@ -1,0 +1,57 @@
+# Check-In — Cursor AI Rules
+
+## 프로젝트 개요
+한국 인테리어 공사 현장 관리 SaaS. Next.js 14 + TypeScript + Supabase + Gemini AI.
+사용자: 업체(시공사) + 고객(발주자) 두 종류뿐.
+
+## 반드시 읽어야 할 파일
+작업 시작 전 CLAUDE.md를 읽어라. 모든 지시사항이 거기 있다.
+DB 작업 시 DATABASE.md 읽어라.
+화면 작업 시 SCREENS.md 읽어라.
+버그 수정 시 ERRORS.md 읽어라.
+
+## 코딩 규칙
+
+### TypeScript
+- any 타입 사용 금지. 반드시 명시적 타입 정의.
+- src/types/ 폴더의 기존 타입 우선 사용.
+- 새 타입 추가 시 src/types/ 에 추가.
+
+### Supabase
+- 클라이언트: createClient() from @/lib/supabase/client (브라우저)
+- 서버: createClient() from @/lib/supabase/server (서버 컴포넌트, API routes)
+- 어드민: createClient() from @/lib/supabase/admin (service role 필요 시만)
+- RLS 항상 활성화. 절대 service role을 클라이언트에서 사용하지 말 것.
+
+### AI 호출
+- 직접 Gemini/Claude import 금지.
+- 반드시 src/lib/ai/brain.ts의 brain() 함수를 통해 호출.
+- 폴백 체인: Gemini → Claude 자동.
+
+### 스타일
+- Tailwind 또는 CSS Modules 사용. 인라인 스타일 최소화.
+- 업체 화면: 네이비 #0F2744 + 오렌지 #E8651A
+- 고객 화면: 오렌지 #E8651A만, 배경 #FFFAF7
+- 버튼 최소 높이 48px (모바일 기준)
+
+### 컴포넌트
+- 'use client' 필요한 경우만 사용. 기본은 서버 컴포넌트.
+- 로딩 상태 반드시 처리. 빈 화면 절대 금지.
+- 에러 상태 반드시 처리.
+
+### 파일 구조
+- 페이지: src/app/(dashboard)/projects/[id]/기능명/page.tsx
+- 고객 페이지: src/app/(client)/
+- API: src/app/api/기능/route.ts
+- 유틸: src/lib/
+- 타입: src/types/
+- 컴포넌트: src/components/
+
+## 절대 하지 말 것
+- 새 기능 추가 (기존 기능 완성이 우선)
+- DB 테이블 구조 임의 변경
+- 환경변수 값 변경
+- 여러 기능 동시 수정
+
+## 완성 기준
+TESTING.md의 모든 체크리스트 통과.

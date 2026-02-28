@@ -47,7 +47,7 @@ export default function DemoUpload() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: '이 현장 사진을 분석해주세요. GO/NO-GO 판정과 주요 체크포인트, 법적 근거를 알려주세요.',
+          message: '이 현장 사진을 분석해주세요. 안전 현황 확인과 주요 체크포인트, 법적 근거를 알려주세요.',
           imageData: { base64, mimeType: file.type },
           isDemo: true,
         }),

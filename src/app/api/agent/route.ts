@@ -1,6 +1,6 @@
 /**
  * POST /api/agent
- * AI Agent "체키" API 엔드포인트
+ * AI Agent "체크인" API 엔드포인트
  *
  * 우선순위:
  * 1. GEMINI_API_KEY → Gemini (2.5-flash 자동 폴백)
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 프로젝트 컨텍스트 로드
-    // projectId 없으면 사용자의 가장 최근 진행 중 프로젝트를 자동 선택 (체키 자율 실행 지원)
+    // projectId 없으면 사용자의 가장 최근 진행 중 프로젝트를 자동 선택 (체크인 자율 실행 지원)
     let resolvedProjectId = projectId
     if (!resolvedProjectId) {
       const { data: projects } = await supabase
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     if (process.env.ANTHROPIC_API_KEY) {
       try {
         // 프로젝트 컨텍스트 포함 시스템 프롬프트 구성
-        let systemPrompt = `당신은 체키(Check-In), 인테리어/건설 현장 전문 AI 비서입니다.
+        let systemPrompt = `당신은 체크인(Check-In), 인테리어/건설 현장 전문 AI 비서입니다.
 한국어로 답변하고 친근하고 전문적인 어조를 유지하세요.
 인테리어/건설 관련 질문에 정확하고 실용적으로 답변하세요.
 프로젝트 관리, 견적, 공정, 인력, 자재, 리스크 분석 등을 도와드립니다.`

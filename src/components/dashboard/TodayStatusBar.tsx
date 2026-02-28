@@ -119,7 +119,7 @@ export default function TodayStatusBar() {
   // 탭 타이틀 뱃지 (미확인 건수)
   useEffect(() => {
     const urgent = counts.pendingChanges + counts.disputeSignals + counts.expiringWarranty
-    document.title = urgent > 0 ? `(${urgent}) 체키` : '체키'
+    document.title = urgent > 0 ? `(${urgent}) 체크인` : '체크인'
   }, [counts])
 
   const scrollTo = (id: string) => {

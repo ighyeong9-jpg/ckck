@@ -24,7 +24,7 @@ export type AlertCategory =
   | 'PROCESS'       // 공정 지연/누락
   | 'MATERIAL'      // 자재 부족/지연
   | 'WORKFORCE'     // 인력 이상
-  | 'DISPUTE'       // 분쟁 징후
+  | 'DISPUTE'       // 기록 관리 징후
   | 'AI_DETECTED'   // AI 감지 이상
 
 export interface Alert {
@@ -135,7 +135,7 @@ function detectRuleBasedAlerts(ctx: AlertContext): Alert[] {
       severity: 'CRITICAL',
       category: 'RISK_SCORE',
       title: '리스크 점수가 매우 높아요',
-      message: `현재 리스크 점수가 ${ctx.riskScore}점으로 F등급입니다. 즉시 체크리스트를 확인하고 리스크 요인을 해소해주세요. 방치하면 분쟁 또는 법적 문제로 이어질 수 있습니다.`,
+      message: `현재 리스크 점수가 ${ctx.riskScore}점으로 F등급입니다. 즉시 체크리스트를 확인하고 리스크 요인을 해소해주세요. 방치하면 기록 관리 또는 법적 문제로 이어질 수 있습니다.`,
       action: '진단 체크리스트 확인',
       actionUrl: `/projects/${ctx.projectId}/diagnostic`,
       detectedAt: now.toISOString(),
@@ -169,7 +169,7 @@ function detectRuleBasedAlerts(ctx: AlertContext): Alert[] {
         severity: 'WARNING',
         category: 'CHECKLIST',
         title: '체크리스트 완료율이 낮아요',
-        message: `공정 진행률(${ctx.progress}%)에 비해 체크리스트 완료율(${pct}%)이 너무 낮습니다. 기록되지 않은 작업은 추후 분쟁 시 증거가 없을 수 있어요. 지금 체크리스트를 작성해주세요.`,
+        message: `공정 진행률(${ctx.progress}%)에 비해 체크리스트 완료율(${pct}%)이 너무 낮습니다. 기록되지 않은 작업은 추후 기록 관리 시 시공 기록이 없을 수 있어요. 지금 체크리스트를 작성해주세요.`,
         action: '체크리스트 작성',
         actionUrl: `/projects/${ctx.projectId}/diagnostic`,
         detectedAt: now.toISOString(),
@@ -205,7 +205,7 @@ function detectRuleBasedAlerts(ctx: AlertContext): Alert[] {
       severity: 'INFO',
       category: 'DISPUTE',
       title: `승인 대기 변경사항 ${ctx.pendingChangeOrders}건`,
-      message: `검토가 필요한 변경사항이 ${ctx.pendingChangeOrders}건 있어요. 고객 확인 전에 공사를 진행하면 추후 분쟁이 생길 수 있습니다.`,
+      message: `검토가 필요한 변경사항이 ${ctx.pendingChangeOrders}건 있어요. 고객 확인 전에 공사를 진행하면 추후 기록 관리이 생길 수 있습니다.`,
       action: '변경사항 확인',
       actionUrl: `/projects/${ctx.projectId}/changes`,
       detectedAt: now.toISOString(),
@@ -213,8 +213,8 @@ function detectRuleBasedAlerts(ctx: AlertContext): Alert[] {
     })
   }
 
-  // 6. AI 체크 NO-GO
-  const noGoChecks = ctx.recentAiChecks.filter(c => c.goNoGo === 'NO-GO')
+  // 6. AI 체크 위험 확인
+  const noGoChecks = ctx.recentAiChecks.filter(c => c.goNoGo === '위험 확인')
   if (noGoChecks.length > 0) {
     const issues = noGoChecks.flatMap(c => c.issues).slice(0, 3)
     alerts.push({

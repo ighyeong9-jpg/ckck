@@ -1,6 +1,6 @@
 /**
  * Gemini AI Provider
- * 체키 AI 비서의 두뇌 역할 - Gemini Flash 모델 사용
+ * 체크인 AI 비서의 두뇌 역할 - Gemini Flash 모델 사용
  * Function Calling으로 100+개 도구를 자연어로 연결
  *
  * 모델 폴백 체인:
@@ -36,18 +36,18 @@ import * as ext from '@/app/api/agent/tools-extended'
 import * as auto from '@/app/api/agent/tools-auto'
 
 /**
- * 체키 마스터 시스템 프롬프트
+ * 체크인 마스터 시스템 프롬프트
  *
- * 체키는 단순 챗봇이 아니다.
+ * 체크인는 단순 챗봇이 아니다.
  * 대한민국 인테리어·건설 현장의 법적 책임을 AI와 함께 지는 신뢰 파트너다.
  */
-export const CHEKI_SYSTEM_PROMPT = `당신은 체키(Cheki)입니다.
+export const CHEKI_SYSTEM_PROMPT = `당신은 체크인(Cheki)입니다.
 대한민국 인테리어·건설 현장 전담 AI 법률·시공 비서입니다.
 15년 현장 경력 전문가 수준으로 답변하며, 법적 책임을 함께 지는 신뢰할 수 있는 조언자입니다.
 
-■ 체키의 핵심 가치
+■ 체크인의 핵심 가치
 1. 법적 근거 필수: 모든 실무 답변에 법령명·조문·KCS시방서 출처를 명시합니다. 출처 없이 추측하지 않습니다.
-2. 분쟁 예방 우선: 싸움이 날 징후(구두 합의·서면 없음·애매한 범위)를 먼저 알려줍니다.
+2. 기록 관리 예방 우선: 싸움이 날 징후(구두 합의·서면 없음·애매한 범위)를 먼저 알려줍니다.
 3. 현장 맥락 인식: 등록된 현장 정보(공종·리스크·변경사항)를 바탕으로 맞춤 조언을 드립니다.
 4. 사용자 편: 고객·디자이너·시공사·감리·하도급·건물주 각 역할의 이익을 최우선으로 대변합니다.
 
@@ -69,8 +69,8 @@ export const CHEKI_SYSTEM_PROMPT = `당신은 체키(Cheki)입니다.
 • project_list 결과에서 고객명(client_name)·프로젝트명(name)으로 키워드 검색해 자동 매칭할 것.
 • 컨텍스트에 프로젝트가 없어도 먼저 도구를 실행하고 결과 기반으로 답변하라. 질문 먼저 하는 것 금지.
 
-■ 분쟁 징후 자동 감지 (이 키워드 발견 시 즉시 경고)
-• "구두로 합의" / "나중에 정산" / "대충" / "알아서" → "⚠️ 분쟁 위험: 서면 계약·사진 기록 권장"
+■ 기록 관리 징후 자동 감지 (이 키워드 발견 시 즉시 경고)
+• "구두로 합의" / "나중에 정산" / "대충" / "알아서" → "⚠️ 기록 관리 위험: 서면 계약·사진 기록 권장"
 • "추가 비용 발생" → 사전 서면 승인 여부 확인
 • "설계와 다르게" → 감리자·설계자 즉시 확인 권고
 
@@ -729,15 +729,15 @@ export async function callGemini(
   for (let i = 0; i < GEMINI_MODELS.length; i++) {
     const modelName = GEMINI_MODELS[i]
     try {
-      console.log(`[체키] ${modelName} 시도 중...`)
+      console.log(`[체크인] ${modelName} 시도 중...`)
       const result = await callGeminiWithModel(genAI, modelName, userMessage, ctx, conversationHistory, image)
-      console.log(`[체키] ${modelName} 응답 성공 ✓`)
+      console.log(`[체크인] ${modelName} 응답 성공 ✓`)
       return result
     } catch (error: any) {
       lastError = error
-      console.error(`[체키] ${modelName} 실패:`, error?.message?.substring(0, 200))
+      console.error(`[체크인] ${modelName} 실패:`, error?.message?.substring(0, 200))
       if (isRateLimitError(error) && i < GEMINI_MODELS.length - 1) {
-        console.warn(`[체키] → ${GEMINI_MODELS[i + 1]}로 자동 전환`)
+        console.warn(`[체크인] → ${GEMINI_MODELS[i + 1]}로 자동 전환`)
         continue
       }
       throw error

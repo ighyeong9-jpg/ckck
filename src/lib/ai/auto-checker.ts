@@ -5,7 +5,7 @@
  * 현장 사진 (base64 or URL)
  *   → Gemini Vision으로 공종 자동 인식
  *   → 해당 공종 체크리스트 항목 자동 체크
- *   → GO / NO-GO / CONDITIONAL 판정
+ *   → 안전 현황 / CONDITIONAL 현황
  *   → 미흡 항목 + 법적 근거 텍스트 자동 생성
  *   → 사람은 [확인] 또는 [수정 후 확인] 버튼만 클릭
  *
@@ -19,7 +19,7 @@ import { callGemini, type ImageData } from '@/lib/ai/gemini-provider'
 // 타입
 // ═══════════════════════════════════════════════════════════
 
-export type GoNoGo = 'GO' | 'NO-GO' | 'CONDITIONAL'
+export type GoNoGo = 'GO' | '위험 확인' | 'CONDITIONAL'
 
 export interface CheckedItem {
   itemId: string
@@ -64,7 +64,7 @@ const PROCESS_CHECKPOINTS: Record<string, string[]> = {
 function buildVisionPrompt(): string {
   const processNames = Object.keys(PROCESS_CHECKPOINTS).join(', ')
 
-  return `당신은 인테리어·건설 현장 품질 검사 AI입니다.
+  return `당신은 인테리어·건설 현장 품질 확인 AI입니다.
 첨부된 현장 사진을 분석하여 아래 JSON 형식으로만 응답하세요.
 
 ## 분석 순서
@@ -74,16 +74,16 @@ function buildVisionPrompt(): string {
 
 2. 식별된 공종의 체크포인트를 기준으로 사진 내 각 항목을 판단하세요.
 
-3. 전체 GO/NO-GO를 판정하세요.
+3. 전체 안전 현황를 현황하세요.
    - GO: 모든 주요 항목 PASS
-   - NO-GO: 주요 항목 1개 이상 FAIL (즉시 시정 필요)
+   - 위험 확인: 주요 항목 1개 이상 FAIL (즉시 시정 필요)
    - CONDITIONAL: 일부 UNCERTAIN, 추가 확인 필요
 
 ## 응답 형식 (JSON만, 마크다운 코드블록 없이)
 {
   "detectedProcess": "공종명",
   "confidence": 0.0~1.0,
-  "goNoGo": "GO|NO-GO|CONDITIONAL",
+  "goNoGo": "GO|위험 확인|CONDITIONAL",
   "checkedItems": [
     {
       "itemId": "고유ID(영문숫자)",
@@ -104,7 +104,7 @@ function buildVisionPrompt(): string {
 - 모든 FAIL 항목에는 반드시 법적 근거 또는 기술 기준 명시
 - 모든 텍스트 필드는 친절한 상담가 말투로 작성 (존댓말 필수)
 - reason 필드는 반드시 공감 → 설명 → 제안 순서로 작성
-- 판정(result·goNoGo) 값 자체는 변경하지 않음 — 텍스트만 친절하게
+- 현황(result·goNoGo) 값 자체는 변경하지 않음 — 텍스트만 친절하게
 - 한국어로 작성`
 }
 
@@ -129,7 +129,7 @@ function parseGeminiResponse(raw: string): Omit<AutoCheckResult, 'rawAnalysis'> 
   return {
     detectedProcess: parsed.detectedProcess ?? '알 수 없음',
     confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
-    goNoGo: (['GO', 'NO-GO', 'CONDITIONAL'].includes(parsed.goNoGo) ? parsed.goNoGo : 'CONDITIONAL') as GoNoGo,
+    goNoGo: (['GO', '위험 확인', 'CONDITIONAL'].includes(parsed.goNoGo) ? parsed.goNoGo : 'CONDITIONAL') as GoNoGo,
     checkedItems: Array.isArray(parsed.checkedItems) ? parsed.checkedItems : [],
     issues: Array.isArray(parsed.issues) ? parsed.issues : [],
     recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],

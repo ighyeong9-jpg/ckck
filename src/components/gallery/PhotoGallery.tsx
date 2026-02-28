@@ -6,9 +6,11 @@ import styles from './PhotoGallery.module.scss'
 
 interface Props {
   photos: GalleryPhoto[]
+  onAutoCheck?: (photo: GalleryPhoto) => void
+  checkingPhotoId?: string | null
 }
 
-export default function PhotoGallery({ photos }: Props) {
+export default function PhotoGallery({ photos, onAutoCheck, checkingPhotoId }: Props) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
   // Group by date
@@ -67,6 +69,16 @@ export default function PhotoGallery({ photos }: Props) {
                   <img src={photo.url} alt={photo.file_name} loading="lazy" />
                   {photo.category && (
                     <span className={styles.photoCategory}>{photo.category}</span>
+                  )}
+                  {onAutoCheck && (
+                    <button
+                      className={`${styles.aiCheckBtn} ${checkingPhotoId === photo.id ? styles.checking : ''}`}
+                      onClick={e => { e.stopPropagation(); onAutoCheck(photo) }}
+                      disabled={checkingPhotoId === photo.id}
+                      title="AI 자동 체크"
+                    >
+                      {checkingPhotoId === photo.id ? '분석 중...' : '🤖 AI 체크'}
+                    </button>
                   )}
                 </div>
               )

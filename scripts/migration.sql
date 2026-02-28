@@ -358,6 +358,109 @@ CREATE INDEX IF NOT EXISTS idx_quote_analyses_user ON quote_analyses(user_id, cr
 CREATE INDEX IF NOT EXISTS idx_quote_analyses_space ON quote_analyses(space_type);
 
 -- ═══════════════════════════════════════════════════════════
+-- v5.0 마인드 업그레이드 — 4개 신규 테이블
+-- ═══════════════════════════════════════════════════════════
+
+-- 1. AI 자동 체크 결과 (사진 → GO/NO-GO)
+CREATE TABLE IF NOT EXISTS ai_check_results (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id        UUID REFERENCES projects(id) ON DELETE CASCADE,
+  photo_url         TEXT NOT NULL,
+  detected_process  TEXT,
+  go_no_go          TEXT CHECK (go_no_go IN ('GO','NO-GO','CONDITIONAL')),
+  check_items       JSONB DEFAULT '[]',
+  issues            JSONB DEFAULT '[]',
+  requires_review   JSONB DEFAULT '[]',
+  confidence        NUMERIC DEFAULT 0,
+  model_used        TEXT DEFAULT 'gemini',
+  human_confirmed   BOOLEAN DEFAULT FALSE,
+  confirmed_by      UUID,
+  confirmed_at      TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_ai_check_project ON ai_check_results(project_id);
+ALTER TABLE ai_check_results ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'ai_check_results' AND policyname = 'ai_check_member') THEN
+    CREATE POLICY ai_check_member ON ai_check_results
+      FOR ALL USING (project_id IN (SELECT id FROM projects WHERE user_id = auth.uid()));
+  END IF;
+END $$;
+
+-- 2. 판례 지식베이스
+CREATE TABLE IF NOT EXISTS case_law (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title             TEXT NOT NULL,
+  court             TEXT NOT NULL,
+  decision_date     DATE,
+  case_type         TEXT NOT NULL,
+  process           TEXT,
+  result            TEXT,
+  summary           TEXT NOT NULL,
+  key_point         TEXT NOT NULL,
+  law_basis         TEXT,
+  compensation      BIGINT DEFAULT 0,
+  lesson            TEXT,
+  keywords          JSONB DEFAULT '[]',
+  created_at        TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_case_type ON case_law(case_type);
+ALTER TABLE case_law ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'case_law' AND policyname = 'case_law_read') THEN
+    CREATE POLICY case_law_read ON case_law
+      FOR SELECT USING (auth.role() = 'authenticated');
+  END IF;
+END $$;
+
+-- 3. 현장 일보
+CREATE TABLE IF NOT EXISTS daily_reports (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id        UUID REFERENCES projects(id) ON DELETE CASCADE,
+  report_date       DATE NOT NULL,
+  completed_work    TEXT,
+  planned_work      TEXT,
+  issues_summary    TEXT,
+  workers_count     INTEGER DEFAULT 0,
+  weather           TEXT,
+  ai_drafted        BOOLEAN DEFAULT TRUE,
+  draft_content     JSONB DEFAULT '{}',
+  confirmed_by      UUID,
+  confirmed_at      TIMESTAMPTZ,
+  photo_urls        JSONB DEFAULT '[]',
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(project_id, report_date)
+);
+ALTER TABLE daily_reports ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'daily_reports' AND policyname = 'report_member') THEN
+    CREATE POLICY report_member ON daily_reports
+      FOR ALL USING (project_id IN (SELECT id FROM projects WHERE user_id = auth.uid()));
+  END IF;
+END $$;
+
+-- 4. 업체 신뢰 배지
+CREATE TABLE IF NOT EXISTS contractor_badges (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           UUID NOT NULL UNIQUE,
+  completed_projects INTEGER DEFAULT 0,
+  avg_checklist_score NUMERIC DEFAULT 0,
+  dispute_count     INTEGER DEFAULT 0,
+  on_time_rate      NUMERIC DEFAULT 0,
+  quality_score     NUMERIC DEFAULT 0,
+  badge_level       TEXT DEFAULT 'none' CHECK (badge_level IN ('none','bronze','silver','gold','platinum')),
+  last_calculated   TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE contractor_badges ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'contractor_badges' AND policyname = 'contractor_badges_self') THEN
+    CREATE POLICY contractor_badges_self ON contractor_badges
+      FOR ALL USING (user_id = auth.uid());
+  END IF;
+END $$;
+
+-- ═══════════════════════════════════════════════════════════
 -- 2순위: 현장 이슈 소통 시스템 — site_issues 테이블
 -- ═══════════════════════════════════════════════════════════
 

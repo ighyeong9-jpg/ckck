@@ -7,9 +7,11 @@ import PhotoGallery from '@/components/gallery/PhotoGallery'
 import BeforeAfterSlider from '@/components/gallery/BeforeAfterSlider'
 import type { GalleryPhoto } from '@/types/photoGallery'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function GalleryPage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -19,6 +21,8 @@ export default function GalleryPage() {
   const [uploading, setUploading] = useState(false)
   const [viewMode, setViewMode] = useState<'gallery' | 'compare'>('gallery')
   const [comparePhotos, setComparePhotos] = useState<{ before: string; after: string }>({ before: '', after: '' })
+  const [checkingPhotoId, setCheckingPhotoId] = useState<string | null>(null)
+  const [checkResult, setCheckResult] = useState<{ photoId: string; result: any } | null>(null)
 
   useEffect(() => {
     loadPhotos()
@@ -52,6 +56,34 @@ export default function GalleryPage() {
       console.error('Error loading photos:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAutoCheck = async (photo: GalleryPhoto) => {
+    setCheckingPhotoId(photo.id)
+    setCheckResult(null)
+    try {
+      // 이미지 URL → base64 변환
+      const res = await fetch(photo.url)
+      const blob = await res.blob()
+      const mimeType = blob.type || 'image/jpeg'
+      const arrayBuffer = await blob.arrayBuffer()
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
+
+      const response = await fetch('/api/ai/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId, imageBase64: base64, mimeType, photoUrl: photo.url }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'AI 분석 실패')
+      setCheckResult({ photoId: photo.id, result: data })
+      const gonogoEmoji = data.goNoGo === 'GO' ? '✅' : data.goNoGo === '위험 확인' ? '❌' : '⚠️'
+      toast.success(`${gonogoEmoji} ${data.detectedProcess || '공종'} — ${data.goNoGo} 현황`)
+    } catch (err: any) {
+      toast.error(`AI 체크 실패: ${err?.message}`)
+    } finally {
+      setCheckingPhotoId(null)
     }
   }
 
@@ -98,7 +130,7 @@ export default function GalleryPage() {
         }
       }
     } catch (err: any) {
-      alert(`업로드 오류: ${err?.message}`)
+      toast.error(`업로드 오류: ${err?.message}`)
     } finally {
       setUploading(false)
     }
@@ -157,9 +189,35 @@ export default function GalleryPage() {
           <span>전체 {photos.length}장</span>
         </div>
 
+        {/* AI 체크 결과 */}
+        {checkResult && (
+          <div className={styles.checkResultBanner} style={{
+            borderLeft: `4px solid ${checkResult.result.goNoGo === 'GO' ? 'var(--checkin-go)' : checkResult.result.goNoGo === '위험 확인' ? 'var(--checkin-nogo)' : 'var(--checkin-warn)'}`,
+          }}>
+            <div className={styles.checkResultHeader}>
+              <span className={styles.checkResultTitle}>
+                🤖 AI 자동 체크 결과: {checkResult.result.detectedProcess || '공종'}
+              </span>
+              <span className={styles.checkResultBadge} style={{
+                background: checkResult.result.goNoGo === 'GO' ? 'var(--checkin-go)' : checkResult.result.goNoGo === '위험 확인' ? 'var(--checkin-nogo)' : 'var(--checkin-warn)',
+              }}>
+                {checkResult.result.goNoGo}
+              </span>
+              <button className={styles.checkResultClose} onClick={() => setCheckResult(null)}>✕</button>
+            </div>
+            {checkResult.result.issues?.length > 0 && (
+              <ul className={styles.checkResultIssues}>
+                {checkResult.result.issues.slice(0, 3).map((issue: string, i: number) => (
+                  <li key={i}>⚠️ {issue}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
         {/* Gallery View */}
         {viewMode === 'gallery' && (
-          <PhotoGallery photos={photos} />
+          <PhotoGallery photos={photos} onAutoCheck={handleAutoCheck} checkingPhotoId={checkingPhotoId} />
         )}
 
         {/* Compare View */}

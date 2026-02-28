@@ -266,6 +266,23 @@ export default function DiagnosticPage() {
 
       if (error) throw error
 
+      // risk_scores 이력 테이블에 저장
+      const { error: historyError } = await supabase
+        .from('risk_scores')
+        .insert({
+          project_id: projectId,
+          score: riskScores.total,
+          grade: riskGrade.grade,
+          level: riskGrade.level,
+          fp: riskScores.Fp,
+          oc: riskScores.Oc,
+          ch: riskScores.Ch,
+        })
+
+      if (historyError) {
+        console.warn('Risk score history save failed:', historyError)
+      }
+
       // 활동 로그
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
@@ -280,6 +297,21 @@ export default function DiagnosticPage() {
       }
 
       toast.success(`리스크 점수 ${riskScores.total}점(${riskGrade.grade}등급)이 저장되었어요.`)
+
+      // 공유 링크 자동 생성
+      try {
+        const shareRes = await fetch('/api/share', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project_id: projectId, expires_days: 7 })
+        })
+        const shareData = await shareRes.json()
+        if (shareData.share_url) {
+          console.log('Share link created:', shareData.share_url)
+        }
+      } catch (shareErr) {
+        console.warn('Share link generation failed:', shareErr)
+      }
     } catch (err) {
       console.error('Error saving risk score:', err)
       toast.error('저장 중 문제가 생겼어요. 잠시 후 다시 시도해주세요.')
@@ -306,7 +338,7 @@ export default function DiagnosticPage() {
   // 커스텀 항목 추가
   const handleAddCustomItem = async () => {
     if (!customForm.item.trim() || !customForm.subcategory.trim()) {
-      alert('항목명과 세부 카테고리를 입력해주세요.')
+      toast.warning('항목명과 세부 카테고리를 입력해주세요.')
       return
     }
 
@@ -344,14 +376,14 @@ export default function DiagnosticPage() {
       resetForm()
     } catch (err) {
       console.error('Error adding custom item:', err)
-      alert('항목 추가 중 오류가 발생했습니다.')
+      toast.error('항목 추가 중 오류가 발생했습니다.')
     }
   }
 
   // 커스텀 항목 수정
   const handleUpdateCustomItem = async () => {
     if (!editingItem || !customForm.item.trim() || !customForm.subcategory.trim()) {
-      alert('항목명과 세부 카테고리를 입력해주세요.')
+      toast.warning('항목명과 세부 카테고리를 입력해주세요.')
       return
     }
 
@@ -382,7 +414,7 @@ export default function DiagnosticPage() {
       resetForm()
     } catch (err) {
       console.error('Error updating custom item:', err)
-      alert('항목 수정 중 오류가 발생했습니다.')
+      toast.error('항목 수정 중 오류가 발생했습니다.')
     }
   }
 
@@ -406,7 +438,7 @@ export default function DiagnosticPage() {
       })
     } catch (err) {
       console.error('Error deleting custom item:', err)
-      alert('항목 삭제 중 오류가 발생했습니다.')
+      toast.error('항목 삭제 중 오류가 발생했습니다.')
     }
   }
 
@@ -555,10 +587,10 @@ export default function DiagnosticPage() {
 
       // 미체크 항목 수 계산
       const uncheckedCount = Object.values(newResponses).filter(v => !v).length
-      alert(`🤖 AI 자동 진단 완료!\n\n✅ 양호 처리: ${allItems.length - uncheckedCount}개\n⚠️ 현장 확인 필요: ${uncheckedCount}개\n\n위험 카테고리(${riskCats.join(', ')})의 필수 항목은\n현장에서 직접 확인 후 체크해주세요.`)
+      toast.success(`AI 자동 진단 완료! 양호 ${allItems.length - uncheckedCount}개 / 확인 필요 ${uncheckedCount}개`)
     } catch (err) {
       console.error('AI 자동 진단 오류:', err)
-      alert('자동 진단 중 오류가 발생했습니다.')
+      toast.error('자동 진단 중 오류가 발생했습니다.')
     } finally {
       setAutoDiagnosing(false)
     }
@@ -739,7 +771,7 @@ export default function DiagnosticPage() {
               className={styles.saveBtn}
               style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }}
               onClick={() => {
-                const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+                const btn = document.querySelector('[aria-label="AI 비서 체크인"]') as HTMLButtonElement
                 if (btn) btn.click()
               }}
             >
@@ -748,16 +780,16 @@ export default function DiagnosticPage() {
           </div>
         </section>
 
-        {/* GO/NO-GO 판정 카드 */}
+        {/* 안전 현황 확인 카드 */}
         {allItems.length > 0 && (
           <section className={styles.gonogoCard}>
             <div className={styles.gonogoHeader}>
               <div>
-                <div className={styles.gonogoTitle}>GO / NO-GO 판정</div>
+                <div className={styles.gonogoTitle}>안전 현황 확인</div>
                 <div className={styles.gonogoSubtitle}>R = Fp×Wf + Oc×Wo + Ch×Wc</div>
               </div>
               <div className={`${styles.gonogoBadge} ${riskScores.total <= 60 ? styles.go : styles.nogo}`}>
-                {riskScores.total <= 60 ? 'GO' : 'NO-GO'}
+                {riskScores.total <= 60 ? 'GO' : '위험 확인'}
               </div>
             </div>
             <div className={styles.factorsGrid}>

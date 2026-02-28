@@ -8,9 +8,11 @@ import { PARTIES } from '@/types/agreement'
 import SignaturePad from '@/components/signature/SignaturePad'
 import { sha256 } from '@/lib/utils/merkleTree'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function AgreementPage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -202,10 +204,10 @@ export default function AgreementPage() {
         setAgreementId(newData.id)
       }
 
-      alert('저장되었습니다.')
+      toast.success('저장되었습니다.')
     } catch (err: any) {
       console.error('Error saving:', err)
-      alert(`저장 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`저장 오류: ${err?.message || JSON.stringify(err)}`)
     } finally {
       setSaving(false)
     }

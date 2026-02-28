@@ -237,6 +237,14 @@ export async function collectPredictionContext(
       if (diff > 0) delayDays = diff
     }
 
+    // 미해결 이슈 여부 (open 또는 reviewing 상태)
+    const { data: openIssues } = await supabaseClient
+      .from('site_issues')
+      .select('id')
+      .eq('project_id', projectId)
+      .in('status', ['open', 'reviewing'])
+      .limit(1)
+
     return {
       projectId,
       projectName: project.name,
@@ -254,7 +262,7 @@ export async function collectPredictionContext(
       })),
       overallProgress,
       checklistScore,
-      hasOpenIssues: false,   // TODO: ai_check_results NO-GO 연결
+      hasOpenIssues: (openIssues?.length ?? 0) > 0,
     }
   } catch (err) {
     console.error('[PredictionEngine] 컨텍스트 수집 실패:', err)

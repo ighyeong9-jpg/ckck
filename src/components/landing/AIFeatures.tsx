@@ -22,8 +22,8 @@ const FEATURES = [
   },
   {
     emoji: '⚖️',
-    title: '판례 기반 분쟁 예방',
-    desc: '22건 이상의 실제 판례 데이터베이스로 AI가 분쟁 징후를 자동 감지합니다.',
+    title: '판례 기반 기록 관리 예방',
+    desc: '22건 이상의 실제 판례 데이터베이스로 AI가 기록 관리 징후를 자동 감지합니다.',
     tags: ['구두합의', '추가비용', '하자담보', '계약서'],
     href: '/login',
     badge: '판례',
@@ -31,7 +31,7 @@ const FEATURES = [
   {
     emoji: '🤖',
     title: 'AI 현장 비서',
-    desc: '사진 한 장으로 현장 상태를 자동 분석하고, 법규 위반·하자 위험을 즉시 알려드립니다.',
+    desc: '사진 한 장으로 현장 상태를 자동 분석하고, 법규 미충족·하자 위험을 즉시 알려드립니다.',
     tags: ['사진 분석', '법규 검색', '일보 작성'],
     href: '/login',
     badge: 'AI',
@@ -49,7 +49,7 @@ export default function AIFeatures() {
             <span className={styles.accent}>AI 비서 4종</span>
           </h2>
           <p className={styles.subtitle}>
-            각각 별도 앱이 아닙니다. 체키 하나로 전부 됩니다.
+            각각 별도 앱이 아닙니다. 체크인 하나로 전부 됩니다.
           </p>
         </div>
 

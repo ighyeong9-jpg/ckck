@@ -1,11 +1,11 @@
 /**
- * GET  /api/ai/proactive  — 체키 프로액티브 브리핑 (사용자 요청)
+ * GET  /api/ai/proactive  — 체크인 프로액티브 브리핑 (사용자 요청)
  * POST /api/ai/proactive  — Vercel Cron 트리거 (CRON_SECRET 인증)
  *
  * 5가지 트리거를 병렬 체크:
  * 1. 하자담보 만료 임박 (D-30)
- * 2. 미확인 AI 판정
- * 3. 미해결 분쟁 징후
+ * 2. 미확인 AI 확인
+ * 3. 미해결 기록 관리 징후
  * 4. 공정 완료 후 다음 단계 안내
  * 5. 오늘 일보 미작성
  */
@@ -19,6 +19,10 @@ import {
   saveNotificationsToDb,
   type ProactiveSummary,
 } from '@/lib/ai/proactive-engine'
+import { registerEventHandlers } from '@/lib/events/handlers'
+
+// 이벤트 핸들러 등록
+registerEventHandlers()
 
 export const dynamic = 'force-dynamic'
 
@@ -44,7 +48,7 @@ async function generateAIBriefing(
       .map(n => `[${n.severity}] ${n.projectName}: ${n.title} — ${n.message}`)
       .join('\n')
 
-    const prompt = `당신은 체키, 인테리어/건설 현장 AI 비서입니다.
+    const prompt = `당신은 체크인, 인테리어/건설 현장 AI 비서입니다.
 ${userName}님에게 오늘 아침 브리핑을 한국어로 3~5문장으로 작성하세요.
 친근하고 전문적인 어조로, 구체적인 행동을 제안하세요.
 

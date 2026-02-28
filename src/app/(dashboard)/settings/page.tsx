@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { UserSettings } from '@/types/settings'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 export default function SettingsPage() {
+  const toast = useToast()
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
@@ -105,9 +107,9 @@ export default function SettingsPage() {
         setSettings(data)
       }
 
-      alert('설정이 저장되었습니다.')
+      toast.success('설정이 저장되었습니다.')
     } catch (err: any) {
-      alert(`저장 오류: ${err?.message}`)
+      toast.error(`저장 오류: ${err?.message}`)
     } finally {
       setSaving(false)
     }

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { Project, ProjectStatus, CreateProjectInput } from '@/types/project'
+import { SAFETY_LEVELS, getSafetyLevelFromRate } from '@/types/safety-levels'
 import QuickStart from '@/components/onboarding/QuickStart'
 import { DEFAULT_PROCESSES } from '@/types/process'
 import { logActivity } from '@/lib/activity/logger'
@@ -84,7 +85,7 @@ export default function ProjectsPage() {
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault()
-    // 폼 유효성 검사
+    // 폼 유효성 확인
     const errs: Record<string, string> = {}
     if (!formData.name.trim()) errs.name = '현장명을 입력해주세요.'
     if (!formData.client_name.trim()) errs.client_name = '고객명을 입력해주세요.'
@@ -149,12 +150,12 @@ export default function ProjectsPage() {
   }) => {
     setShowQuickStart(false)
     // Trigger AI Agent to create the project
-    const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+    const btn = document.querySelector('[aria-label="AI 비서 체크인"]') as HTMLButtonElement
     if (btn) {
       btn.click()
       // Send message to Agent after panel opens
       setTimeout(() => {
-        const input = document.querySelector('input[placeholder="체키에게 물어보세요..."]') as HTMLInputElement
+        const input = document.querySelector('input[placeholder="체크인에게 물어보세요..."]') as HTMLInputElement
         if (input) {
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
             window.HTMLInputElement.prototype, 'value'
@@ -245,7 +246,7 @@ export default function ProjectsPage() {
             + 새 현장
           </button>
           <button type="button" className={styles.newProjectBtn} style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }} onClick={() => {
-            const btn = document.querySelector('[aria-label="AI 비서 체키"]') as HTMLButtonElement
+            const btn = document.querySelector('[aria-label="AI 비서 체크인"]') as HTMLButtonElement
             if (btn) btn.click()
           }}>
             ⚡ AI 빠른 생성
@@ -375,6 +376,15 @@ export default function ProjectsPage() {
                         <span className={styles.riskBadge} style={{ background: risk.bg, color: risk.color }}>
                           {risk.grade}
                         </span>
+                        {(() => {
+                          const sl = getSafetyLevelFromRate(progress)
+                          const si = SAFETY_LEVELS[sl]
+                          return (
+                            <span style={{ background: si.bg, color: si.color, padding: '2px 8px', borderRadius: '1rem', fontSize: '11px', fontWeight: 600 }}>
+                              {si.icon} {si.label}
+                            </span>
+                          )
+                        })()}
                       </div>
                     </div>
                     <div className={styles.cardMiddle}>

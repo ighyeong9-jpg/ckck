@@ -6,7 +6,7 @@ import styles from './BeforeAfter.module.scss'
 const PAIRS = [
   {
     before: { icon: '😰', text: '사진 없어서\n책임을 못 묻는다' },
-    after: { icon: '📸', text: '체키가 자동 기록\n증거가 완성된다' },
+    after: { icon: '📸', text: '체크인가 자동 기록\n시공 기록이 완성된다' },
     law: '민법 제667조 — 수급인 담보책임',
   },
   {
@@ -41,7 +41,7 @@ export default function BeforeAfter() {
   return (
     <section ref={ref} className={styles.section}>
       <div className={styles.inner}>
-        <div className={styles.eyebrow}>체키 도입 전 · 후</div>
+        <div className={styles.eyebrow}>체크인 도입 전 · 후</div>
         <h2 className={styles.title}>
           이렇게 <span className={styles.accent}>달라집니다</span>
         </h2>

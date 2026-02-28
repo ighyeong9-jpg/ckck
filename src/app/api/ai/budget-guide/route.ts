@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { spaceTypeId, areaPyeong, gradeId, scheduleId } = body
 
-    // 유효성 검사
+    // 유효성 확인
     const spaceType = SPACE_TYPES.find(s => s.id === spaceTypeId)
     const grade = MATERIAL_GRADES.find(g => g.id === gradeId)
     const schedule = SCHEDULE_OPTIONS.find(s => s.id === scheduleId)

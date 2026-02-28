@@ -1,0 +1,154 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHECK-IN 체키 — MASTER UPGRADE PROMPT v2.0
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+지금부터 Check-In 체키 시스템 전체 업그레이드를 진행한다.
+작업 전에 반드시 아래 파일들을 순서대로 읽어라.
+
+━━━ 0. 필독 파일 (코드 건드리기 전 전부 읽어라) ━━━
+
+프로젝트 경로: E:\check-in-stable
+
+읽을 파일 순서:
+1. 4_CHECKIN_MIND.md     ← 이 시스템의 본질. 가장 먼저 읽어라.
+2. 2_ARCHITECTURE.md     ← 전체 구조와 구현 순서
+3. 1_SCHEMA_MASTER.sql   ← DB 스키마 전체
+4. 3_README.md           ← 프로젝트 현황
+5. src/lib/ai/brain.ts   ← 현재 AI 호출 구조 파악
+
+읽기 완료 후: "파악 완료. 현재 X개 파일 확인. 1순위부터 시작합니다." 보고.
+보고 전 코드 절대 건드리지 말 것.
+
+━━━ 1순위: DB 마이그레이션 ━━━
+
+1_SCHEMA_MASTER.sql 내용을 scripts/migration.sql에 추가하고
+Supabase SQL Editor에서 실행하라.
+
+신규 테이블 8개:
+- ai_check_results       (사진→GO/NO-GO 판정 기록)
+- warranty_tracking      (하자담보 자동 추적)
+- dispute_signals        (분쟁 징후 감지)
+- proactive_notifications (체키 자동 알림)
+- case_law               (판례 지식베이스)
+- knowledge_chunks       (법규 RAG + pgvector)
+- daily_reports          (현장 일보)
+- contractor_badges      (업체 신뢰 배지)
+
+quote_analyses 컬럼 추가:
+space_type, space_detail, area_pyeong, grade_economy,
+grade_standard, grade_premium, hidden_costs, payment_terms
+
+완료 후: "✅ 1순위(DB) 완료 → 2순위 시작" 보고.
+
+━━━ 2순위: AI 예산 가이드 ━━━
+
+파일 생성:
+- components/quotes/QuoteSpaceSelector.tsx   (공간유형 선택: 주거5+상업6)
+- components/quotes/QuoteBudgetResult.tsx    (경제/표준/고급 3등급 결과)
+- components/quotes/QuoteEducation.tsx       (왜 비싼지 자동 교육)
+- components/quotes/QuoteDisclaimer.tsx      (면책 고지 — 삭제/숨김 절대 불가)
+- components/quotes/QuotePaymentTerms.tsx    (대금협의 + 계약금 30% 초과 경고)
+- lib/ai/quote-generator.ts                  (brain.ts 통해 Gemini 호출)
+- app/(dashboard)/quotes/new/page.tsx        (채팅형 4문답 흐름)
+
+채팅 흐름: 공간유형 → 평수 → 자재등급 → 일정 → AI 예산 결과
+공간별 단가 기준 (서울):
+  주거 전체: 150~300만/평 / 카페: 100~300만/평
+  사무실: 80~200만/평 / 병원: 200~500만/평
+
+완료 후: "✅ 2순위(예산가이드) 완료 → 3순위 시작" 보고.
+
+━━━ 3순위: 현장 이슈 소통 완성 ━━━
+
+기존 issues 페이지에 추가:
+- [승인][거절][협의요청] 3버튼 플로우 완성
+- 승인 시 → 자동으로 비용 반영 + 타임스탬프 기록
+- 거절 시 → 사유 입력 + 기록
+- 협의 시 → 채팅 연결 + 전체 기록
+- IssueTimeline.tsx → 프로젝트별 전체 이슈 타임라인
+
+완료 후: "✅ 3순위(이슈소통) 완료 → 4순위 시작" 보고.
+
+━━━ 4순위: 법규 지식베이스 ━━━
+
+파일 생성:
+- lib/knowledge/sources/laws.json     (건설 법령 12개 핵심 조문)
+- lib/knowledge/sources/cases.json    (판례 20개 이상)
+- lib/knowledge/embedder.ts           (텍스트 → vector(768) 임베딩)
+- lib/knowledge/retriever.ts          (pgvector 코사인 유사도 검색)
+- lib/knowledge/case-search.ts        (판례 키워드 검색)
+- app/api/knowledge/search/route.ts   (검색 API)
+
+판례 20개 포함 기준:
+  공종별: 방수/타일/도장/전기/설비/목공 각 2개 이상
+  유형별: 하자/계약금/추가공사/자재변경/대금미지급 각 2개 이상
+
+완료 후: "✅ 4순위(지식베이스) 완료 → 5순위 시작" 보고.
+
+━━━ 5순위: 사진→자동 체크 ━━━
+
+파일 생성:
+- lib/ai/auto-checker.ts              (Gemini Vision → GO/NO-GO)
+- app/api/ai/check/route.ts
+- 갤러리 페이지에 "AI 자동 체크" 버튼 추가
+- 결과 카드 UI (GO=초록/NO-GO=빨강/CONDITIONAL=노랑)
+- ai_check_results 테이블에 저장
+- [확인] 버튼 → human_confirmed = true
+
+완료 후: "✅ 5순위(자동체크) 완료 → 6순위 시작" 보고.
+
+━━━ 6순위: 하자담보 추적 ━━━
+
+파일 생성:
+- app/(dashboard)/warranty/page.tsx   (하자담보 현황 대시보드)
+- warranty_tracking 테이블 CRUD
+- 공종 완료 시 담보기간 자동 입력 (건산법 시행령 별표4 기준)
+- D-30/D-7 자동 알림 → proactive_notifications
+
+법정 담보기간 기준:
+  방수: 3년 / 전기·설비: 2년 / 타일·도장·목공·기타: 1년
+
+완료 후: "✅ 6순위(하자담보) 완료 → 7순위 시작" 보고.
+
+━━━ 7순위: event-bus + 유기적 연동 ━━━
+
+파일 생성:
+- lib/events/event-bus.ts
+- lib/ai/alert-engine.ts
+- lib/ai/report-writer.ts
+
+연동 흐름:
+  PHOTO_UPLOADED → auto-checker → CHECKLIST_AUTO_FILLED
+  CHECKLIST_COMPLETED → prediction-engine → NEXT_RISK_PREDICTED
+  RISK_HIGH(61+) → alert-engine → 결제 CTA 표시
+  DAILY_END → report-writer → daily_reports 초안 저장
+  DISPUTE_SIGNAL → 판례 자동 검색 → urgent 알림
+
+완료 후: "✅ 7순위(연동) 완료. 전체 완성." 보고.
+
+━━━ 절대 금지 ━━━
+
+❌ brain.ts 우회 직접 AI import
+❌ 기존 테이블 컬럼 삭제/타입 변경
+❌ QuoteDisclaimer.tsx 삭제 또는 숨김
+❌ API 키 하드코딩
+❌ npm 패키지 설치 전 확인 없이 진행
+❌ 각 순위 완료 보고 없이 다음 순위 진행
+
+━━━ 완료 기준 ━━━
+
+각 순위 완료마다:
+1. npm run check 실행 (에러 0개 확인)
+2. develop 브랜치 커밋
+3. main 머지 + push
+4. "✅ X순위 완료 → Y순위 시작" 보고
+
+전체 완료 후:
+"사용자가 말하거나 사진 찍거나 [확인] 누르면
+ 나머지는 체키가 전부 한다." 상태가 되어야 한다.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+지금 바로 시작해라.
+4_CHECKIN_MIND.md 읽기부터.
+완료 전까지 멈추지 마라.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

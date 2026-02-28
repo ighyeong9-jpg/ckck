@@ -89,7 +89,7 @@ function buildReportPrompt(ctx: DailyReportContext): string {
     .join('\n') || '자재 변동 없음'
 
   const aiIssues = (ctx.aiCheckResults ?? [])
-    .filter(r => r.goNoGo === 'NO-GO')
+    .filter(r => r.goNoGo === '위험 확인')
     .flatMap(r => r.issues)
 
   const allIssues = [...(ctx.issues ?? []), ...aiIssues]
@@ -154,7 +154,7 @@ export async function writeDailyReport(ctx: DailyReportContext): Promise<DailyRe
   })
 
   const hasCriticalIssue =
-    (ctx.aiCheckResults ?? []).some(r => r.goNoGo === 'NO-GO') ||
+    (ctx.aiCheckResults ?? []).some(r => r.goNoGo === '위험 확인') ||
     (ctx.issues ?? []).length > 0
 
   return {

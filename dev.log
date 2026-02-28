@@ -1,0 +1,10 @@
+
+> check-in-stable@1.0.0 dev
+> next dev
+
+  ▲ Next.js 13.5.6
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Ready in 1422ms
+[?25h

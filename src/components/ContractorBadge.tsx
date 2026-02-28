@@ -21,16 +21,16 @@ interface ContractorBadgeProps {
 }
 
 const BADGE_CONFIG = {
-  gold:   { icon: '🥇', label: '체키 Gold 인증 업체',   color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',   borderColor: 'rgba(245,158,11,0.4)' },
-  silver: { icon: '🥈', label: '체키 Silver 인증 업체', color: '#6B7280', bg: 'rgba(107,114,128,0.1)', borderColor: 'rgba(107,114,128,0.4)' },
-  bronze: { icon: '🥉', label: '체키 Bronze 인증 업체', color: '#92400E', bg: 'rgba(146,64,14,0.08)',  borderColor: 'rgba(146,64,14,0.35)' },
+  gold:   { icon: '🥇', label: '체크인 Gold 인증 업체',   color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',   borderColor: 'rgba(245,158,11,0.4)' },
+  silver: { icon: '🥈', label: '체크인 Silver 인증 업체', color: '#6B7280', bg: 'rgba(107,114,128,0.1)', borderColor: 'rgba(107,114,128,0.4)' },
+  bronze: { icon: '🥉', label: '체크인 Bronze 인증 업체', color: '#92400E', bg: 'rgba(146,64,14,0.08)',  borderColor: 'rgba(146,64,14,0.35)' },
   none:   { icon: '',   label: '',                       color: '#9CA3AF', bg: 'transparent',            borderColor: 'transparent' },
 }
 
 const BADGE_CONDITIONS = {
-  gold:   { months: 6,  passRate: 90, disputes: 0, label: '6개월 이상 · 통과율 90% · 분쟁 0건' },
-  silver: { months: 3,  passRate: 85, disputes: 0, label: '3개월 이상 · 통과율 85% · 분쟁 0건' },
-  bronze: { months: 1,  passRate: 70, disputes: 1, label: '1개월 이상 · 통과율 70% · 분쟁 1건 이하' },
+  gold:   { months: 6,  passRate: 90, disputes: 0, label: '6개월 이상 · 통과율 90% · 기록 관리 0건' },
+  silver: { months: 3,  passRate: 85, disputes: 0, label: '3개월 이상 · 통과율 85% · 기록 관리 0건' },
+  bronze: { months: 1,  passRate: 70, disputes: 1, label: '1개월 이상 · 통과율 70% · 기록 관리 1건 이하' },
 }
 
 export default function ContractorBadge({ userId, showDetail = false, size = 'md' }: ContractorBadgeProps) {
@@ -112,7 +112,7 @@ export default function ContractorBadge({ userId, showDetail = false, size = 'md
     if (!showDetail) return null
     return (
       <div className={`${styles.progressBox} ${styles[size]}`}>
-        <p className={styles.progressTitle}>체키 인증 업체 조건</p>
+        <p className={styles.progressTitle}>체크인 인증 업체 조건</p>
         {(Object.keys(BADGE_CONDITIONS) as BadgeLevel[]).filter(k => k !== 'none').map(level => (
           <div key={level} className={styles.conditionRow}>
             <span>{BADGE_CONFIG[level].icon}</span>
@@ -142,7 +142,7 @@ export default function ContractorBadge({ userId, showDetail = false, size = 'md
         <span className={styles.label}>{cfg.label}</span>
         {showDetail && (
           <span className={styles.detail}>
-            {badge.usageMonths}개월 사용 · 통과율 {badge.passRate}% · 분쟁 {badge.disputeCount}건
+            {badge.usageMonths}개월 사용 · 통과율 {badge.passRate}% · 기록 관리 {badge.disputeCount}건
           </span>
         )}
       </div>

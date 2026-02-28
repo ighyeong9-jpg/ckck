@@ -1,0 +1,272 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHECK-IN 체키 — COLOR SYSTEM UPGRADE PROMPT v1.0
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+체키의 전체 색상 시스템을 업그레이드한다.
+이 파일을 읽고 아래 순서대로 정확하게 실행해라.
+
+━━━ 0. 색상 철학 (반드시 이해하고 시작해라) ━━━
+
+체키는 두 가지를 동시에 전달해야 한다:
+1. "이건 법적으로 강력한 시스템이다" → 딥 네이비 (#0F2744)
+2. "지금 당장 행동해야 한다" → 공사 오렌지 (#E8651A)
+
+사용자는 공사 분쟁으로 불안한 상태에서 진입한다.
+배경색이 먼저 "여기는 안전하고 권위 있다"는 신뢰를 줘야 한다.
+그다음 오렌지 CTA가 행동을 유도한다.
+
+전환 흐름:
+빨간 경고(공포) → 네이비(권위/안심) → 오렌지 CTA(결제)
+
+━━━ 1순위: globals.css — 컬러 토큰 시스템 ━━━
+
+src/app/globals.css에 아래 CSS 변수 추가:
+
+:root {
+  /* ── 브랜드 코어 ── */
+  --checkin-navy:         #0F2744;
+  --checkin-navy-mid:     #1A3A5C;
+  --checkin-navy-light:   #1E4976;
+  --checkin-navy-glow:    rgba(15,39,68,0.12);
+
+  --checkin-orange:       #E8651A;
+  --checkin-orange-hot:   #FF7020;
+  --checkin-orange-soft:  #FFF3ED;
+  --checkin-orange-glow:  rgba(232,101,26,0.35);
+
+  /* ── 시맨틱 ── */
+  --checkin-go:           #10B981;
+  --checkin-go-bg:        rgba(16,185,129,0.08);
+  --checkin-nogo:         #EF4444;
+  --checkin-nogo-bg:      rgba(239,68,68,0.08);
+  --checkin-warn:         #F59E0B;
+  --checkin-warn-bg:      rgba(245,158,11,0.08);
+  --checkin-info:         #3B82F6;
+
+  /* ── 배경 ── */
+  --bg-primary:           #FFFFFF;
+  --bg-secondary:         #F8FAFC;
+  --bg-tertiary:          #F1F5F9;
+  --bg-dark:              #0A1929;
+  --bg-dark-card:         #0F2744;
+
+  /* ── 텍스트 ── */
+  --text-primary:         #0F172A;
+  --text-secondary:       #475569;
+  --text-muted:           #94A3B8;
+  --text-on-dark:         #F8FAFC;
+  --text-on-navy:         #CBD5E1;
+
+  /* ── 보더 ── */
+  --border-light:         #E2E8F0;
+  --border-mid:           #CBD5E1;
+  --border-navy:          rgba(255,255,255,0.08);
+  --border-orange:        rgba(232,101,26,0.25);
+
+  /* ── 그림자 ── */
+  --shadow-sm:   0 1px 3px rgba(15,39,68,0.08);
+  --shadow-md:   0 4px 16px rgba(15,39,68,0.10);
+  --shadow-lg:   0 8px 32px rgba(15,39,68,0.14);
+  --shadow-xl:   0 16px 48px rgba(15,39,68,0.18);
+  --shadow-cta:  0 4px 20px rgba(232,101,26,0.35);
+  --shadow-card: 0 2px 12px rgba(15,39,68,0.07);
+}
+
+완료 후: "✅ 1순위(CSS 변수) 완료 → 2순위 시작" 보고.
+
+━━━ 2순위: 랜딩페이지 (app/(marketing)/page.tsx 또는 app/page.tsx) ━━━
+
+배경: var(--bg-dark) #0A1929 → var(--checkin-navy) 그라데이션
+그리드 오버레이: 미묘한 1px 격자 (건설 도면 느낌)
+
+히어로:
+- 배경: linear-gradient(135deg, #0A1929 0%, #0F2744 100%)
+- 헤드라인: 흰색 + "체키" 단어는 var(--checkin-orange)
+- 서브텍스트: #7C9DBF (냉한 하늘색)
+- CTA 버튼: var(--checkin-orange) + box-shadow: var(--shadow-cta)
+- 보조 버튼: border 1px rgba(255,255,255,.2) + 흰색 텍스트
+
+분쟁 경고 섹션:
+- 배경: rgba(239,68,68,.06)
+- 보더: rgba(239,68,68,.2)
+- "평균 700만원" 숫자: var(--checkin-nogo) 색상 + 큰 폰트
+
+신뢰 섹션 (법령 12개 등):
+- 배경: var(--checkin-navy)
+- 텍스트: rgba(255,255,255,.9)
+- 아이콘/숫자: var(--checkin-orange)
+
+최하단 CTA:
+- 배경: var(--checkin-orange)
+- 텍스트: #FFFFFF
+- hover: var(--checkin-orange-hot)
+
+완료 후: "✅ 2순위(랜딩) 완료 → 3순위 시작" 보고.
+
+━━━ 3순위: 로그인 페이지 (app/auth/page.tsx) ━━━
+
+배경: linear-gradient(135deg, #0A1929 0%, #0F2744 60%, #1A3A5C 100%)
+(전체 화면)
+
+로그인 카드:
+- background: #FFFFFF
+- border-radius: 20px
+- box-shadow: var(--shadow-xl)
+- 카드 위에 로고: 흰 배경 위에 var(--checkin-navy) 텍스트
+
+입력창:
+- background: var(--bg-secondary)
+- border: 1px solid var(--border-light)
+- focus border: var(--checkin-orange)
+- placeholder: var(--text-muted)
+
+로그인 버튼:
+- background: var(--checkin-orange)
+- box-shadow: var(--shadow-cta)
+- hover: var(--checkin-orange-hot)
+- color: #FFFFFF
+- font-weight: 700
+
+소셜 로그인 버튼 (구글 등):
+- background: #FFFFFF
+- border: 1px solid var(--border-mid)
+- color: var(--text-primary)
+
+에러 메시지:
+- color: var(--checkin-nogo)
+
+완료 후: "✅ 3순위(로그인) 완료 → 4순위 시작" 보고.
+
+━━━ 4순위: 대시보드 레이아웃 (사이드바 + 메인) ━━━
+
+사이드바:
+- background: var(--checkin-navy) #0F2744
+- 로고 텍스트: 흰색, "체키" 강조는 var(--checkin-orange)
+- 메뉴 아이템 기본: rgba(255,255,255,.5)
+- 메뉴 아이템 active: #FFFFFF + background rgba(255,255,255,.08)
+- 메뉴 아이템 hover: rgba(255,255,255,.75)
+- 분리선: rgba(255,255,255,.06)
+- 분쟁 경고 메뉴: var(--checkin-orange) 색상
+
+메인 배경:
+- background: var(--bg-secondary) #F8FAFC
+
+카드:
+- background: #FFFFFF
+- border: 1px solid var(--border-light)
+- border-radius: 12px
+- box-shadow: var(--shadow-card)
+
+KPI 숫자:
+- 기본: var(--checkin-navy)
+- 리스크: var(--checkin-nogo)
+- 만료임박: var(--checkin-warn)
+- GO: var(--checkin-go)
+
+분쟁 경고 배너 (리스크 61점+):
+- background: var(--checkin-nogo-bg)
+- border: 1px solid rgba(239,68,68,.2)
+- "700만원" 텍스트: var(--checkin-nogo) bold
+- CTA 링크: var(--checkin-orange) bold
+
+완료 후: "✅ 4순위(대시보드) 완료 → 5순위 시작" 보고.
+
+━━━ 5순위: 체크리스트/진단 페이지 ━━━
+
+배경: var(--bg-secondary)
+헤더: var(--checkin-navy) 텍스트
+
+체크 항목 상태별 색상:
+- 완료(✅): border-left 3px var(--checkin-go) + background var(--checkin-go-bg)
+- 미확인(❓): border-left 3px var(--checkin-warn) + background var(--checkin-warn-bg)
+- NO-GO(❌): border-left 3px var(--checkin-nogo) + background var(--checkin-nogo-bg)
+
+리스크 점수 표시:
+- 0~30점: var(--checkin-go) 색상
+- 31~60점: var(--checkin-warn) 색상
+- 61~100점: var(--checkin-nogo) 색상
+
+점수 61+ 경고 박스:
+- background: rgba(239,68,68,.06)
+- border: 1px solid rgba(239,68,68,.25)
+- border-left: 4px solid var(--checkin-nogo)
+- "분쟁 확률 XX%" → var(--checkin-nogo) bold
+- "분쟁 비용 700만원" → var(--checkin-nogo) bold
+- CTA: var(--checkin-orange) 버튼
+
+완료 후: "✅ 5순위(체크리스트) 완료 → 6순위 시작" 보고.
+
+━━━ 6순위: 이슈 / 갤러리 / 기타 페이지 ━━━
+
+현장 이슈 페이지:
+- 긴급(즉시): var(--checkin-nogo) 배지
+- 오늘중: var(--checkin-warn) 배지
+- 여유: var(--checkin-go) 배지
+- 승인 버튼: var(--checkin-go)
+- 거절 버튼: var(--checkin-nogo)
+- 협의 버튼: var(--checkin-orange)
+
+갤러리 페이지:
+- Before/After 슬라이더 핸들: var(--checkin-orange)
+- "이 기록이 분쟁 시 증거가 됩니다" 배너: var(--checkin-navy) 배경
+
+견적서/예산 가이드:
+- 경제형 배지: var(--checkin-warn)
+- 표준형 배지 (AI 권장): var(--checkin-go)
+- 고급형 배지: var(--checkin-navy)
+- 면책 고지: var(--checkin-warn-bg) + amber 보더
+
+완료 후: "✅ 6순위(기타 페이지) 완료" 보고.
+
+━━━ 전체 공통 적용 규칙 ━━━
+
+버튼 시스템:
+PRIMARY = var(--checkin-orange) + shadow-cta + 흰 텍스트
+SECONDARY = var(--checkin-navy) border + navy 텍스트
+DANGER = var(--checkin-nogo) + 흰 텍스트
+SUCCESS = var(--checkin-go) + 흰 텍스트
+GHOST = transparent + border-light + text-primary
+
+폰트: Pretendard 우선 (없으면 Apple SD Gothic Neo 폰트)
+헤딩 font-weight: 800 또는 900
+본문 font-weight: 400~500
+강조 font-weight: 700
+
+애니메이션:
+transition: all 0.2s ease (버튼 hover)
+transition: all 0.3s ease (카드 hover)
+없이는 색상 변환에 0.15s 이상 사용
+
+접근성:
+모든 텍스트 WCAG AA 기준 (4.5:1 명암비)
+오렌지 위 흰 텍스트 ← OK
+네이비 위 흰 텍스트 ← OK
+흰 배경 위 navy 텍스트 ← OK
+
+━━━ 금지 ━━━
+
+❌ 기존 회색 배경(#f5f5f5 계열) 그대로 유지
+❌ 파란색 계열 CTA 버튼 (토스 파랑으로 대체하지 말 것)
+❌ 보라색 사용 (체키 아이덴티티 아님)
+❌ 흰색 배경에 흰색 카드 (구분 불가)
+❌ 색상 변수 하드코딩 (반드시 var(--변수명) 사용)
+
+━━━ 완료 기준 ━━━
+
+모든 페이지에서:
+□ 사이드바: 딥 네이비 #0F2744
+□ 주요 CTA: 공사 오렌지 #E8651A
+□ GO 판정: 에메랄드 그린 #10B981
+□ NO-GO / 경고: 빨강 #EF4444
+□ 대시보드 배경: 냉백색 #F8FAFC
+□ 히어로: 다크 네이비 그라데이션
+□ 700만원 프레임: 빨간 경고 배너로 표시
+
+완료 후 npm run check 실행, develop 커밋, main 머지 push.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+이 색상 시스템은 체키가 세상에 말하는 방식이다.
+"법적 권위 + 현장 전문성 = 당신을 완전히 보호하는 유일한 시스템"
+모든 픽셀이 이 메시지를 전달해야 한다.
+지금 바로 시작해라. 완료 전까지 멈추지 마라.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

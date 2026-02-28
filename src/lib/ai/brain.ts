@@ -14,6 +14,7 @@ import { injectPersonaContext } from '@/lib/ai/personas'
 import { retrieve, buildRAGPrompt } from '@/lib/knowledge/retriever'
 import { detectDisputeSignals, buildDisputeContext, type DisputeAlert } from '@/lib/ai/dispute-preventer'
 import { searchCases, needsCaseSearch, buildCaseContext } from '@/lib/knowledge/case-search'
+import { autoCheckFromPhoto } from '@/lib/ai/auto-checker'
 
 // ═══════════════════════════════════════════════════════════
 // 타입 정의
@@ -32,7 +33,7 @@ export type AITask =
 export type UserPersona =
   | 'customer'      // 고객 (집주인, 세입자)
   | 'designer'      // 인테리어 디자이너
-  | 'contractor'    // 시공사/시공자
+  | 'contractor'    // 시공사/작업자
   | 'supervisor'    // 감리자
   | 'subcontractor' // 하도급 업체
   | 'self'          // 셀프인테리어
@@ -81,7 +82,7 @@ export interface BrainResponse {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 분쟁 징후 DB 저장 (fire-and-forget)
+// 기록 관리 징후 DB 저장 (fire-and-forget)
 // ═══════════════════════════════════════════════════════════
 
 async function saveDisputeSignalsToDB(
@@ -247,7 +248,7 @@ export async function brain(req: BrainRequest): Promise<BrainResponse> {
         ? `[시스템 힌트: 사용자가 비용/예산 관련 질문을 했습니다. 답변 말미에 "더 정확한 예산은 [AI 예산 가이드](/quotes/new)에서 공간·면적·등급을 선택하면 자동으로 계산돼요." 를 자연스럽게 추가하세요.]\n\n`
         : ''
 
-      // 1. 분쟁 징후 자동 감지 + DB 저장 (fire-and-forget)
+      // 1. 기록 관리 징후 자동 감지 + DB 저장 (fire-and-forget)
       const disputeAlert = detectDisputeSignals(userMessage)
       const disputeContext = buildDisputeContext(disputeAlert)
       if (disputeAlert.detected) {
@@ -274,12 +275,12 @@ export async function brain(req: BrainRequest): Promise<BrainResponse> {
         // RAG 실패해도 채팅은 계속
       }
 
-      // 4. 분쟁 컨텍스트 주입 (감지된 경우만)
+      // 4. 기록 관리 컨텍스트 주입 (감지된 경우만)
       if (disputeContext) {
         finalMessage = finalMessage + disputeContext
       }
 
-      // 4-1. 판례 RAG 주입 (분쟁 관련 키워드 감지 시)
+      // 4-1. 판례 RAG 주입 (기록 관리 관련 키워드 감지 시)
       if (needsCaseSearch(userMessage)) {
         try {
           const caseResults = searchCases(userMessage, 2)
@@ -329,55 +330,35 @@ export async function brain(req: BrainRequest): Promise<BrainResponse> {
     }
 
     // ─── 사진 자동 체크 ───────────────────────────────────
-    // STEP 3에서 lib/ai/auto-checker.ts 구현 후 연결
     case 'vision-check': {
-      const prompt = imageData
-        ? `현장 사진을 분석해주세요. ${userMessage}`
-        : `현장 사진 분석 요청: ${userMessage}`
-      const { text, model } = await callWithFallback(
-        prompt,
-        task,
-        projectCtx,
-        conversationHistory,
-        imageData,
-      )
-      return { answer: text, sources: [], confidence: 0.7, model }
+      if (!imageData) {
+        return { answer: '사진이 필요합니다.', sources: [], confidence: 0, model: 'gemini' }
+      }
+      const result = await autoCheckFromPhoto(imageData, projectId || '')
+      return {
+        answer: JSON.stringify(result),
+        sources: [],
+        confidence: result.goNoGo === 'GO' ? 0.85 : 0.75,
+        model: 'gemini',
+      }
     }
 
     // ─── 일보 자동 작성 ───────────────────────────────────
-    // STEP 5에서 lib/ai/report-writer.ts 구현 후 연결
+    // Note: 이 케이스는 /api/ai/report 에서 직접 처리하므로 여기서는 기본 응답만
     case 'report-write': {
-      const { text, model } = await callWithFallback(
-        `일보 초안 작성 요청. 오늘 현황: ${userMessage}`,
-        task,
-        projectCtx,
-        conversationHistory,
-      )
-      return { answer: text, sources: [], confidence: 0.85, model }
+      return { answer: '일보 작성은 /api/ai/report에서 처리합니다.', sources: [], confidence: 1.0, model: 'gemini' }
     }
 
     // ─── 리스크 예측 ──────────────────────────────────────
-    // STEP 5에서 lib/ai/prediction-engine.ts 구현 후 연결
+    // Note: 이 케이스는 /api/ai/predict 에서 직접 처리하므로 여기서는 기본 응답만
     case 'risk-predict': {
-      const { text, model } = await callWithFallback(
-        `다음 공종 리스크 예측: ${userMessage}`,
-        task,
-        projectCtx,
-        conversationHistory,
-      )
-      return { answer: text, sources: [], confidence: 0.75, model }
+      return { answer: '리스크 예측은 /api/ai/predict에서 처리합니다.', sources: [], confidence: 1.0, model: 'gemini' }
     }
 
     // ─── 이상 감지 분석 ───────────────────────────────────
-    // STEP 5에서 lib/ai/alert-engine.ts 구현 후 연결
+    // Note: 이 케이스는 /api/ai/alerts 에서 직접 처리하므로 여기서는 기본 응답만
     case 'alert-analyze': {
-      const { text, model } = await callWithFallback(
-        `이상 감지 분석 요청: ${userMessage}`,
-        task,
-        projectCtx,
-        conversationHistory,
-      )
-      return { answer: text, sources: [], confidence: 0.8, model }
+      return { answer: '알림 분석은 /api/ai/alerts에서 처리합니다.', sources: [], confidence: 1.0, model: 'gemini' }
     }
 
     // ─── 노트북 문서 분석 ─────────────────────────────────
