@@ -22,10 +22,10 @@ export type CheckInEvent =
   | 'CHECKLIST_COMPLETED'      // 체크리스트 전체 완료
   | 'NEXT_RISK_PREDICTED'      // 다음 공종 리스크 예측 완료
   | 'RISK_HIGH_DETECTED'       // 고위험 감지
-  | 'LAW_VIOLATION_SUSPECTED'  // 법규 위반 의심
+  | 'LAW_VIOLATION_SUSPECTED'  // 법규 미충족 의심
   | 'DAILY_END'                // 일과 종료
   | 'DAILY_REPORT_DRAFTED'     // 일보 초안 생성
-  | 'DISPUTE_SIGNAL_DETECTED'  // 분쟁 징후 감지
+  | 'DISPUTE_SIGNAL_DETECTED'  // 기록 관리 징후 감지
   | 'PROJECT_CREATED'          // 프로젝트 생성
   | 'PROCESS_COMPLETED'        // 공정 완료
   | 'DEADLINE_OVERDUE'         // 마감 초과

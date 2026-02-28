@@ -32,7 +32,7 @@ export type AITask =
 export type UserPersona =
   | 'customer'      // 고객 (집주인, 세입자)
   | 'designer'      // 인테리어 디자이너
-  | 'contractor'    // 시공사/시공자
+  | 'contractor'    // 시공사/작업자
   | 'supervisor'    // 감리자
   | 'subcontractor' // 하도급 업체
   | 'self'          // 셀프인테리어
@@ -81,7 +81,7 @@ export interface BrainResponse {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 분쟁 징후 DB 저장 (fire-and-forget)
+// 기록 관리 징후 DB 저장 (fire-and-forget)
 // ═══════════════════════════════════════════════════════════
 
 async function saveDisputeSignalsToDB(
@@ -247,7 +247,7 @@ export async function brain(req: BrainRequest): Promise<BrainResponse> {
         ? `[시스템 힌트: 사용자가 비용/예산 관련 질문을 했습니다. 답변 말미에 "더 정확한 예산은 [AI 예산 가이드](/quotes/new)에서 공간·면적·등급을 선택하면 자동으로 계산돼요." 를 자연스럽게 추가하세요.]\n\n`
         : ''
 
-      // 1. 분쟁 징후 자동 감지 + DB 저장 (fire-and-forget)
+      // 1. 기록 관리 징후 자동 감지 + DB 저장 (fire-and-forget)
       const disputeAlert = detectDisputeSignals(userMessage)
       const disputeContext = buildDisputeContext(disputeAlert)
       if (disputeAlert.detected) {
@@ -274,12 +274,12 @@ export async function brain(req: BrainRequest): Promise<BrainResponse> {
         // RAG 실패해도 채팅은 계속
       }
 
-      // 4. 분쟁 컨텍스트 주입 (감지된 경우만)
+      // 4. 기록 관리 컨텍스트 주입 (감지된 경우만)
       if (disputeContext) {
         finalMessage = finalMessage + disputeContext
       }
 
-      // 4-1. 판례 RAG 주입 (분쟁 관련 키워드 감지 시)
+      // 4-1. 판례 RAG 주입 (기록 관리 관련 키워드 감지 시)
       if (needsCaseSearch(userMessage)) {
         try {
           const caseResults = searchCases(userMessage, 2)

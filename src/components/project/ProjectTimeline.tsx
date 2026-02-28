@@ -30,7 +30,7 @@ interface ProjectTimelineProps {
 
 const EVENT_CONFIG: Record<EventType, { icon: string; color: string; label: string }> = {
   evidence:     { icon: '📁', color: '#3b82f6', label: '증빙 파일' },
-  dispute:      { icon: '⚠️', color: '#FF6B2B', label: '분쟁 징후' },
+  dispute:      { icon: '⚠️', color: '#FF6B2B', label: '기록 관리 징후' },
   change_order: { icon: '🔄', color: '#8b5cf6', label: '변경사항' },
   process:      { icon: '🔧', color: '#10b981', label: '공정 완료' },
   diagnostic:   { icon: '📋', color: '#f59e0b', label: '진단 체크' },
@@ -79,7 +79,7 @@ export default function ProjectTimeline({ projectId, projectName }: ProjectTimel
         })
       })
 
-      // 2. 분쟁 징후
+      // 2. 기록 관리 징후
       const { data: disputes } = await supabase
         .from('dispute_signals')
         .select('id, signal_type, description, created_at, legal_basis, recommended_action')
@@ -92,7 +92,7 @@ export default function ProjectTimeline({ projectId, projectName }: ProjectTimel
           id: `ds-${d.id}`,
           type: 'dispute',
           title: SIGNAL_LABELS[d.signal_type] ?? d.signal_type,
-          description: d.recommended_action ?? d.description ?? '분쟁 징후 감지됨',
+          description: d.recommended_action ?? d.description ?? '기록 관리 징후 감지됨',
           date: d.created_at,
           icon: '⚠️',
           color: '#FF6B2B',

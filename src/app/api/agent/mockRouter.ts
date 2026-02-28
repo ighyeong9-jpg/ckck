@@ -342,7 +342,7 @@ function answerGeneralQuestion(message: string, industry: string, area: number):
         `  • 전기 용량 확인 (증설 필요 시 추가 비용)\n` +
         `  • 방수 상태 확인\n` +
         `  • 관리소 공사 허가 조건\n\n` +
-        `4. 📸 증거 남기기\n` +
+        `4. 📸 시공 기록 남기기\n` +
         `  • 공사 전/중/후 사진 촬영\n` +
         `  • 변경 사항은 문서로 남기기\n` +
         `  • 체키가 이 모든 걸 자동으로 해드립니다!\n\n` +
@@ -366,7 +366,7 @@ function answerGeneralQuestion(message: string, industry: string, area: number):
         `  • 건축물 용도변경: 업종에 따라 필요\n` +
         `  • 영업신고/허가: 업종별 관할 관청\n` +
         `  • 간판 허가: 구청 옥외광고물 신고\n` +
-        `  • 소방시설 완비증명원: 영업허가 시 필요\n\n` +
+        `  • 소방시설 완비확인원: 영업허가 시 필요\n\n` +
         `⚠️ 업종과 면적에 따라 요건이 다릅니다.\n체키가 업종별 체크리스트로 자동 확인해드립니다.`,
     }
   }
@@ -377,7 +377,7 @@ function answerGeneralQuestion(message: string, industry: string, area: number):
       tool: 'general_answer',
       success: true,
       message: `🔧 인테리어 공정 순서 안내\n\n` +
-        `올바른 공정 순서 (순서 꼬이면 분쟁의 원인!)\n\n` +
+        `올바른 공정 순서 (순서 꼬이면 기록 관리의 원인!)\n\n` +
         `1️⃣ 철거 → 구조벽 확인, 석면 체크\n` +
         `2️⃣ 설비/배관 → 급배수, 가스 배관\n` +
         `3️⃣ 전기 배선 → 분전반, 콘센트, 조명 배선\n` +
@@ -412,12 +412,12 @@ function answerGeneralQuestion(message: string, industry: string, area: number):
         `  1. 하자 부위 사진 (날짜 포함)\n` +
         `  2. 계약서 (하자보수 기간 확인)\n` +
         `  3. 시공 완료 확인서\n` +
-        `  4. 하자보수 요청 내용증명\n\n` +
+        `  4. 하자보수 요청 내용통지\n\n` +
         `💡 체키를 사용하면:\n` +
         `  • 모든 사진에 SHA-256 해시 자동 생성\n` +
         `  • 타임스탬프 위변조 불가\n` +
-        `  • 공종별 작업 완료 기록 = 책임 소재 증거\n` +
-        `  → 분쟁 시 가장 강력한 증거자료가 됩니다.`,
+        `  • 공종별 작업 완료 기록 = 책임 소재 시공 기록\n` +
+        `  → 기록 관리 시 가장 강력한 시공 기록자료가 됩니다.`,
     }
   }
 
@@ -535,12 +535,12 @@ export async function routeMessage(
       tool: 'general_answer',
       success: true,
       message: `🔄 변경 관리 안내\n\n` +
-        `인테리어 공사 중 변경은 분쟁의 가장 큰 원인입니다.\n\n` +
+        `인테리어 공사 중 변경은 기록 관리의 가장 큰 원인입니다.\n\n` +
         `체키의 변경 관리 기능:\n` +
         `  • 변경 요청 자동 기록 (누가, 언제, 뭘 변경)\n` +
         `  • 추가 비용 자동 산출\n` +
         `  • 양측 서명으로 합의 확인\n` +
-        `  • 변경 이력 전체 추적\n\n` +
+        `  • 변경 이력 전체 현황 확인\n\n` +
         `프로젝트를 생성하시면 변경 관리가 가능합니다.`,
     }
   }
@@ -589,23 +589,23 @@ export async function routeMessage(
   }
 
   // 증빙
-  if (matchKeywords(msg, ['증빙', '증거', '패키지', 'evidence', '해시', '블록체인'])) {
+  if (matchKeywords(msg, ['증빙', '시공 기록', '패키지', 'evidence', '해시', '블록체인'])) {
     if (ctx?.project) return evidencePackage(ctx)
     return {
       tool: 'general_answer',
       success: true,
-      message: `📦 증거 패키징 안내\n\n` +
-        `체키는 모든 증거를 위변조 불가능하게 보관합니다:\n\n` +
+      message: `📦 시공 기록 패키징 안내\n\n` +
+        `체키는 모든 시공 기록를 위변조 불가능하게 보관합니다:\n\n` +
         `🔐 SHA-256 해시\n` +
         `  • 모든 파일에 고유 해시값 생성\n` +
         `  • 1비트라도 변경되면 해시가 달라짐\n\n` +
         `🌲 Merkle Tree\n` +
-        `  • 전체 증거를 트리 구조로 연결\n` +
+        `  • 전체 시공 기록를 트리 구조로 연결\n` +
         `  • 어떤 하나라도 변경 시 루트 해시가 변경\n\n` +
         `📸 자동 기록\n` +
         `  • 사진 촬영 시 타임스탬프 자동\n` +
         `  • 위치정보(GPS) 포함\n` +
-        `  • 분쟁 시 법적 증거력 확보\n\n` +
+        `  • 기록 관리 시 법적 기록력 확보\n\n` +
         `프로젝트를 생성하시면 모든 기록이 자동으로 패키징됩니다.`,
     }
   }
@@ -619,7 +619,7 @@ export async function routeMessage(
       message: `📝 전자서명/합의 안내\n\n` +
         `체키의 3자 합의 시스템:\n` +
         `  👤 발주자 (고객)\n` +
-        `  🏗️ 시공자 (인테리어 업체)\n` +
+        `  🏗️ 작업자 (인테리어 업체)\n` +
         `  📊 감리자 (제3자)\n\n` +
         `전자서명으로 계약 내용을 확인하고,\n` +
         `변경 시에도 양측 합의를 기록합니다.\n\n` +
@@ -779,7 +779,7 @@ async function fallbackToGemini(message: string): Promise<ToolResult> {
           `  • "셀프 시공 가능해?" → 공종별 난이도\n` +
           `  • "소방법 기준" → 법규 안내\n` +
           `  • "공사 기간 얼마나?" → 업종별 일수\n` +
-          `  • "하자 대처법" → 분쟁 예방 가이드`,
+          `  • "하자 대처법" → 기록 관리 예방 가이드`,
       }
     }
   }

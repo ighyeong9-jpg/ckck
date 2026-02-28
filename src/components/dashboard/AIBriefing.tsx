@@ -39,8 +39,8 @@ const SEVERITY_COLOR: Record<ProactiveSeverity, string> = {
 
 const TRIGGER_LABEL: Record<string, string> = {
   WARRANTY_EXPIRING: '하자담보',
-  AI_CHECK_PENDING: 'AI 판정',
-  DISPUTE_UNRESOLVED: '분쟁 징후',
+  AI_CHECK_PENDING: 'AI 확인',
+  DISPUTE_UNRESOLVED: '기록 관리 징후',
   PROCESS_NEXT_STEP: '다음 단계',
   DAILY_REPORT_MISSING: '일보 미작성',
 }

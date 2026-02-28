@@ -395,7 +395,7 @@ export async function agreementCreate(ctx: ProjectContext): Promise<ToolResult> 
     message: `📋 3자 합의서가 생성되었습니다!\n\n` +
       `💰 합의 금액: ${formatKRW(totalWithVat)}\n` +
       `👤 발주자: 서명 대기\n` +
-      `🏗️ 시공자: 서명 대기\n` +
+      `🏗️ 작업자: 서명 대기\n` +
       `📊 감리자: 서명 대기\n\n합의 페이지에서 서명을 진행하세요.`,
     data: { totalAmount: totalWithVat },
   }

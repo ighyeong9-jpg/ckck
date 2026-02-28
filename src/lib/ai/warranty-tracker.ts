@@ -1,5 +1,5 @@
 /**
- * warranty-tracker.ts — 하자담보기간 자동 추적기
+ * warranty-tracker.ts — 하자담보기간 자동 현황 확인기
  *
  * 공종 완료 시 warranty_tracking 테이블에 레코드를 생성한다.
  * warranty_expires_date는 DB 트리거(trg_warranty_expires)가 자동 계산한다.

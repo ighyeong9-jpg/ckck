@@ -28,9 +28,9 @@ const BADGE_CONFIG = {
 }
 
 const BADGE_CONDITIONS = {
-  gold:   { months: 6,  passRate: 90, disputes: 0, label: '6개월 이상 · 통과율 90% · 분쟁 0건' },
-  silver: { months: 3,  passRate: 85, disputes: 0, label: '3개월 이상 · 통과율 85% · 분쟁 0건' },
-  bronze: { months: 1,  passRate: 70, disputes: 1, label: '1개월 이상 · 통과율 70% · 분쟁 1건 이하' },
+  gold:   { months: 6,  passRate: 90, disputes: 0, label: '6개월 이상 · 통과율 90% · 기록 관리 0건' },
+  silver: { months: 3,  passRate: 85, disputes: 0, label: '3개월 이상 · 통과율 85% · 기록 관리 0건' },
+  bronze: { months: 1,  passRate: 70, disputes: 1, label: '1개월 이상 · 통과율 70% · 기록 관리 1건 이하' },
 }
 
 export default function ContractorBadge({ userId, showDetail = false, size = 'md' }: ContractorBadgeProps) {
@@ -142,7 +142,7 @@ export default function ContractorBadge({ userId, showDetail = false, size = 'md
         <span className={styles.label}>{cfg.label}</span>
         {showDetail && (
           <span className={styles.detail}>
-            {badge.usageMonths}개월 사용 · 통과율 {badge.passRate}% · 분쟁 {badge.disputeCount}건
+            {badge.usageMonths}개월 사용 · 통과율 {badge.passRate}% · 기록 관리 {badge.disputeCount}건
           </span>
         )}
       </div>

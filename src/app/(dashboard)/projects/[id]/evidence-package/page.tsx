@@ -8,6 +8,7 @@ import { FILE_CATEGORIES } from '@/types/evidenceFile'
 import { getMerkleRoot, verifyEvidencePackage, type VerificationResult } from '@/lib/utils/merkleTree'
 import type { AutoCheckResult } from '@/lib/ai/auto-checker'
 import QuickActions from '@/components/ui/QuickActions'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
 // 이미지 파일 확장자 목록
@@ -19,10 +20,10 @@ function isImageFile(file: EvidenceFile): boolean {
   return IMAGE_EXTENSIONS.includes(ext) || IMAGE_MIME_TYPES.includes(file.file_type ?? '')
 }
 
-// GO/NO-GO 판정에 대응하는 친절 안내 문구
+// 안전 현황 확인에 대응하는 친절 안내 문구
 const GO_NO_GO_LABEL: Record<string, { label: string; message: string }> = {
   'GO':          { label: '진행해도 좋아요',       message: '주요 항목이 모두 기준을 충족했습니다. 현재 공정을 그대로 이어가셔도 됩니다.' },
-  'NO-GO':       { label: '즉시 확인이 필요해요',   message: '기준을 충족하지 못한 항목이 발견되었습니다. 아래 내용을 확인하시고 보완 후 재검토해 주세요.' },
+  '위험 확인':       { label: '즉시 확인이 필요해요',   message: '기준을 충족하지 못한 항목이 발견되었습니다. 아래 내용을 확인하시고 보완 후 재검토해 주세요.' },
   'CONDITIONAL': { label: '추가 확인 후 진행하세요', message: '사진만으로는 판단하기 어려운 항목이 있어요. 현장에서 직접 확인해 주시면 더 정확한 결과를 드릴 수 있습니다.' },
 }
 
@@ -34,6 +35,7 @@ const ITEM_RESULT_LABEL: Record<string, { icon: string; label: string }> = {
 }
 
 export default function EvidencePackagePage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -101,7 +103,7 @@ export default function EvidencePackagePage() {
       for (const file of Array.from(selectedFiles)) {
         // 파일 크기 체크 (5MB 제한)
         if (file.size > 5 * 1024 * 1024) {
-          alert(`"${file.name}" 파일이 너무 큽니다. (최대 5MB)`)
+          toast.warning(`"${file.name}" 파일이 너무 큽니다. (최대 5MB)`)
           continue
         }
 
@@ -146,10 +148,10 @@ export default function EvidencePackagePage() {
         fileInputRef.current.value = ''
       }
 
-      alert('업로드 완료!')
+      toast.success('업로드 완료!')
     } catch (err: any) {
       console.error('Error uploading:', err)
-      alert(`업로드 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`업로드 오류: ${err?.message || JSON.stringify(err)}`)
     } finally {
       setUploading(false)
     }
@@ -176,14 +178,14 @@ export default function EvidencePackagePage() {
       setFiles(prev => prev.filter(f => f.id !== file.id))
     } catch (err: any) {
       console.error('Error deleting:', err)
-      alert(`삭제 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`삭제 오류: ${err?.message || JSON.stringify(err)}`)
     }
   }
 
   // AI 자동 체크
   const handleAiCheck = async (file: EvidenceFile) => {
     if (!isImageFile(file)) {
-      alert('이미지 파일만 AI 분석이 가능합니다.')
+      toast.warning('이미지 파일만 AI 분석이 가능합니다.')
       return
     }
 
@@ -234,7 +236,7 @@ export default function EvidencePackagePage() {
       setShowAiModal(true)
     } catch (err: any) {
       console.error('[AI Check]', err)
-      alert(`AI 분석 오류: ${err?.message}`)
+      toast.error(`AI 분석 오류: ${err?.message}`)
     } finally {
       setAiChecking(null)
     }
@@ -257,14 +259,14 @@ export default function EvidencePackagePage() {
       }
     } catch (err: any) {
       console.error('Error downloading:', err)
-      alert(`다운로드 오류: ${err?.message || '파일을 찾을 수 없습니다.'}`)
+      toast.error(`다운로드 오류: ${err?.message || '파일을 찾을 수 없습니다.'}`)
     }
   }
 
   // 해시 복사
   const copyHash = (hash: string) => {
     navigator.clipboard.writeText(hash)
-    alert('인증값이 클립보드에 복사되었습니다.')
+    toast.success('인증값이 클립보드에 복사되었습니다.')
   }
 
   const getCategoryInfo = (id: string) => FILE_CATEGORIES.find(c => c.id === id)
@@ -298,7 +300,7 @@ export default function EvidencePackagePage() {
   // 증빙 패키지 검증
   const verifyPackage = async () => {
     if (files.length === 0) {
-      alert('검증할 파일이 없습니다.')
+      toast.warning('검증할 파일이 없습니다.')
       return
     }
 
@@ -324,13 +326,13 @@ export default function EvidencePackagePage() {
       setVerificationResult(result)
 
       if (result.isValid) {
-        alert('검증 완료: 모든 파일이 유효합니다.')
+        toast.success('검증 완료: 모든 파일이 유효합니다.')
       } else {
-        alert(`검증 실패: ${result.failedFiles.length}개 파일에 문제가 있습니다.`)
+        toast.error(`검증 실패: ${result.failedFiles.length}개 파일에 문제가 있습니다.`)
       }
     } catch (err) {
       console.error('Error verifying package:', err)
-      alert('검증 중 오류가 발생했습니다.')
+      toast.error('검증 중 오류가 발생했습니다.')
     } finally {
       setVerifying(false)
     }
@@ -339,7 +341,7 @@ export default function EvidencePackagePage() {
   // Merkle Root 저장
   const saveMerkleRoot = async () => {
     if (!merkleRoot) {
-      alert('저장할 인증 코드가 없습니다.')
+      toast.warning('저장할 인증 코드가 없습니다.')
       return
     }
 
@@ -350,9 +352,9 @@ export default function EvidencePackagePage() {
         .eq('id', projectId)
 
       if (error) throw error
-      alert('인증 코드가 저장되었습니다.')
+      toast.success('인증 코드가 저장되었습니다.')
     } catch (err: any) {
-      alert(`저장 오류: ${err?.message}`)
+      toast.error(`저장 오류: ${err?.message}`)
     }
   }
 
@@ -411,7 +413,7 @@ export default function EvidencePackagePage() {
                 onClick={verifyPackage}
                 disabled={verifying || files.length === 0}
               >
-                {verifying ? '검증 중...' : '위변조 검사'}
+                {verifying ? '검증 중...' : '위변조 확인'}
               </button>
               <button
                 className={styles.saveRootBtn}
@@ -511,7 +513,7 @@ export default function EvidencePackagePage() {
                 </div>
 
                 <div className={styles.modalBody}>
-                  {/* 판정 요약 카드 — 공감 먼저 */}
+                  {/* 현황 요약 카드 — 공감 먼저 */}
                   <div className={styles.aiSummary}>
                     <span className={styles.aiFileName}>{aiResultFile}</span>
                     <div className={styles.aiMeta}>
@@ -520,7 +522,7 @@ export default function EvidencePackagePage() {
                         분석 신뢰도 {Math.round(aiResult.confidence * 100)}%
                       </span>
                     </div>
-                    {/* 판정 — 친절 레이블 + 기술 코드 병기 */}
+                    {/* 현황 — 친절 레이블 + 기술 코드 병기 */}
                     <div className={`${styles.verdictBanner} ${styles[`goNoGo${aiResult.goNoGo.replace('-', '')}`]}`}>
                       <span className={styles.verdictLabel}>{verdict.label}</span>
                       <span className={styles.verdictCode}>{aiResult.goNoGo}</span>

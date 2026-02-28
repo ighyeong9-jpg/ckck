@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import styles from './StatsSection.module.scss'
 
 const STATS = [
-  { value: 450, suffix: '건', label: '월 평균 예방 가능 분쟁', desc: '한국소비자원 인테리어 분쟁 통계' },
-  { value: 7, suffix: '대', label: '자동 감지 분쟁 유형', desc: '구두합의·추가비용·먹튀 등' },
+  { value: 450, suffix: '건', label: '월 평균 예방 가능 기록 관리', desc: '한국소비자원 인테리어 기록 관리 통계' },
+  { value: 7, suffix: '대', label: '자동 감지 기록 관리 유형', desc: '구두합의·추가비용·먹튀 등' },
   { value: 12, suffix: '개', label: '실시간 적용 법령', desc: '민법·건산법·하도급법 등' },
   { value: 9, suffix: '개', label: 'AI 자동 체크 공종', desc: '철거~가구까지 전 공정' },
 ]
@@ -60,7 +60,7 @@ export default function StatsSection() {
       <div className={styles.inner}>
         <div className={styles.eyebrow}>숫자로 보는 체키</div>
         <h2 className={styles.title}>
-          인테리어 분쟁은 <span className={styles.accent}>운</span>이 아니라<br />
+          인테리어 기록 관리은 <span className={styles.accent}>운</span>이 아니라<br />
           <span className={styles.accent}>기록</span>의 문제입니다
         </h2>
         <div className={styles.grid}>

@@ -1,0 +1,270 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHECK-IN 체키 — DESIGN UPGRADE PROMPT v1.0
+"Industrial Precision" 디자인 시스템 전면 구현
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+지금부터 체키의 전체 디자인을 세계 최고 수준으로 업그레이드한다.
+Stripe, Linear, 토스, Vercel에 견줄 수 있는 디자인.
+
+━━━ 0. 시작 전 필독 ━━━
+
+프로젝트 경로: E:\check-in-stable
+
+먼저 읽어라:
+1. 8_DESIGN_SYSTEM.md    ← 디자인 철학 + 색상 + 컴포넌트 사양
+2. 10_TAILWIND_TOKENS.ts ← tailwind.config.ts + 컴포넌트 클래스
+3. 11_PAGE_SPEC.md       ← 페이지별 정밀 구현 사양
+
+읽기 완료 후: "파악 완료. 현재 디자인 확인. 1순위부터 시작합니다." 보고.
+
+━━━ 디자인 컨셉 ━━━
+
+이름: Industrial Precision
+뜻: 건설 도면의 정밀함 × 현대 SaaS의 세련됨
+
+기억할 한 줄:
+"이 앱을 열면 '이건 진지한 전문가 도구다'라는 느낌이 먼저 온다"
+
+절대 하지 말 것:
+❌ 보라색 / 그라데이션 남발
+❌ 흰 배경에 파란 CTA (토스 카피)
+❌ 중간 회색 단색 배경 (지루함)
+❌ 가독성 없는 작은 폰트
+❌ 카드 모서리 너무 크게 (초등학교 느낌)
+
+━━━ 1순위: Tailwind 설정 + 글로벌 스타일 ━━━
+
+tailwind.config.ts:
+  10_TAILWIND_TOKENS.ts의 config 내용으로 완전 교체
+  (colors, fontFamily, fontSize, borderRadius, boxShadow,
+   backgroundImage, backgroundSize, animation, keyframes 전부)
+
+src/app/globals.css:
+  @import url Pretendard 폰트 추가
+  (https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css)
+
+  :root에 CSS 변수 추가 (8_DESIGN_SYSTEM.md 섹션 4 전체)
+
+  body 기본:
+    font-family: Pretendard
+    background: #F8FAFC
+    -webkit-font-smoothing: antialiased
+
+  .blueprint 유틸 클래스 추가
+  .blueprint-light 유틸 클래스 추가
+
+완료 후: "✅ 1순위 완료 → 2순위 시작" 보고.
+
+━━━ 2순위: 공통 컴포넌트 ━━━
+
+생성 파일들:
+src/components/ui/Button.tsx
+src/components/ui/Card.tsx
+src/components/ui/Badge.tsx
+src/components/ui/Input.tsx
+src/components/ui/AlertBanner.tsx
+src/components/layout/Sidebar.tsx
+src/components/layout/TopBar.tsx
+src/components/layout/DashboardLayout.tsx
+
+Button.tsx:
+  variant: 'primary' | 'secondary' | 'ghost' | 'ghost-dark' | 'danger' | 'success' | 'white'
+  size: 'sm' | 'md' | 'lg' | 'xl'
+  11_PAGE_SPEC.md 버튼 클래스 그대로 구현
+  hover: translateY(-1px), spring cubic-bezier
+  active: translateY(1px) scale(.98)
+
+Card.tsx:
+  variant: 'default' | 'featured' | 'pass' | 'fail' | 'warn' | 'navy' | 'glass'
+  hover: shadow 상승 + translateY(-2px)
+
+Badge.tsx:
+  variant: 'go' | 'nogo' | 'warn' | 'info' | 'high' | 'new'
+
+Input.tsx:
+  variant: 'light' | 'dark'
+  focus: orange-500 ring
+
+AlertBanner.tsx:
+  리스크 61+ 시에만 표시
+  배경: red-500/8 → red-500/4 gradient
+  border-l-4 red-500
+  "700만원" 텍스트 강조
+
+Sidebar.tsx:
+  bg-navy-800, 240px
+  섹션 레이블, 메뉴 아이템, active 상태
+  border-l-2 orange-500 active indicator
+  bottom user 섹션
+  뱃지 (숫자 + 만료임박)
+
+완료 후: "✅ 2순위 완료 → 3순위 시작" 보고.
+
+━━━ 3순위: 랜딩페이지 ━━━
+
+파일: src/app/page.tsx (또는 app/(marketing)/page.tsx)
+
+HeroSection:
+  배경: bg-hero-gradient + blueprint 패턴
+  오렌지 글로우 orb (absolute, radial-gradient)
+  좌우 2칸 그리드
+  
+  LEFT:
+    - 애니메이션 뱃지 (pulse dot + 특허 등록 확정)
+    - h1 text-hero (80px, fw-900, tracking-tight)
+    - "체키" 단어: text-orange-500 + text-shadow glow
+    - 서브텍스트: text-white/55
+    - CTA 버튼 2개 (primary-xl + ghost-xl)
+    - 신뢰 지표 3개 row
+  
+  RIGHT:
+    - 대시보드 미니 프리뷰 카드
+    - animate-float (위아래 부유)
+    - glass card 스타일
+    - KPI 3개 + 경고 배너 + 막대 차트
+
+StatsStrip: bg-navy-950, 4개 지표, font-mono 숫자
+
+ProblemSection: bg-white, 3 카드
+SolutionSection: bg-gray-50, 4 카드 (hover 상단 라인 reveal)
+LawSection: bg-navy-800 + blueprint, 12개 카드 grid-cols-4
+PricingSection: bg-white, 4 카드 (featured scale 1.04)
+CtaBottom: bg-cta-gradient (오렌지), 흰 버튼
+
+완료 후: "✅ 3순위 완료 → 4순위 시작" 보고.
+
+━━━ 4순위: 로그인 페이지 ━━━
+
+파일: src/app/auth/page.tsx
+
+전체 배경: bg-login-gradient + blueprint
+글로우 orb 2개 (우상단 orange, 좌하단 navy)
+
+로그인 카드:
+  bg-white/4 backdrop-blur-xl
+  border border-white/10
+  rounded-3xl p-11
+  shadow-login
+  animate-fade-up (진입 애니메이션)
+
+내부 요소:
+  로고: 체키 (체 = white, 키 = orange-500) 28px fw-black
+  입력창: dark variant
+  로그인 버튼: primary-xl w-full
+  구분선 "또는" + 카카오 버튼
+  하단 회원가입 링크: text-white/40
+
+완료 후: "✅ 4순위 완료 → 5순위 시작" 보고.
+
+━━━ 5순위: 대시보드 ━━━
+
+파일: src/app/(dashboard)/page.tsx + DashboardLayout.tsx
+
+DashboardLayout:
+  Sidebar (240px) + 우측 MainArea
+  TopBar (h-[60px], bg-white, border-b-gray-200)
+
+대시보드 내용:
+  AlertBanner (리스크 61+ 조건부)
+  KPI 4개: hover shadow 상승 + translateY
+  숫자 countUp 애니메이션
+  
+  2칸 그리드 (60% / 40%):
+    좌: AI 브리핑 (navy-gradient) + 공정 진행 카드
+    우: 리스크 게이지 카드 + 하자담보 카드
+
+AiBriefCard:
+  bg-navy-gradient, 흰 텍스트
+  AI 아이콘: animate-pulse-glow
+
+ProcessList:
+  각 공정: hover bg-gray-50
+  진행 바: orange, 완료: green
+  진행 중 dot: animate-pulse
+
+RiskCard:
+  점수 giant number (color: 0-30 green / 31-60 amber / 61+ red)
+  리스크 바 (gradient)
+  리스크 아이템 목록
+
+완료 후: "✅ 5순위 완료 → 6순위 시작" 보고.
+
+━━━ 6순위: 체크리스트 페이지 ━━━
+
+헤더: bg-navy-gradient
+  좌: 공종명 + 메타정보
+  우: 리스크 점수 giant + PASS/FAIL/확인중 카운터
+
+NO-GO 배너 (조건부): bg-red-500/15, 경고 메시지 + 증거 확보 CTA
+
+메인 콘텐츠 2칸:
+  좌 (flex-1): 체크 아이템 리스트
+    - 상태별 border-l-4 색상
+    - 체크 아이콘 (pass=green/fail=red/pending=amber)
+    - 법조문 표시 (font-mono, xs)
+  
+  우 (280px): 사이드바
+    - 리스크 점수 카드 (navy-gradient + giant red number)
+    - 사진 자동 체크 카드 (드래그앤드롭 hover 효과)
+
+완료 후: "✅ 6순위 완료 → 7순위 시작" 보고.
+
+━━━ 7순위: 현장 이슈 페이지 ━━━
+
+이슈 카드:
+  상단: 긴급도 dot (critical=red pulse / high=amber / normal=blue)
+  타입 배지 (시공하자/비용추가/자재변경)
+  하단: AI 가이드 + [승인][거절][협의] 3버튼
+  
+  버튼 색상:
+    승인: bg-green-500 text-white
+    거절: bg-red-100 text-red-500 → hover bg-red-500 text-white
+    협의: bg-orange-100 text-orange-500 → hover bg-orange-500 text-white
+
+타임라인 사이드바 (320px):
+  이벤트 dot + 연결선 + 내용 + 타임스탬프
+  dot 색상: orange/green/red/navy 타입별
+
+완료 후: "✅ 7순위 완료 → 8순위 시작" 보고.
+
+━━━ 8순위: 반응형 + 마무리 ━━━
+
+모바일 (< 640px):
+  - 사이드바 → 하단 탭바 (5개 아이콘)
+  - 히어로 1열, 프리뷰 카드 hidden
+  - KPI 2열
+  - 버튼 w-full
+
+모든 페이지:
+  페이지 진입 stagger 애니메이션 (fadeUp, 0.1s 간격)
+  KPI 숫자 countUp 애니메이션
+  버튼 spring cubic-bezier hover
+
+완료 후:
+  npm run check (에러 0)
+  npm run build (빌드 성공)
+  develop 커밋 → main 머지 push
+
+━━━ 절대 금지 ━━━
+
+❌ Inter / Roboto / Arial 폰트 사용
+❌ 보라색 / 인디고 계열
+❌ 배경색 단순 회색 (#f5f5f5) 그대로 유지
+❌ 파란 CTA 버튼
+❌ 기존 기능 수정 (색상/레이아웃만 교체)
+❌ 컴포넌트 완성 보고 없이 다음 순위 진행
+
+━━━ 완료 기준 ━━━
+
+□ 랜딩페이지: 다크 히어로 + 도면 그리드 + float 프리뷰
+□ 로그인: 다크 glass 카드
+□ 대시보드: navy 사이드바 + AI 브리핑 + 리스크 배너
+□ 체크리스트: navy 헤더 + 상태별 색상 + giant 리스크 점수
+□ 이슈: 3버튼 플로우 + 타임라인
+□ 전체: Pretendard 폰트, orange CTA, countUp 애니메이션
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+지금 바로 8_DESIGN_SYSTEM.md 읽기부터 시작해라.
+완료 전까지 멈추지 마라.
+체키는 세계 어떤 앱에도 지지 않는 디자인이 된다.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

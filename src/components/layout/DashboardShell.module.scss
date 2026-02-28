@@ -8,7 +8,7 @@
 .contentArea {
   flex: 1;
   min-width: 0;
-  margin-left: var(--sidebar-width, 260px);
+  margin-left: var(--sidebar-width, 240px);
   transition: margin-left var(--transition-fast);
   display: flex;
   flex-direction: column;

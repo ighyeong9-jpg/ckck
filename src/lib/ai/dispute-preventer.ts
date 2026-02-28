@@ -1,14 +1,14 @@
 /**
- * dispute-preventer.ts — 분쟁 징후 자동 감지 엔진
+ * dispute-preventer.ts — 기록 관리 징후 자동 감지 엔진
  *
- * 사용자 메시지에서 인테리어 7대 분쟁 징후 키워드를 감지하고
+ * 사용자 메시지에서 인테리어 7대 기록 관리 징후 키워드를 감지하고
  * 관련 법적 근거 + 권장 조치를 자동으로 반환한다.
  *
  * 사용: brain.ts chat 케이스에서 callWithFallback 전에 호출
  */
 
 // ═══════════════════════════════════════════════════════════
-// 분쟁 유형 정의
+// 기록 관리 유형 정의
 // ═══════════════════════════════════════════════════════════
 
 export type DisputeType =
@@ -35,7 +35,7 @@ export interface DisputeSignal {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 분쟁 징후 키워드 매핑
+// 기록 관리 징후 키워드 매핑
 // ═══════════════════════════════════════════════════════════
 
 interface SignalRule {
@@ -58,7 +58,7 @@ const SIGNAL_RULES: SignalRule[] = [
     severity: 'danger',
     legalBasis: '민법 제666조(도급계약) — 구두 계약도 효력 있으나 입증 책임은 주장하는 자에게 있음',
     recommendedAction: '지금 바로 합의 내용을 카톡·문자로 재확인하고, 변경계약서에 서명하세요.',
-    warningMessage: '⚠️ 분쟁 위험: 구두 합의는 나중에 "그런 말 한 적 없다"는 분쟁의 80% 원인입니다. 모든 합의는 서면(카톡 포함)으로 남기세요.',
+    warningMessage: '⚠️ 기록 관리 위험: 구두 합의는 나중에 "그런 말 한 적 없다"는 기록 관리의 80% 원인입니다. 모든 합의는 서면(카톡 포함)으로 남기세요.',
   },
   {
     type: 'additional_cost',
@@ -70,7 +70,7 @@ const SIGNAL_RULES: SignalRule[] = [
     severity: 'warning',
     legalBasis: '민법 제665조(도급인의 보수지급의무) — 계약서에 없는 추가 공사는 서면 합의 없이 지급 의무 없음',
     recommendedAction: '추가 공사 내용·금액을 서면으로 확인하고, 변경계약서(사진+금액+서명)를 작성하세요.',
-    warningMessage: '⚠️ 추가 비용 분쟁 위험: 계약서에 없는 추가 공사는 서면 변경계약서 없이는 지급 거부가 가능합니다.',
+    warningMessage: '⚠️ 추가 비용 기록 관리 위험: 계약서에 없는 추가 공사는 서면 변경계약서 없이는 지급 거부가 가능합니다.',
   },
   {
     type: 'abandonment_risk',
@@ -93,8 +93,8 @@ const SIGNAL_RULES: SignalRule[] = [
     ],
     severity: 'warning',
     legalBasis: '민법 제667조(수급인의 담보책임) — 하자 발생 시 시공 후 1년 이내 보수 청구 가능',
-    recommendedAction: '하자 부위 사진·동영상 촬영 후 내용증명으로 보수 요청(2주 기한 부여)하세요.',
-    warningMessage: '⚠️ 하자 분쟁 위험: "원래 이렇다"는 주장에 대응하려면 시공 전후 사진이 필수입니다. 지금 바로 현장 사진을 촬영하세요.',
+    recommendedAction: '하자 부위 사진·동영상 촬영 후 내용통지으로 보수 요청(2주 기한 부여)하세요.',
+    warningMessage: '⚠️ 하자 기록 관리 위험: "원래 이렇다"는 주장에 대응하려면 시공 전후 사진이 필수입니다. 지금 바로 현장 사진을 촬영하세요.',
   },
   {
     type: 'delay',
@@ -105,7 +105,7 @@ const SIGNAL_RULES: SignalRule[] = [
     ],
     severity: 'warning',
     legalBasis: '표준계약서 지체보상금 조항 — 준공 기한 초과 시 1일당 공사대금의 0.1% 청구 가능',
-    recommendedAction: '준공일 초과 일수를 기록하고, 지체보상금 계산(공사대금 × 0.001 × 지연일수) 후 내용증명을 발송하세요.',
+    recommendedAction: '준공일 초과 일수를 기록하고, 지체보상금 계산(공사대금 × 0.001 × 지연일수) 후 내용통지을 발송하세요.',
     warningMessage: '⚠️ 공사 지연 감지: 계약서에 준공일과 지체보상금 조항이 있다면 지연일수만큼 청구할 수 있습니다.',
   },
   {
@@ -117,7 +117,7 @@ const SIGNAL_RULES: SignalRule[] = [
     ],
     severity: 'danger',
     legalBasis: '하도급거래공정화법 제13조·제14조 — 60일 이내 미지급 시 발주자에게 직접 청구 가능, 지연이자 연 15.5%',
-    recommendedAction: '내용증명으로 지급 최고 → 원도급 60일 초과 미지급 시 발주자 직접 청구(하도급법 제14조) → 공정위 신고(1380)',
+    recommendedAction: '내용통지으로 지급 최고 → 원도급 60일 초과 미지급 시 발주자 직접 청구(하도급법 제14조) → 공정위 신고(1380)',
     warningMessage: '⚠️ 임금 체불 감지: 원도급이 안 줘도 발주자에게 직접 청구할 수 있습니다(하도급법 제14조). 지연이자 연 15.5%도 청구 가능합니다.',
   },
   {
@@ -129,16 +129,16 @@ const SIGNAL_RULES: SignalRule[] = [
     severity: 'danger',
     legalBasis: '건설산업기본법 제16조 — 건설공사 도급계약은 서면으로 체결 의무',
     recommendedAction: '즉시 서면 계약서 작성하세요. 공정위 인테리어 표준계약서 양식 사용 권장.',
-    warningMessage: '🚨 계약서 없음: 계약서 없이 공사를 진행하면 분쟁 발생 시 아무것도 증명할 수 없습니다. 지금 당장 서면 계약서를 요청하세요.',
+    warningMessage: '🚨 계약서 없음: 계약서 없이 공사를 진행하면 기록 관리 발생 시 아무것도 확인할 수 없습니다. 지금 당장 서면 계약서를 요청하세요.',
   },
 ]
 
 // ═══════════════════════════════════════════════════════════
-// 분쟁 징후 감지 메인 함수
+// 기록 관리 징후 감지 메인 함수
 // ═══════════════════════════════════════════════════════════
 
 /**
- * 텍스트에서 분쟁 징후 키워드를 감지한다.
+ * 텍스트에서 기록 관리 징후 키워드를 감지한다.
  * brain.ts의 chat 케이스에서 사용.
  */
 export function detectDisputeSignals(text: string): DisputeAlert {
@@ -166,7 +166,7 @@ export function detectDisputeSignals(text: string): DisputeAlert {
 }
 
 /**
- * 감지된 분쟁 징후를 AI 프롬프트에 주입할 컨텍스트 문자열로 변환한다.
+ * 감지된 기록 관리 징후를 AI 프롬프트에 주입할 컨텍스트 문자열로 변환한다.
  * 가장 심각한 경고 1~2개만 포함하여 프롬프트 오염 방지.
  */
 export function buildDisputeContext(alert: DisputeAlert): string {
@@ -178,7 +178,7 @@ export function buildDisputeContext(alert: DisputeAlert): string {
   )
   const top = sorted.slice(0, 2) // 최대 2개
 
-  const lines: string[] = ['\n\n[체키 분쟁 감지 컨텍스트 — 아래 내용을 답변에 반드시 포함]']
+  const lines: string[] = ['\n\n[체키 기록 관리 감지 컨텍스트 — 아래 내용을 답변에 반드시 포함]']
   for (const sig of top) {
     lines.push(`${sig.warningMessage}`)
     lines.push(`📌 법적 근거: ${sig.legalBasis}`)

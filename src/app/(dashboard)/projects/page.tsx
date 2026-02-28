@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { Project, ProjectStatus, CreateProjectInput } from '@/types/project'
+import { SAFETY_LEVELS, getSafetyLevelFromRate } from '@/types/safety-levels'
 import QuickStart from '@/components/onboarding/QuickStart'
 import { DEFAULT_PROCESSES } from '@/types/process'
 import { logActivity } from '@/lib/activity/logger'
@@ -84,7 +85,7 @@ export default function ProjectsPage() {
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault()
-    // 폼 유효성 검사
+    // 폼 유효성 확인
     const errs: Record<string, string> = {}
     if (!formData.name.trim()) errs.name = '현장명을 입력해주세요.'
     if (!formData.client_name.trim()) errs.client_name = '고객명을 입력해주세요.'
@@ -375,6 +376,15 @@ export default function ProjectsPage() {
                         <span className={styles.riskBadge} style={{ background: risk.bg, color: risk.color }}>
                           {risk.grade}
                         </span>
+                        {(() => {
+                          const sl = getSafetyLevelFromRate(progress)
+                          const si = SAFETY_LEVELS[sl]
+                          return (
+                            <span style={{ background: si.bg, color: si.color, padding: '2px 8px', borderRadius: '1rem', fontSize: '11px', fontWeight: 600 }}>
+                              {si.icon} {si.label}
+                            </span>
+                          )
+                        })()}
                       </div>
                     </div>
                     <div className={styles.cardMiddle}>

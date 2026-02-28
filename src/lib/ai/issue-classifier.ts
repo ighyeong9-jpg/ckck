@@ -64,7 +64,7 @@ const ISSUE_CLASSIFIER_PROMPT = `너는 대한민국 인테리어·건설 현장
 - quality: 자재불량·시공불량·하자
 - cost: 추가비용·원자재가격 변동
 - schedule: 공정지연·날씨·인력부족
-- legal: 허가·법규·안전검사
+- legal: 허가·법규·안전확인
 - material: 자재미달·배송지연·단종
 - labor: 인력이탈·파업·전문인력 부족
 - weather: 기상악화·동절기·장마

@@ -2,10 +2,10 @@
  * pdfExporter.ts — 체키 PDF 출력 유틸리티
  *
  * 출력 가능 문서 4종:
- * 1. GO/NO-GO 판정서
+ * 1. 안전 확인 보고서
  * 2. 일일 현장 일보
- * 3. 하자보수 요청 내용증명 양식
- * 4. 분쟁 대응 요약서
+ * 3. 하자보수 요청 내용통지 양식
+ * 4. 기록 보관 요약서
  *
  * 기술: jsPDF (이미 설치됨)
  */
@@ -73,13 +73,13 @@ function addDivider(doc: jsPDF, y: number): number {
   return y + 4
 }
 
-// ─── 1. GO/NO-GO 판정서 ───────────────────────────────────
+// ─── 1. 안전 확인 보고서 ───────────────────────────────────
 
 export interface GoNoGoData {
   projectName: string
   siteName?: string
   processName: string
-  judgment: 'GO' | 'NO-GO' | 'CONDITIONAL'
+  judgment: 'GO' | '위험 확인' | 'CONDITIONAL'
   reason: string
   legalBasis?: string
   inspector?: string
@@ -88,12 +88,12 @@ export interface GoNoGoData {
 
 export function exportGoNoGoPDF(data: GoNoGoData): void {
   const doc = createPDF()
-  addHeader(doc, 'GO / NO-GO 판정서')
+  addHeader(doc, '안전 현황 확인서')
 
   let y = 28
 
-  // 판정 결과 뱃지
-  const color = data.judgment === 'GO' ? [0, 208, 132] : data.judgment === 'NO-GO' ? [255, 59, 92] : [255, 184, 0]
+  // 확인 결과 뱃지
+  const color = data.judgment === 'GO' ? [0, 208, 132] : data.judgment === '위험 확인' ? [255, 59, 92] : [255, 184, 0]
   doc.setFillColor(color[0], color[1], color[2])
   doc.roundedRect(14, y, 60, 14, 3, 3, 'F')
   doc.setTextColor(255, 255, 255)
@@ -107,7 +107,7 @@ export function exportGoNoGoPDF(data: GoNoGoData): void {
   y = addDivider(doc, y)
   y = addSection(doc, y, '공종', data.processName)
   y = addDivider(doc, y)
-  y = addSection(doc, y, '판정 근거', data.reason, true)
+  y = addSection(doc, y, '확인 근거', data.reason, true)
   y = addDivider(doc, y)
   if (data.legalBasis) {
     y = addSection(doc, y, '법적 근거', data.legalBasis, true)
@@ -117,17 +117,17 @@ export function exportGoNoGoPDF(data: GoNoGoData): void {
     y = addSection(doc, y, '점검자', data.inspector)
     y = addDivider(doc, y)
   }
-  y = addSection(doc, y, '판정일', TODAY())
+  y = addSection(doc, y, '확인일', TODAY())
 
   // 면책 고지
   y += 8
   doc.setFontSize(7.5)
   doc.setTextColor(150, 150, 150)
   doc.setFont('helvetica', 'italic')
-  doc.text('⚠ 이 판정서는 현장 기록 참고용입니다. 법적 효력을 갖는 판단은 전문 기관에 확인하세요.', 14, y)
+  doc.text('⚠ 이 확인서는 현장 기록 참고용입니다. 법적 효력을 갖는 판단은 전문 기관에 확인하세요.', 14, y)
 
   addFooter(doc)
-  doc.save(`GO-NOGO-판정서_${data.projectName}_${new Date().toISOString().split('T')[0]}.pdf`)
+  doc.save(`안전현황-확인서_${data.projectName}_${new Date().toISOString().split('T')[0]}.pdf`)
 }
 
 // ─── 2. 일일 현장 일보 ────────────────────────────────────
@@ -179,7 +179,7 @@ export function exportDailyReportPDF(data: DailyReportData): void {
   doc.save(`일보_${data.projectName}_${data.date}.pdf`)
 }
 
-// ─── 3. 하자보수 요청 내용증명 양식 ──────────────────────
+// ─── 3. 하자보수 요청 내용통지 양식 ──────────────────────
 
 export interface WarrantyClaimData {
   projectName: string
@@ -194,7 +194,7 @@ export interface WarrantyClaimData {
 
 export function exportWarrantyClaimPDF(data: WarrantyClaimData): void {
   const doc = createPDF()
-  addHeader(doc, '하자보수 요청 내용증명')
+  addHeader(doc, '하자보수 요청 내용통지')
 
   let y = 28
 
@@ -208,7 +208,7 @@ export function exportWarrantyClaimPDF(data: WarrantyClaimData): void {
   doc.setFontSize(9)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(100, 100, 100)
-  doc.text('※ 이 문서는 내용증명 발송용 서식입니다. 내용증명으로 발송 시 법적 효력이 발생합니다.', 105, y, { align: 'center' })
+  doc.text('※ 이 문서는 내용통지 발송용 서식입니다. 내용통지으로 발송 시 법적 효력이 발생합니다.', 105, y, { align: 'center' })
   y += 10
   y = addDivider(doc, y)
 
@@ -257,7 +257,7 @@ export function exportWarrantyClaimPDF(data: WarrantyClaimData): void {
   doc.save(`하자보수요청_${data.projectName}_${new Date().toISOString().split('T')[0]}.pdf`)
 }
 
-// ─── 4. 분쟁 대응 요약서 ─────────────────────────────────
+// ─── 4. 기록 보관 요약서 ─────────────────────────────────
 
 export interface DisputeSummaryData {
   projectName: string
@@ -270,7 +270,7 @@ export interface DisputeSummaryData {
 
 export function exportDisputeSummaryPDF(data: DisputeSummaryData): void {
   const doc = createPDF()
-  addHeader(doc, '분쟁 대응 요약서')
+  addHeader(doc, '기록 보관 요약서')
 
   let y = 28
 
@@ -279,7 +279,7 @@ export function exportDisputeSummaryPDF(data: DisputeSummaryData): void {
   doc.roundedRect(14, y, 182, 10, 2, 2, 'F')
   doc.setTextColor(255, 107, 43)
   doc.setFont('helvetica', 'bold')
-  doc.text(`⚠ 분쟁 유형: ${data.disputeType}`, 18, y + 6.5)
+  doc.text(`⚠ 기록 관리 유형: ${data.disputeType}`, 18, y + 6.5)
   y += 16
 
   doc.setTextColor(30, 30, 30)
@@ -320,11 +320,11 @@ export function exportDisputeSummaryPDF(data: DisputeSummaryData): void {
   })
   y = addDivider(doc, y)
 
-  // 증거 목록
+  // 시공 기록 목록
   doc.setFontSize(8)
   doc.setTextColor(120, 120, 120)
   doc.setFont('helvetica', 'bold')
-  doc.text('보유 증거 목록', 14, y)
+  doc.text('보유 시공 기록 목록', 14, y)
   y += 6
   data.evidenceList.forEach((ev, i) => {
     doc.setFontSize(10)
@@ -341,5 +341,5 @@ export function exportDisputeSummaryPDF(data: DisputeSummaryData): void {
   doc.text('⚠ 이 요약서는 체키 AI가 생성한 참고용 문서입니다. 법적 조언은 전문 변호사에게 확인하세요.', 14, y)
 
   addFooter(doc)
-  doc.save(`분쟁대응요약_${data.projectName}_${new Date().toISOString().split('T')[0]}.pdf`)
+  doc.save(`기록 관리대응요약_${data.projectName}_${new Date().toISOString().split('T')[0]}.pdf`)
 }

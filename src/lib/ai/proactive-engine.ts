@@ -6,8 +6,8 @@
  *
  * 감지 항목:
  * 1. 하자담보 만료 임박 (D-30 이내)
- * 2. 미확인 AI 판정 (human_confirmed = false)
- * 3. 미해결 분쟁 징후
+ * 2. 미확인 AI 확인 (human_confirmed = false)
+ * 3. 미해결 기록 관리 징후
  * 4. 공정 완료 후 다음 단계 안내 미발송
  * 5. 오늘 일보 미작성
  */
@@ -20,8 +20,8 @@ import { createClient } from '@supabase/supabase-js'
 
 export type ProactiveTriggerType =
   | 'WARRANTY_EXPIRING'      // 하자담보 만료 임박
-  | 'AI_CHECK_PENDING'       // 미확인 AI 판정
-  | 'DISPUTE_UNRESOLVED'     // 미해결 분쟁 징후
+  | 'AI_CHECK_PENDING'       // 미확인 AI 확인
+  | 'DISPUTE_UNRESOLVED'     // 미해결 기록 관리 징후
   | 'PROCESS_NEXT_STEP'      // 공정 완료 후 다음 단계
   | 'DAILY_REPORT_MISSING'   // 일보 미작성
 
@@ -105,7 +105,7 @@ async function checkWarrantyExpiring(
   }
 }
 
-/** 2. 미확인 AI 판정 (human_confirmed = false) */
+/** 2. 미확인 AI 확인 (human_confirmed = false) */
 async function checkAIPending(
   supabase: any,
   userId: string,
@@ -134,7 +134,7 @@ async function checkAIPending(
 
     return (Object.entries(byProject) as [string, any[]][]).map(([projectId, records]) => {
       const sample = records[0]
-      const noGoCount = records.filter((r: any) => r.go_no_go === 'NO-GO').length
+      const noGoCount = records.filter((r: any) => r.go_no_go === '위험 확인').length
       const severity: ProactiveSeverity = noGoCount > 0 ? 'CRITICAL' : 'INFO'
 
       return {
@@ -143,10 +143,10 @@ async function checkAIPending(
         severity,
         projectId,
         projectName: sample?.projects?.name ?? '알 수 없는 현장',
-        title: `확인 대기 AI 판정 ${records.length}건${noGoCount > 0 ? ` (NO-GO ${noGoCount}건)` : ''}`,
-        message: `${sample?.projects?.name ?? '현장'}에서 확인 대기 중인 AI 판정이 ${records.length}건 있어요${noGoCount > 0 ? ` — NO-GO 판정 포함!` : ''} 👀`,
+        title: `확인 대기 AI 확인 ${records.length}건${noGoCount > 0 ? ` (위험 확인 ${noGoCount}건)` : ''}`,
+        message: `${sample?.projects?.name ?? '현장'}에서 확인 대기 중인 AI 확인이 ${records.length}건 있어요${noGoCount > 0 ? ` — 위험 확인 포함!` : ''} 👀`,
         actionUrl: `/projects/${projectId}/evidence-package`,
-        actionLabel: '판정 확인',
+        actionLabel: '현황 확인',
         metadata: { total: records.length, noGoCount },
       }
     })
@@ -155,7 +155,7 @@ async function checkAIPending(
   }
 }
 
-/** 3. 미해결 분쟁 징후 */
+/** 3. 미해결 기록 관리 징후 */
 async function checkDisputeSignals(
   supabase: any,
   userId: string,
@@ -190,10 +190,10 @@ async function checkDisputeSignals(
         severity: 'WARNING' as ProactiveSeverity,
         projectId: projectId === 'no-project' ? null : projectId,
         projectName: sample?.projects?.name ?? '알 수 없는 현장',
-        title: `분쟁 징후 ${records.length}건 감지`,
-        message: `${sample?.projects?.name ?? '현장'}에서 분쟁 징후가 감지됐어요 ⚠️ ${sample?.description ?? ''}`,
+        title: `기록 관리 징후 ${records.length}건 감지`,
+        message: `${sample?.projects?.name ?? '현장'}에서 기록 관리 징후가 감지됐어요 ⚠️ ${sample?.description ?? ''}`,
         actionUrl: projectId !== 'no-project' ? `/projects/${projectId}/changes` : '/dashboard',
-        actionLabel: '분쟁 확인',
+        actionLabel: '기록 관리 확인',
         metadata: { count: records.length, types: records.map((r: any) => r.signal_type) },
       }
     })

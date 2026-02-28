@@ -8,9 +8,11 @@ import { QUOTE_CATEGORIES, UNITS } from '@/types/quote'
 import type { QuoteAnalysisResult } from '@/lib/ai/quote-analyzer'
 import QuickActions from '@/components/ui/QuickActions'
 import PdfDownloadButton from '@/components/pdf/PdfDownloadButton'
+import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
 
-export default function SOWPage() {
+export default function WorkOrderPage() {
+  const toast = useToast()
   const params = useParams()
   const projectId = params.id as string
   const supabase = createClient()
@@ -90,7 +92,7 @@ export default function SOWPage() {
   // AI 견적 분석
   const handleAnalyze = async () => {
     if (items.length === 0) {
-      alert('견적 항목을 먼저 추가해주세요.')
+      toast.warning('견적 항목을 먼저 추가해주세요.')
       return
     }
     setAnalyzing(true)
@@ -199,7 +201,7 @@ export default function SOWPage() {
       resetForm()
     } catch (err: any) {
       console.error('Error adding item:', err)
-      alert(`항목 추가 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`항목 추가 오류: ${err?.message || JSON.stringify(err)}`)
     } finally {
       setSaving(false)
     }
@@ -244,7 +246,7 @@ export default function SOWPage() {
       resetForm()
     } catch (err: any) {
       console.error('Error updating item:', err)
-      alert(`항목 수정 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`항목 수정 오류: ${err?.message || JSON.stringify(err)}`)
     } finally {
       setSaving(false)
     }
@@ -265,7 +267,7 @@ export default function SOWPage() {
       setItems(prev => prev.filter(item => item.id !== id))
     } catch (err: any) {
       console.error('Error deleting item:', err)
-      alert(`삭제 오류: ${err?.message || JSON.stringify(err)}`)
+      toast.error(`삭제 오류: ${err?.message || JSON.stringify(err)}`)
     }
   }
 

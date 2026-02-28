@@ -73,7 +73,7 @@ export async function buildMerkleTree(hashes: string[]): Promise<MerkleTreeResul
   const leaves = [...hashes]
   const proofMap = new Map<string, MerkleProof[]>()
 
-  // 각 리프에 대한 증명 경로 초기화
+  // 각 리프에 대한 확인 경로 초기화
   hashes.forEach(hash => proofMap.set(hash, []))
 
   // 트리 구축 (상향식)
@@ -93,7 +93,7 @@ export async function buildMerkleTree(hashes: string[]): Promise<MerkleTreeResul
 
       nextLevel.push(parent)
 
-      // 증명 경로 업데이트
+      // 확인 경로 업데이트
       updateProofs(proofMap, left.hash, right.hash, 'right')
       if (level[i + 1]) {
         updateProofs(proofMap, right.hash, left.hash, 'left')
@@ -112,7 +112,7 @@ export async function buildMerkleTree(hashes: string[]): Promise<MerkleTreeResul
 }
 
 /**
- * 증명 경로 업데이트
+ * 확인 경로 업데이트
  */
 function updateProofs(
   proofMap: Map<string, MerkleProof[]>,
@@ -120,7 +120,7 @@ function updateProofs(
   siblingHash: string,
   direction: 'left' | 'right'
 ): void {
-  // 리프 노드의 모든 증명 경로 업데이트
+  // 리프 노드의 모든 확인 경로 업데이트
   proofMap.forEach((proofs, leafHash) => {
     // 현재 레벨에서 이 리프와 관련된 해시 찾기
     const lastProof = proofs[proofs.length - 1]

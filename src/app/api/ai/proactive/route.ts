@@ -4,8 +4,8 @@
  *
  * 5가지 트리거를 병렬 체크:
  * 1. 하자담보 만료 임박 (D-30)
- * 2. 미확인 AI 판정
- * 3. 미해결 분쟁 징후
+ * 2. 미확인 AI 확인
+ * 3. 미해결 기록 관리 징후
  * 4. 공정 완료 후 다음 단계 안내
  * 5. 오늘 일보 미작성
  */
@@ -19,6 +19,10 @@ import {
   saveNotificationsToDb,
   type ProactiveSummary,
 } from '@/lib/ai/proactive-engine'
+import { registerEventHandlers } from '@/lib/events/handlers'
+
+// 이벤트 핸들러 등록
+registerEventHandlers()
 
 export const dynamic = 'force-dynamic'
 

@@ -10,6 +10,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { autoCheckFromPhoto, saveCheckResult } from '@/lib/ai/auto-checker'
 import type { ImageData } from '@/lib/ai/gemini-provider'
+import { eventBus, makePayload } from '@/lib/events/event-bus'
+import { registerEventHandlers } from '@/lib/events/handlers'
+
+// 핸들러 등록 (모듈 로드 시 1회 실행)
+registerEventHandlers()
 
 export async function POST(req: NextRequest) {
   try {
@@ -72,6 +77,16 @@ export async function POST(req: NextRequest) {
     let resultId: string | null = null
     if (photoUrl) {
       resultId = await saveCheckResult(projectId, photoUrl, result, supabase)
+    }
+
+    // 이벤트 발행: AI 체크 완료 후 위험 확인 → RISK_HIGH_DETECTED
+    if (result.goNoGo === '위험 확인' && result.confidence >= 0.6) {
+      eventBus.emitSync('RISK_HIGH_DETECTED', makePayload(projectId, {
+        projectName: project.name,
+        riskScore: Math.round(result.confidence * 100),
+        detectedProcess: result.detectedProcess,
+        issues: result.issues,
+      }, user.id))
     }
 
     return NextResponse.json({ ...result, resultId })
