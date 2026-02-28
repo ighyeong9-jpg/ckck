@@ -6,10 +6,24 @@ export interface EvidenceFile {
   file_type: string | null
   storage_path: string
   sha256_hash: string | null
+  merkle_root: string | null       // Merkle Tree 루트 해시
+  ai_check_result: AiCheckResult | null  // AI 자동 체크 결과
+  is_evidence: boolean             // 법정 증거 지정 여부
   category: string
   description: string | null
   uploaded_by: string | null
   created_at: string
+}
+
+export type AiCheckResultStatus = 'GO' | 'NO-GO' | 'CONDITIONAL'
+
+export interface AiCheckResult {
+  status: AiCheckResultStatus
+  confidence: number               // 0~1
+  analysis: string
+  issues: string[]
+  recommendations: string[]
+  checked_at: string
 }
 
 export const FILE_CATEGORIES = [

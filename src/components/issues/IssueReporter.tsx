@@ -1,8 +1,31 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { IssueClassifyResult } from '@/lib/ai/issue-types'
 import styles from './IssueReporter.module.scss'
+
+// Web Speech API 타입 (브라우저 내장)
+interface ISpeechRecognitionEvent {
+  results: { 0: { 0: { transcript: string } } }
+}
+
+interface ISpeechRecognition {
+  lang: string
+  continuous: boolean
+  interimResults: boolean
+  onresult: ((e: ISpeechRecognitionEvent) => void) | null
+  onend: (() => void) | null
+  onerror: (() => void) | null
+  start(): void
+  stop(): void
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => ISpeechRecognition
+    webkitSpeechRecognition?: new () => ISpeechRecognition
+  }
+}
 
 interface IssueReporterProps {
   projectId?: string
@@ -15,6 +38,46 @@ export default function IssueReporter({ projectId, onClassified }: IssueReporter
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [charCount, setCharCount] = useState(0)
+  const [recording, setRecording] = useState(false)
+  const recognitionRef = useRef<ISpeechRecognition | null>(null)
+  const [speechSupported, setSpeechSupported] = useState(false)
+
+  useEffect(() => {
+    const SR = window.SpeechRecognition ?? window.webkitSpeechRecognition
+    setSpeechSupported(!!SR)
+  }, [])
+
+  const toggleRecording = useCallback(() => {
+    const SR = window.SpeechRecognition ?? window.webkitSpeechRecognition
+    if (!SR) return
+
+    if (recording) {
+      recognitionRef.current?.stop()
+      setRecording(false)
+      return
+    }
+
+    const recognition = new SR()
+    recognition.lang = 'ko-KR'
+    recognition.continuous = false
+    recognition.interimResults = false
+
+    recognition.onresult = (e: ISpeechRecognitionEvent) => {
+      const transcript = e.results[0][0].transcript
+      setText(prev => {
+        const next = prev ? prev + ' ' + transcript : transcript
+        setCharCount(next.length)
+        return next
+      })
+    }
+
+    recognition.onend = () => setRecording(false)
+    recognition.onerror = () => setRecording(false)
+
+    recognitionRef.current = recognition
+    recognition.start()
+    setRecording(true)
+  }, [recording])
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value)
@@ -62,14 +125,27 @@ export default function IssueReporter({ projectId, onClassified }: IssueReporter
         </div>
       </div>
 
-      <textarea
-        className={styles.textarea}
-        placeholder={`현장에서 발생한 상황을 자세히 입력해주세요.\n\n예시:\n• 2층 화장실 방수 작업 후 누수 발견됨. 타일 시공 전이라 바로 재작업 가능한 상황.\n• 자재 납품이 3일 지연됨. 창호 설치가 밀려 전체 공정 지연 우려.`}
-        value={text}
-        onChange={handleChange}
-        rows={6}
-        maxLength={1000}
-      />
+      <div className={styles.textareaWrap}>
+        <textarea
+          className={styles.textarea}
+          placeholder={`현장에서 발생한 상황을 자세히 입력해주세요.\n\n예시:\n• 2층 화장실 방수 작업 후 누수 발견됨. 타일 시공 전이라 바로 재작업 가능한 상황.\n• 자재 납품이 3일 지연됨. 창호 설치가 밀려 전체 공정 지연 우려.`}
+          value={text}
+          onChange={handleChange}
+          rows={6}
+          maxLength={1000}
+        />
+        {speechSupported && (
+          <button
+            type="button"
+            className={`${styles.micBtn} ${recording ? styles.micRecording : ''}`}
+            onClick={toggleRecording}
+            title={recording ? '녹음 중지' : '음성으로 입력'}
+            aria-label={recording ? '녹음 중지' : '음성으로 입력'}
+          >
+            {recording ? '🔴' : '🎤'}
+          </button>
+        )}
+      </div>
       <div className={styles.charCount}>{charCount}/1000</div>
 
       <textarea

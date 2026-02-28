@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Project, ProjectStatus, CreateProjectInput } from '@/types/project'
 import { SAFETY_LEVELS, getSafetyLevelFromRate } from '@/types/safety-levels'
@@ -9,6 +10,7 @@ import QuickStart from '@/components/onboarding/QuickStart'
 import { DEFAULT_PROCESSES } from '@/types/process'
 import { logActivity } from '@/lib/activity/logger'
 import { useToast } from '@/components/ui/Toast'
+import { exitDemoMode } from '@/lib/demo/demoData'
 import styles from './page.module.scss'
 
 const INDUSTRY_ICONS: Record<string, string> = {
@@ -20,6 +22,8 @@ const INDUSTRY_ICONS: Record<string, string> = {
 export default function ProjectsPage() {
   const supabase = createClient()
   const toast = useToast()
+  const searchParams = useSearchParams()
+  const isDemo = searchParams.get('demo') === 'true'
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
@@ -236,15 +240,37 @@ export default function ProjectsPage() {
 
   return (
     <div className={styles.container}>
+      {/* 데모 모드 배너 */}
+      {isDemo && (
+        <div style={{
+          background: 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)',
+          color: '#fff',
+          padding: '10px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: '13px',
+          fontWeight: 600,
+          gap: 12,
+        }}>
+          <span>🎮 데모 모드입니다. 데이터는 저장되지 않습니다.</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Link href="/login" style={{ color: '#fff', textDecoration: 'underline' }}
+              onClick={() => exitDemoMode()}>
+              회원가입하기
+            </Link>
+          </div>
+        </div>
+      )}
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div>
             <h1 className={styles.title}>현장 관리</h1>
             <p className={styles.subtitle}>진행 중인 모든 현장을 관리하세요</p>
           </div>
-          <button type="button" className={styles.newProjectBtn} onClick={() => setShowModal(true)}>
-            + 새 현장
-          </button>
+          <Link href="/projects/new" className={styles.newProjectBtn} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+            + 새 현장 등록
+          </Link>
           <button type="button" className={styles.newProjectBtn} style={{ background: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }} onClick={() => {
             const btn = document.querySelector('[aria-label="AI 비서 체크인"]') as HTMLButtonElement
             if (btn) btn.click()
@@ -304,9 +330,9 @@ export default function ProjectsPage() {
               <h3>첫 현장을 등록해보세요!</h3>
               <p>현장을 등록하면 진단부터 리포트까지<br/>모든 과정을 체계적으로 관리할 수 있습니다</p>
               <div className={styles.emptyActions}>
-                <button type="button" className={styles.emptyBtn} onClick={() => setShowModal(true)}>
-                  + 새 현장 등록
-                </button>
+                <Link href="/projects/new" className={styles.emptyBtn} style={{ textDecoration: 'none' }}>
+                  + 첫 현장 등록하기
+                </Link>
                 <button type="button" className={styles.emptyBtnAlt} onClick={() => setShowQuickStart(true)}>
                   ⚡ 퀵스타트로 시작
                 </button>

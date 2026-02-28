@@ -48,6 +48,21 @@
 .tabLabel { font-size: 0.8125rem; }
 .statusIcon { font-size: 0.625rem; line-height: 1; }
 
+.tabBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .nextBtn {
   flex-shrink: 0;
   padding: 0.5rem 1rem;
