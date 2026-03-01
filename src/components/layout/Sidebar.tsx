@@ -39,13 +39,23 @@ const coreMenuItems: NavItem[] = [
 const moreMenuItems: NavItem[] = [
   { icon: '🤖', label: 'AI 채팅', href: '/ai-chat' },
   { icon: '📒', label: 'AI 노트북', href: '/notebook' },
+  { icon: '💳', label: '결제 및 구독', href: '/payment' },
   { icon: '👥', label: '고객관리', href: '/clients' },
   { icon: '📡', label: '현장 이슈', href: '/issues' },
   { icon: '⚙️', label: '설정', href: '/settings' },
 ]
 
-// 프로젝트 서브메뉴는 사용하지 않음 (핵심 메뉴로 통합)
-const projectSubMenuItems: SubMenuItem[] = []
+// 프로젝트 서브메뉴 - 현장 선택 시 표시
+const projectSubMenuItems: SubMenuItem[] = [
+  { icon: '📊', label: '개요', path: 'overview' },
+  { icon: '💰', label: '견적단가 검증', path: 'estimate' },
+  { icon: '🔍', label: '사전진단', path: 'diagnostic' },
+  { icon: '📸', label: '사진 갤러리', path: 'gallery' },
+  { icon: '🔧', label: '공정 관리', path: 'process' },
+  { icon: '⚠️', label: '하자 관리', path: 'defects' },
+  { icon: '📋', label: '변경 사항', path: 'changes' },
+  { icon: '🛡️', label: '하자담보', path: 'warranty' },
+]
 
 const extraNavItems: NavItem[] = []
 const bottomNavItems: NavItem[] = []
@@ -124,14 +134,22 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const isOnProjectPage = !!currentProjectId && currentProjectId !== 'new'
 
   useEffect(() => {
-    if (!currentProjectId || currentProjectId === 'new') return
+    if (!currentProjectId || currentProjectId === 'new' || currentProjectId === 'demo') return
     const loadBadges = async () => {
       try {
-        const { count: diagTotal } = await supabase
-          .from('diagnostic_responses')
-          .select('*', { count: 'exact', head: true })
-          .eq('project_id', currentProjectId)
-          .eq('checked', false)
+        // diagnostic_responses 미완료 항목 (에러 무시)
+        let diagTotal = 0
+        try {
+          const { count } = await supabase
+            .from('diagnostic_responses')
+            .select('*', { count: 'exact', head: true })
+            .eq('project_id', currentProjectId)
+            .eq('checked', false)
+          diagTotal = count ?? 0
+        } catch (err) {
+          console.warn('[Sidebar] diagnostic_responses query failed:', err)
+        }
+
         const { count: pendingProcesses } = await supabase
           .from('processes')
           .select('*', { count: 'exact', head: true })

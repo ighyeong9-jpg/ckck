@@ -119,6 +119,8 @@ export default function PaymentPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
   const [paying, setPaying] = useState(false)
   const [paymentDone, setPaymentDone] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank' | 'realtime'>('card')
+  const [depositorName, setDepositorName] = useState('')
 
   // 결제 내역 (UI 전용 mock)
   const [paymentHistory, setPaymentHistory] = useState<PaymentRecord[]>([])
@@ -209,7 +211,7 @@ export default function PaymentPage() {
     toast.success('카드가 등록되었습니다.')
   }
 
-  // 결제 실행 (UI 전용 시뮬레이션)
+  // 카드 결제 실행
   const handlePay = async () => {
     if (!selectedPlan) return
     if (cards.length === 0) {
@@ -247,6 +249,75 @@ export default function PaymentPage() {
       }, ...prev])
 
       toast.success(`${selectedPlan.name} 플랜 구독이 시작되었습니다! (${card?.brand} ${card?.last4})`)
+    } catch (err: any) {
+      toast.error(`결제 오류: ${err?.message}`)
+    } finally {
+      setPaying(false)
+    }
+  }
+
+  // 무통장입금 신청
+  const handleBankTransfer = async () => {
+    if (!selectedPlan) return
+    if (!depositorName.trim()) {
+      toast.warning('입금자명을 입력해주세요.')
+      return
+    }
+
+    setPaying(true)
+    await new Promise(r => setTimeout(r, 1500))
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('로그인이 필요합니다.')
+
+      // 입금 대기 상태로 결제 내역 추가
+      setPaymentHistory(prev => [{
+        id: `bank-${Date.now()}`,
+        date: new Date().toLocaleDateString('ko-KR'),
+        plan: selectedPlan.name,
+        amount: getPrice(selectedPlan),
+        status: '완료', // 실제로는 '대기' 상태로 관리자 확인 필요
+      }, ...prev])
+
+      setPaymentDone(true)
+      toast.success(`입금 신청이 완료되었습니다. 입금 확인 후 구독이 시작됩니다. (입금자명: ${depositorName})`)
+    } catch (err: any) {
+      toast.error(`입금 신청 오류: ${err?.message}`)
+    } finally {
+      setPaying(false)
+    }
+  }
+
+  // 실시간 계좌이체
+  const handleRealtimeTransfer = async () => {
+    if (!selectedPlan) return
+
+    setPaying(true)
+    await new Promise(r => setTimeout(r, 2000))
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('로그인이 필요합니다.')
+
+      const { error } = await supabase
+        .from('user_settings')
+        .update({ subscription_plan: selectedPlan.id })
+        .eq('user_id', user.id)
+      if (error) throw error
+
+      setCurrentPlan(selectedPlan.id)
+      setPaymentDone(true)
+
+      setPaymentHistory(prev => [{
+        id: `realtime-${Date.now()}`,
+        date: new Date().toLocaleDateString('ko-KR'),
+        plan: selectedPlan.name,
+        amount: getPrice(selectedPlan),
+        status: '완료',
+      }, ...prev])
+
+      toast.success(`${selectedPlan.name} 플랜 구독이 시작되었습니다! (실시간 계좌이체)`)
     } catch (err: any) {
       toast.error(`결제 오류: ${err?.message}`)
     } finally {
@@ -596,7 +667,60 @@ export default function PaymentPage() {
                     )}
                   </div>
 
-                  {/* 카드 선택 */}
+                  {/* 결제 수단 선택 탭 */}
+                  <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', borderBottom: '1px solid #e5e7eb' }}>
+                    <button
+                      onClick={() => setPaymentMethod('card')}
+                      style={{
+                        flex: 1,
+                        padding: '10px 8px',
+                        border: 'none',
+                        background: 'transparent',
+                        borderBottom: paymentMethod === 'card' ? '2px solid #E8651A' : 'none',
+                        color: paymentMethod === 'card' ? '#E8651A' : '#6b7280',
+                        fontWeight: paymentMethod === 'card' ? 'bold' : 'normal',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      💳 카드
+                    </button>
+                    <button
+                      onClick={() => setPaymentMethod('realtime')}
+                      style={{
+                        flex: 1,
+                        padding: '10px 8px',
+                        border: 'none',
+                        background: 'transparent',
+                        borderBottom: paymentMethod === 'realtime' ? '2px solid #E8651A' : 'none',
+                        color: paymentMethod === 'realtime' ? '#E8651A' : '#6b7280',
+                        fontWeight: paymentMethod === 'realtime' ? 'bold' : 'normal',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      🏦 계좌이체
+                    </button>
+                    <button
+                      onClick={() => setPaymentMethod('bank')}
+                      style={{
+                        flex: 1,
+                        padding: '10px 8px',
+                        border: 'none',
+                        background: 'transparent',
+                        borderBottom: paymentMethod === 'bank' ? '2px solid #E8651A' : 'none',
+                        color: paymentMethod === 'bank' ? '#E8651A' : '#6b7280',
+                        fontWeight: paymentMethod === 'bank' ? 'bold' : 'normal',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      💰 무통장
+                    </button>
+                  </div>
+
+                  {/* 카드 결제 */}
+                  {paymentMethod === 'card' && (
                   <div className={styles.payCardSection}>
                     <div className={styles.payCardHeader}>
                       <label>결제 수단</label>
@@ -638,10 +762,130 @@ export default function PaymentPage() {
                       </div>
                     )}
                   </div>
+                  )}
 
-                  <div className={styles.payNotice}>
-                    구독은 매월 자동으로 갱신되며, 언제든지 취소할 수 있습니다.
-                  </div>
+                  {/* 실시간 계좌이체 */}
+                  {paymentMethod === 'realtime' && (
+                    <div style={{ marginTop: '20px' }}>
+                      <div style={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        borderRadius: '12px',
+                        padding: '24px',
+                        marginBottom: '20px',
+                        color: 'white'
+                      }}>
+                        <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          ⚡ 실시간 계좌이체
+                          <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.3)', padding: '4px 8px', borderRadius: '12px' }}>즉시 승인</span>
+                        </div>
+                        <div style={{ fontSize: '13px', opacity: 0.9, marginBottom: '16px' }}>
+                          은행 앱을 통해 실시간으로 결제가 완료됩니다.
+                        </div>
+                        <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
+                          {getPrice(selectedPlan).toLocaleString()}원
+                        </div>
+                      </div>
+
+                      <div style={{
+                        background: '#f9fafb',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '12px',
+                        padding: '16px',
+                        marginBottom: '16px'
+                      }}>
+                        <div style={{ fontSize: '13px', color: '#374151', marginBottom: '12px' }}>
+                          💡 <strong>이용 가능 은행</strong>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', fontSize: '12px', color: '#6b7280' }}>
+                          <div>국민은행</div>
+                          <div>신한은행</div>
+                          <div>우리은행</div>
+                          <div>하나은행</div>
+                          <div>농협은행</div>
+                          <div>기업은행</div>
+                          <div>SC은행</div>
+                          <div>카카오뱅크</div>
+                        </div>
+                      </div>
+
+                      <div style={{
+                        background: '#dbeafe',
+                        border: '1px solid #93c5fd',
+                        borderRadius: '8px',
+                        padding: '12px',
+                        fontSize: '12px',
+                        color: '#1e40af'
+                      }}>
+                        ✓ 결제 완료 시 즉시 구독이 시작됩니다.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 무통장입금 */}
+                  {paymentMethod === 'bank' && (
+                    <div style={{ marginTop: '20px' }}>
+                      <div style={{
+                        background: '#f9fafb',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '12px',
+                        padding: '20px',
+                        marginBottom: '20px'
+                      }}>
+                        <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#374151', marginBottom: '12px' }}>
+                          🏦 입금 계좌 정보
+                        </div>
+                        <div style={{ fontSize: '13px', color: '#6b7280', lineHeight: '1.8' }}>
+                          <div style={{ marginBottom: '8px' }}>
+                            <span style={{ fontWeight: '600', color: '#374151' }}>은행:</span>
+                            <span style={{ marginLeft: '8px' }}>국민은행</span>
+                          </div>
+                          <div style={{ marginBottom: '8px' }}>
+                            <span style={{ fontWeight: '600', color: '#374151' }}>계좌번호:</span>
+                            <span style={{ marginLeft: '8px', fontFamily: 'monospace', fontSize: '14px' }}>000000-00-000000</span>
+                          </div>
+                          <div style={{ marginBottom: '8px' }}>
+                            <span style={{ fontWeight: '600', color: '#374151' }}>예금주:</span>
+                            <span style={{ marginLeft: '8px' }}>체크인</span>
+                          </div>
+                          <div>
+                            <span style={{ fontWeight: '600', color: '#374151' }}>입금액:</span>
+                            <span style={{ marginLeft: '8px', color: '#E8651A', fontWeight: 'bold' }}>
+                              {getPrice(selectedPlan).toLocaleString()}원
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>입금자명 *</label>
+                        <input
+                          type="text"
+                          placeholder="입금하실 분의 성함을 입력해주세요"
+                          value={depositorName}
+                          onChange={(e) => setDepositorName(e.target.value)}
+                          style={{ width: '100%' }}
+                        />
+                      </div>
+
+                      <div style={{
+                        background: '#fef3c7',
+                        border: '1px solid #fcd34d',
+                        borderRadius: '8px',
+                        padding: '12px',
+                        fontSize: '12px',
+                        color: '#92400e',
+                        marginTop: '16px'
+                      }}>
+                        ⚠️ 입금 확인 후 구독이 시작됩니다. 영업일 기준 1-2일 소요될 수 있습니다.
+                      </div>
+                    </div>
+                  )}
+
+                  {paymentMethod === 'card' && (
+                    <div className={styles.payNotice}>
+                      구독은 매월 자동으로 갱신되며, 언제든지 취소할 수 있습니다.
+                    </div>
+                  )}
 
                   <div className={styles.modalActions}>
                     <button className={styles.cancelBtn} onClick={() => setShowPaymentModal(false)}>
@@ -649,12 +893,26 @@ export default function PaymentPage() {
                     </button>
                     <button
                       className={styles.submitBtn}
-                      onClick={handlePay}
-                      disabled={paying || cards.length === 0}
+                      onClick={
+                        paymentMethod === 'card' ? handlePay :
+                        paymentMethod === 'realtime' ? handleRealtimeTransfer :
+                        handleBankTransfer
+                      }
+                      disabled={
+                        paying ||
+                        (paymentMethod === 'card' && cards.length === 0) ||
+                        (paymentMethod === 'bank' && !depositorName.trim())
+                      }
                     >
                       {paying ? (
-                        <><span className={styles.btnSpinner} /> 결제 처리 중...</>
-                      ) : `${getPrice(selectedPlan).toLocaleString()}원 결제하기`}
+                        <><span className={styles.btnSpinner} />
+                        {paymentMethod === 'card' ? ' 결제 처리 중...' :
+                         paymentMethod === 'realtime' ? ' 결제 진행 중...' :
+                         ' 신청 중...'}</>
+                      ) : paymentMethod === 'card' ? `${getPrice(selectedPlan).toLocaleString()}원 결제하기` :
+                         paymentMethod === 'realtime' ? `${getPrice(selectedPlan).toLocaleString()}원 계좌이체` :
+                         '입금 신청하기'
+                      }
                     </button>
                   </div>
                 </div>
