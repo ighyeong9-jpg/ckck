@@ -77,6 +77,23 @@ export default function EstimateForm({
   const inputClass = "w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-xl focus:outline-none focus:border-[#E8651A] focus:ring-2 focus:ring-[#E8651A]/20 transition-all duration-200 placeholder-gray-400";
   const labelClass = "block text-sm font-semibold text-gray-700 mb-2";
 
+  // 공간 유형별 카테고리 매핑
+  const spaceTypeToCategory: Record<string, 'residential' | 'commercial'> = {
+    '아파트_올수리': 'residential',
+    '구축아파트_올수리': 'residential',
+    '부분수리': 'residential',
+    '카페': 'commercial',
+    '음식점_일반': 'commercial',
+    '미용실': 'commercial',
+    '사무실': 'commercial',
+    '의료기관': 'commercial',
+  };
+
+  const handleSpaceTypeChange = (spaceType: string) => {
+    const projectType = spaceTypeToCategory[spaceType] || 'residential';
+    setFormData({ ...formData, spaceType, projectType });
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* 기본 정보 카드 */}
@@ -91,9 +108,7 @@ export default function EstimateForm({
             <label className={labelClass}>공간 유형</label>
             <select
               value={formData.spaceType}
-              onChange={(e) =>
-                setFormData({ ...formData, spaceType: e.target.value })
-              }
+              onChange={(e) => handleSpaceTypeChange(e.target.value)}
               className={inputClass}
             >
               <optgroup label="주거">
