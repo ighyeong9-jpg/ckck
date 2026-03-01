@@ -124,16 +124,16 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
             </p>
             <div className="flex flex-wrap gap-3 mb-12">
               <Link
-                href={isLoggedIn ? '/dashboard' : '/login'}
+                href="/projects/demo/estimate"
                 className="inline-flex items-center justify-center gap-2 h-[52px] px-8 rounded-xl text-[15px] font-bold text-white bg-orange-500 shadow-orange transition-all duration-300 hover:bg-orange-400 hover:-translate-y-1"
               >
-                무료로 시작하기 →
+                💰 견적 검증 체험하기 →
               </Link>
               <Link
-                href="/login"
+                href="/dashboard"
                 className="inline-flex items-center justify-center gap-2 h-[52px] px-8 rounded-xl text-[15px] font-semibold text-gray-700 bg-gray-100 border border-gray-300 transition-all duration-200 hover:bg-gray-200 hover:-translate-y-0.5"
               >
-                데모 보기 ▶
+                📊 전체 기능 둘러보기
               </Link>
             </div>
             <div className="flex flex-wrap gap-6">
@@ -189,6 +189,54 @@ export default function LandingPage({ isLoggedIn }: LandingPageProps) {
               <div className="text-xs text-gray-600 mt-1.5 font-medium">{stat.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ──── 빠른 시작 ──── */}
+      <section className="bg-white py-16 px-8 border-b border-gray-200">
+        <div className="max-w-[1280px] mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-black text-gray-900 mb-2">🚀 지금 바로 체험하기</h2>
+            <p className="text-sm text-gray-600">로그인 없이 즉시 사용 가능한 데모 기능</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+            <Link
+              href="/projects/demo/estimate"
+              className="group bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+            >
+              <div className="text-3xl mb-3">💰</div>
+              <h3 className="text-base font-bold text-gray-900 mb-1">견적단가 검증</h3>
+              <p className="text-xs text-gray-600 mb-3">AI 시장가 분석</p>
+              <div className="text-xs font-semibold text-orange-600 group-hover:text-orange-700">체험하기 →</div>
+            </Link>
+            <Link
+              href="/projects/demo/diagnostic"
+              className="group bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+            >
+              <div className="text-3xl mb-3">🔍</div>
+              <h3 className="text-base font-bold text-gray-900 mb-1">사전진단</h3>
+              <p className="text-xs text-gray-600 mb-3">현장 리스크 파악</p>
+              <div className="text-xs font-semibold text-blue-600 group-hover:text-blue-700">체험하기 →</div>
+            </Link>
+            <Link
+              href="/ai-chat"
+              className="group bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-5 hover:border-green-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+            >
+              <div className="text-3xl mb-3">🤖</div>
+              <h3 className="text-base font-bold text-gray-900 mb-1">AI 채팅</h3>
+              <p className="text-xs text-gray-600 mb-3">건설 법규 상담</p>
+              <div className="text-xs font-semibold text-green-600 group-hover:text-green-700">체험하기 →</div>
+            </Link>
+            <Link
+              href="/dashboard"
+              className="group bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 rounded-xl p-5 hover:border-purple-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+            >
+              <div className="text-3xl mb-3">📊</div>
+              <h3 className="text-base font-bold text-gray-900 mb-1">전체 기능</h3>
+              <p className="text-xs text-gray-600 mb-3">대시보드 보기</p>
+              <div className="text-xs font-semibold text-purple-600 group-hover:text-purple-700">둘러보기 →</div>
+            </Link>
+          </div>
         </div>
       </section>
 
