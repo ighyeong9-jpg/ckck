@@ -39,7 +39,7 @@ export default function GalleryPage() {
     try {
       // Load from files table
       const { data, error } = await supabase
-        .from('files')
+        .from('evidence_files')
         .select('*')
         .eq('project_id', projectId)
         .order('created_at', { ascending: false })
@@ -132,7 +132,7 @@ export default function GalleryPage() {
         const { data: urlData } = supabase.storage.from('evidence').getPublicUrl(fileName)
 
         const { data: newFile, error: insertError } = await supabase
-          .from('files')
+          .from('evidence_files')
           .insert([{
             project_id: projectId,
             file_name: file.name,
