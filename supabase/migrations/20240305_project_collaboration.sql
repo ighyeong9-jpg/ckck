@@ -109,38 +109,30 @@ CREATE POLICY "Members can view project members"
     )
   );
 
--- OWNER와 MANAGER만 멤버 초대 가능
-CREATE POLICY "Owners and managers can invite members"
+-- 프로젝트 소유자만 멤버 초대 가능 (순환 참조 방지)
+CREATE POLICY "Owners can invite members"
   ON project_members FOR INSERT
   WITH CHECK (
     project_id IN (
-      SELECT project_id FROM project_members
-      WHERE user_id = auth.uid()
-      AND status = 'ACTIVE'
-      AND role IN ('OWNER', 'MANAGER')
+      SELECT id FROM projects WHERE user_id = auth.uid()
     )
   );
 
--- OWNER만 멤버 역할 변경 및 삭제 가능
+-- 프로젝트 소유자만 멤버 역할 변경 가능
 CREATE POLICY "Owners can update members"
   ON project_members FOR UPDATE
   USING (
     project_id IN (
-      SELECT project_id FROM project_members
-      WHERE user_id = auth.uid()
-      AND status = 'ACTIVE'
-      AND role = 'OWNER'
+      SELECT id FROM projects WHERE user_id = auth.uid()
     )
   );
 
+-- 프로젝트 소유자만 멤버 삭제 가능
 CREATE POLICY "Owners can delete members"
   ON project_members FOR DELETE
   USING (
     project_id IN (
-      SELECT project_id FROM project_members
-      WHERE user_id = auth.uid()
-      AND status = 'ACTIVE'
-      AND role = 'OWNER'
+      SELECT id FROM projects WHERE user_id = auth.uid()
     )
   );
 
