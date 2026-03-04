@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import PhotoGallery from '@/components/gallery/PhotoGallery'
+import TimelineView from '@/components/gallery/TimelineView'
 import BeforeAfterSlider from '@/components/gallery/BeforeAfterSlider'
-import type { GalleryPhoto } from '@/types/photoGallery'
+import PhotoGuide from '@/components/gallery/PhotoGuide'
+import type { GalleryPhoto, ConstructionStage } from '@/types/photoGallery'
+import { CONSTRUCTION_STAGES } from '@/types/photoGallery'
 import QuickActions from '@/components/ui/QuickActions'
 import { useToast } from '@/components/ui/Toast'
 import styles from './page.module.scss'
@@ -19,10 +22,14 @@ export default function GalleryPage() {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
-  const [viewMode, setViewMode] = useState<'gallery' | 'compare'>('gallery')
+  const [viewMode, setViewMode] = useState<'timeline' | 'gallery' | 'compare'>('timeline')
   const [comparePhotos, setComparePhotos] = useState<{ before: string; after: string }>({ before: '', after: '' })
   const [checkingPhotoId, setCheckingPhotoId] = useState<string | null>(null)
   const [checkResult, setCheckResult] = useState<{ photoId: string; result: any } | null>(null)
+  const [showGuide, setShowGuide] = useState(false)
+  const [selectedStage, setSelectedStage] = useState<ConstructionStage>('before')
+  const [showStageModal, setShowStageModal] = useState(false)
+  const [pendingFiles, setPendingFiles] = useState<File[]>([])
 
   useEffect(() => {
     loadPhotos()
@@ -46,9 +53,10 @@ export default function GalleryPage() {
             id: f.id,
             url: f.file_url,
             file_name: f.file_name || 'photo',
-            category: '',
+            stage: (f.category as ConstructionStage) || 'etc',
             description: null,
             uploaded_at: f.created_at,
+            hash_sha256: f.hash_sha256 || undefined,
           }))
         setPhotos(galleryPhotos)
       }
@@ -57,6 +65,14 @@ export default function GalleryPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // SHA-256 해시 생성
+  const generateSHA256 = async (file: File): Promise<string> => {
+    const buffer = await file.arrayBuffer()
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
   }
 
   const handleAutoCheck = async (photo: GalleryPhoto) => {
@@ -81,21 +97,34 @@ export default function GalleryPage() {
       const gonogoEmoji = data.goNoGo === 'GO' ? '✅' : data.goNoGo === '위험 확인' ? '❌' : '⚠️'
       toast.success(`${gonogoEmoji} ${data.detectedProcess || '공종'} — ${data.goNoGo} 현황`)
     } catch (err: any) {
-      toast.error(`AI 체크 실패: ${err?.message}`)
+      toast.error(`AI 확인 실패: ${err?.message}`)
     } finally {
       setCheckingPhotoId(null)
     }
   }
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
 
+    setPendingFiles(Array.from(files))
+    setShowStageModal(true)
+  }
+
+  const handleStageSelect = async (stage: ConstructionStage) => {
+    setShowStageModal(false)
+    if (pendingFiles.length === 0) return
+
     setUploading(true)
     try {
-      for (const file of Array.from(files)) {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      for (const file of pendingFiles) {
         const ext = file.name.split('.').pop()
         const fileName = `gallery/${projectId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+
+        // SHA-256 해시 생성
+        const hash = await generateSHA256(file)
 
         const { error: uploadError } = await supabase.storage.from('evidence').upload(fileName, file)
         if (uploadError) throw uploadError
@@ -111,7 +140,8 @@ export default function GalleryPage() {
             file_type: file.type,
             file_size: file.size,
             timestamp: new Date().toISOString(),
-            hash_sha256: '',
+            hash_sha256: hash,
+            category: stage,
           }])
           .select()
           .single()
@@ -123,16 +153,19 @@ export default function GalleryPage() {
             id: newFile.id,
             url: newFile.file_url,
             file_name: newFile.file_name,
-            category: '',
+            stage: stage,
             description: null,
             uploaded_at: newFile.created_at,
+            hash_sha256: hash,
           }, ...prev])
         }
       }
+      toast.success(`${CONSTRUCTION_STAGES[stage].icon} ${CONSTRUCTION_STAGES[stage].label} 사진 ${pendingFiles.length}장이 저장되었습니다`)
     } catch (err: any) {
       toast.error(`업로드 오류: ${err?.message}`)
     } finally {
       setUploading(false)
+      setPendingFiles([])
     }
   }
 
@@ -159,34 +192,53 @@ export default function GalleryPage() {
         <div className={styles.header}>
           <div className={styles.viewToggle}>
             <button
+              className={`${styles.viewBtn} ${viewMode === 'timeline' ? styles.active : ''}`}
+              onClick={() => setViewMode('timeline')}
+            >
+              📅 공정별
+            </button>
+            <button
               className={`${styles.viewBtn} ${viewMode === 'gallery' ? styles.active : ''}`}
               onClick={() => setViewMode('gallery')}
             >
-              현장사진
+              🖼️ 모아보기
             </button>
             <button
               className={`${styles.viewBtn} ${viewMode === 'compare' ? styles.active : ''}`}
               onClick={() => setViewMode('compare')}
             >
-              비교
+              🔄 전후비교
             </button>
           </div>
-          <label className={styles.uploadBtn}>
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              multiple
-              onChange={handleUpload}
-              style={{ display: 'none' }}
-            />
-            {uploading ? '업로드 중...' : '📷 사진 추가'}
-          </label>
+          <div className={styles.actions}>
+            <button
+              className={styles.guideBtn}
+              onClick={() => setShowGuide(true)}
+            >
+              📖 촬영 가이드
+            </button>
+            <label className={styles.uploadBtn}>
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                multiple
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+              />
+              {uploading ? '업로드 중...' : '📷 사진 추가'}
+            </label>
+          </div>
         </div>
 
         {/* Stats */}
         <div className={styles.stats}>
           <span>전체 {photos.length}장</span>
+          {photos.filter(p => p.hash_sha256).length > 0 && (
+            <span className={styles.verifiedCount}>
+              🔒 안전 보관 {photos.filter(p => p.hash_sha256).length}장
+            </span>
+          )}
         </div>
 
         {/* AI 체크 결과 */}
@@ -196,7 +248,7 @@ export default function GalleryPage() {
           }}>
             <div className={styles.checkResultHeader}>
               <span className={styles.checkResultTitle}>
-                🤖 AI 자동 체크 결과: {checkResult.result.detectedProcess || '공종'}
+                🤖 AI 자동 확인: {checkResult.result.detectedProcess || '공종'}
               </span>
               <span className={styles.checkResultBadge} style={{
                 background: checkResult.result.goNoGo === 'GO' ? 'var(--checkin-go)' : checkResult.result.goNoGo === '위험 확인' ? 'var(--checkin-nogo)' : 'var(--checkin-warn)',
@@ -213,6 +265,16 @@ export default function GalleryPage() {
               </ul>
             )}
           </div>
+        )}
+
+        {/* Timeline View */}
+        {viewMode === 'timeline' && (
+          <TimelineView
+            photos={photos}
+            onPhotoClick={() => {}}
+            onAutoCheck={handleAutoCheck}
+            checkingPhotoId={checkingPhotoId}
+          />
         )}
 
         {/* Gallery View */}
@@ -267,6 +329,45 @@ export default function GalleryPage() {
           </div>
         )}
       </main>
+
+      {/* 촬영 가이드 모달 */}
+      {showGuide && (
+        <PhotoGuide
+          selectedStage={selectedStage}
+          onStageChange={setSelectedStage}
+          onClose={() => setShowGuide(false)}
+        />
+      )}
+
+      {/* 공정 선택 모달 */}
+      {showStageModal && (
+        <div className={styles.overlay} onClick={() => setShowStageModal(false)}>
+          <div className={styles.stageModal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>어느 공정 사진인가요?</h3>
+            <p className={styles.modalDesc}>{pendingFiles.length}장의 사진을 추가합니다</p>
+            <div className={styles.stageGrid}>
+              {Object.entries(CONSTRUCTION_STAGES)
+                .sort((a, b) => a[1].order - b[1].order)
+                .map(([stage, info]) => (
+                  <button
+                    key={stage}
+                    className={styles.stageOption}
+                    onClick={() => handleStageSelect(stage as ConstructionStage)}
+                  >
+                    <span className={styles.stageIcon}>{info.icon}</span>
+                    <span className={styles.stageLabel}>{info.label}</span>
+                  </button>
+                ))}
+            </div>
+            <button className={styles.cancelBtn} onClick={() => {
+              setShowStageModal(false)
+              setPendingFiles([])
+            }}>
+              취소
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
