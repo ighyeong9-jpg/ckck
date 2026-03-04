@@ -1,0 +1,51 @@
+.container {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 2px solid #e5e7eb;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+    padding: 0.75rem;
+    gap: 0.5rem;
+    z-index: 100;
+    justify-content: space-around;
+  }
+}
+
+.actionBtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background: linear-gradient(135deg, #FF6B2B, #ff8c5a);
+  border: none;
+  border-radius: 12px;
+  padding: 0.875rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(255, 107, 43, 0.2);
+
+  &:active {
+    transform: scale(0.95);
+    box-shadow: 0 1px 4px rgba(255, 107, 43, 0.3);
+  }
+}
+
+.icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}

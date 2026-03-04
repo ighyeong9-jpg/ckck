@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import ProjectDetailHeader from './ProjectDetailHeader'
 import ProjectContextTracker from '@/components/project/ProjectContextTracker'
+import MobileQuickAction from '@/components/mobile/MobileQuickAction'
 import styles from './layout.module.scss'
 
 export default async function ProjectDetailLayout({
@@ -99,6 +100,7 @@ export default async function ProjectDetailLayout({
       <div className={styles.content}>
         {children}
       </div>
+      <MobileQuickAction projectId={projectId} />
     </div>
   )
 }
