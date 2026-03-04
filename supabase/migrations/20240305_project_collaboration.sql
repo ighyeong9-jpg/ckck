@@ -93,12 +93,19 @@ DROP POLICY IF EXISTS "Users can update their own evidence files" ON evidence_fi
 DROP POLICY IF EXISTS "Users can delete their own evidence files" ON evidence_files;
 
 -- 7. RLS 정책: project_members
--- 프로젝트 멤버는 해당 프로젝트의 멤버 목록을 볼 수 있음
+-- 프로젝트 소유자 또는 해당 프로젝트의 멤버는 멤버 목록을 볼 수 있음
 CREATE POLICY "Members can view project members"
   ON project_members FOR SELECT
   USING (
     project_id IN (
-      SELECT project_id FROM project_members WHERE user_id = auth.uid() AND status = 'ACTIVE'
+      SELECT id FROM projects WHERE user_id = auth.uid()
+    )
+    OR
+    EXISTS (
+      SELECT 1 FROM project_members pm
+      WHERE pm.project_id = project_members.project_id
+      AND pm.user_id = auth.uid()
+      AND pm.status = 'ACTIVE'
     )
   );
 
