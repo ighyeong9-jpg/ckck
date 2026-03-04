@@ -7,6 +7,7 @@ import PhotoGallery from '@/components/gallery/PhotoGallery'
 import TimelineView from '@/components/gallery/TimelineView'
 import BeforeAfterSlider from '@/components/gallery/BeforeAfterSlider'
 import PhotoGuide from '@/components/gallery/PhotoGuide'
+import ComparisonManager from '@/components/gallery/ComparisonManager'
 import type { GalleryPhoto, ConstructionStage } from '@/types/photoGallery'
 import { CONSTRUCTION_STAGES } from '@/types/photoGallery'
 import QuickActions from '@/components/ui/QuickActions'
@@ -30,6 +31,7 @@ export default function GalleryPage() {
   const [selectedStage, setSelectedStage] = useState<ConstructionStage>('before')
   const [showStageModal, setShowStageModal] = useState(false)
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
+  const [showComparisonManager, setShowComparisonManager] = useState(false)
 
   useEffect(() => {
     loadPhotos()
@@ -209,7 +211,7 @@ export default function GalleryPage() {
             </button>
             <button
               className={`${styles.viewBtn} ${viewMode === 'compare' ? styles.active : ''}`}
-              onClick={() => setViewMode('compare')}
+              onClick={() => setShowComparisonManager(true)}
             >
               🔄 전후비교
             </button>
@@ -333,6 +335,15 @@ export default function GalleryPage() {
           </div>
         )}
       </main>
+
+      {/* 전후 비교 관리 */}
+      {showComparisonManager && (
+        <ComparisonManager
+          projectId={projectId}
+          photos={photos}
+          onClose={() => setShowComparisonManager(false)}
+        />
+      )}
 
       {/* 촬영 가이드 모달 */}
       {showGuide && (

@@ -72,3 +72,45 @@ export interface StageGroup {
   order: number
   photos: GalleryPhoto[]
 }
+
+// 전후 비교 쌍
+export interface ComparisonPair {
+  id: string
+  project_id: string
+  before_photo_id: string
+  after_photo_id: string
+  before_photo?: GalleryPhoto
+  after_photo?: GalleryPhoto
+  title: string  // "거실 벽 시공"
+  change_note?: string  // "벽지 → 페인트 변경 합의 (고객 요청)"
+  // 승인 정보
+  client_approved?: boolean
+  client_approved_at?: string
+  client_signature?: string
+  contractor_approved?: boolean
+  contractor_approved_at?: string
+  contractor_signature?: string
+  supervisor_approved?: boolean
+  supervisor_approved_at?: string
+  // 주석 정보
+  annotations?: PhotoAnnotation[]
+  created_at: string
+  updated_at?: string
+}
+
+// 사진 주석 (화살표, 텍스트 등)
+export interface PhotoAnnotation {
+  id: string
+  type: 'arrow' | 'text' | 'circle' | 'rectangle'
+  photo_side: 'before' | 'after'  // 어느 사진에 표시할지
+  // 좌표 (%)
+  x: number
+  y: number
+  width?: number
+  height?: number
+  // 내용
+  text?: string
+  color?: string
+  created_by?: string
+  created_at: string
+}
