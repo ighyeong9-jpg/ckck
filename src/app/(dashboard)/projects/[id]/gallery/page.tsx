@@ -37,7 +37,6 @@ export default function GalleryPage() {
 
   const loadPhotos = async () => {
     try {
-      // Load from files table
       const { data, error } = await supabase
         .from('evidence_files')
         .select('*')
@@ -48,16 +47,20 @@ export default function GalleryPage() {
 
       if (data) {
         const galleryPhotos: GalleryPhoto[] = data
-          .filter(f => f.file_type?.startsWith('image/') || f.file_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i))
-          .map(f => ({
-            id: f.id,
-            url: f.file_url,
-            file_name: f.file_name || 'photo',
-            stage: (f.category as ConstructionStage) || 'etc',
-            description: null,
-            uploaded_at: f.created_at,
-            hash_sha256: f.hash_sha256 || undefined,
-          }))
+          .filter(f => f.file_type?.startsWith('image/'))
+          .map(f => {
+            // storage_path에서 public URL 생성
+            const { data: urlData } = supabase.storage.from('evidence').getPublicUrl(f.storage_path)
+            return {
+              id: f.id,
+              url: urlData.publicUrl,
+              file_name: f.file_name || 'photo',
+              stage: (f.category as ConstructionStage) || 'etc',
+              description: f.description || null,
+              uploaded_at: f.created_at,
+              hash_sha256: f.sha256_hash || undefined,
+            }
+          })
         setPhotos(galleryPhotos)
       }
     } catch (err) {
@@ -117,30 +120,29 @@ export default function GalleryPage() {
 
     setUploading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-
       for (const file of pendingFiles) {
-        const ext = file.name.split('.').pop()
-        const fileName = `gallery/${projectId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-
         // SHA-256 해시 생성
         const hash = await generateSHA256(file)
 
-        const { error: uploadError } = await supabase.storage.from('evidence').upload(fileName, file)
+        // 파일명 생성 (중복 방지)
+        const timestamp = Date.now()
+        const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+        const storagePath = `${projectId}/${timestamp}_${safeName}`
+
+        // Supabase Storage에 업로드
+        const { error: uploadError } = await supabase.storage.from('evidence').upload(storagePath, file)
         if (uploadError) throw uploadError
 
-        const { data: urlData } = supabase.storage.from('evidence').getPublicUrl(fileName)
-
+        // DB에 메타데이터 저장
         const { data: newFile, error: insertError } = await supabase
           .from('evidence_files')
           .insert([{
             project_id: projectId,
             file_name: file.name,
-            file_url: urlData.publicUrl,
             file_type: file.type,
             file_size: file.size,
-            timestamp: new Date().toISOString(),
-            hash_sha256: hash,
+            storage_path: storagePath,
+            sha256_hash: hash,
             category: stage,
           }])
           .select()
@@ -148,10 +150,12 @@ export default function GalleryPage() {
 
         if (insertError) throw insertError
 
+        // URL 생성하여 상태 업데이트
         if (newFile) {
+          const { data: urlData } = supabase.storage.from('evidence').getPublicUrl(storagePath)
           setPhotos(prev => [{
             id: newFile.id,
-            url: newFile.file_url,
+            url: urlData.publicUrl,
             file_name: newFile.file_name,
             stage: stage,
             description: null,
