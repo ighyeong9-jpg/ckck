@@ -63,6 +63,10 @@ export default function ComparisonManager({ projectId, photos, onClose }: Props)
   // 자동 매칭된 쌍
   const [suggestedPairs, setSuggestedPairs] = useState<Array<{ before: GalleryPhoto; after: GalleryPhoto; stage: ConstructionStage }>>([])
 
+  // 수동 선택
+  const [manualBefore, setManualBefore] = useState('')
+  const [manualAfter, setManualAfter] = useState('')
+
   useEffect(() => {
     loadPairs()
     // 자동 매칭
@@ -125,6 +129,53 @@ export default function ComparisonManager({ projectId, photos, onClose }: Props)
       setSuggestedPairs(prev => prev.filter(s => s !== suggestion))
 
       toast.success(`${title} 공사 전후가 등록되었습니다`)
+    } catch (err: any) {
+      toast.error(`생성 실패: ${err.message}`)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const createManualPair = async () => {
+    if (!manualBefore || !manualAfter) {
+      toast.error('공사 전과 공사 후 사진을 모두 선택해주세요')
+      return
+    }
+
+    setSaving(true)
+    try {
+      const beforePhoto = photos.find(p => p.id === manualBefore)
+      const afterPhoto = photos.find(p => p.id === manualAfter)
+
+      if (!beforePhoto || !afterPhoto) {
+        throw new Error('선택한 사진을 찾을 수 없습니다')
+      }
+
+      const title = `공사 전후 비교`
+
+      const { data, error } = await supabase
+        .from('comparison_pairs')
+        .insert([{
+          project_id: projectId,
+          before_photo_id: beforePhoto.id,
+          after_photo_id: afterPhoto.id,
+          title,
+        }])
+        .select()
+        .single()
+
+      if (error) throw error
+
+      setPairs(prev => [{
+        ...data,
+        before_photo: beforePhoto,
+        after_photo: afterPhoto,
+      }, ...prev])
+
+      setManualBefore('')
+      setManualAfter('')
+
+      toast.success('공사 전후 비교가 등록되었습니다')
     } catch (err: any) {
       toast.error(`생성 실패: ${err.message}`)
     } finally {
@@ -239,6 +290,56 @@ export default function ComparisonManager({ projectId, photos, onClose }: Props)
               </div>
             </div>
           )}
+
+          {/* 직접 선택하기 */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>📌 직접 선택하기</h3>
+            <div className={styles.manualSelection}>
+              <div className={styles.selectGroup}>
+                <label className={styles.selectLabel}>공사 전</label>
+                <select
+                  className={styles.photoSelect}
+                  value={manualBefore}
+                  onChange={(e) => setManualBefore(e.target.value)}
+                >
+                  <option value="">사진 선택</option>
+                  {photos.map(photo => {
+                    const stageInfo = CONSTRUCTION_STAGES[photo.stage]
+                    return (
+                      <option key={photo.id} value={photo.id}>
+                        {stageInfo.icon} {stageInfo.label} - {photo.file_name}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+              <div className={styles.selectGroup}>
+                <label className={styles.selectLabel}>공사 후</label>
+                <select
+                  className={styles.photoSelect}
+                  value={manualAfter}
+                  onChange={(e) => setManualAfter(e.target.value)}
+                >
+                  <option value="">사진 선택</option>
+                  {photos.map(photo => {
+                    const stageInfo = CONSTRUCTION_STAGES[photo.stage]
+                    return (
+                      <option key={photo.id} value={photo.id}>
+                        {stageInfo.icon} {stageInfo.label} - {photo.file_name}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+              <button
+                className={styles.createBtn}
+                onClick={createManualPair}
+                disabled={saving || !manualBefore || !manualAfter}
+              >
+                비교 만들기
+              </button>
+            </div>
+          </div>
 
           {/* 생성된 비교 항목 목록 */}
           <div className={styles.section}>
