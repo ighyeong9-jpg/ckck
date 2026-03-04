@@ -15,18 +15,18 @@ export type ConstructionStage =
   | 'etc'         // 기타
 
 export const CONSTRUCTION_STAGES: Record<ConstructionStage, { label: string; icon: string; order: number }> = {
-  before:     { label: '착공 전',    icon: '📋', order: 0 },
+  before:     { label: '시작 전',    icon: '📋', order: 0 },
   demolition: { label: '철거',       icon: '🔨', order: 1 },
-  framework:  { label: '골조/목공',  icon: '🪵', order: 2 },
-  electric:   { label: '전기/설비',  icon: '⚡', order: 3 },
+  framework:  { label: '목공',       icon: '🪵', order: 2 },
+  electric:   { label: '전기',       icon: '⚡', order: 3 },
   plumbing:   { label: '배관',       icon: '🚰', order: 4 },
   tile:       { label: '타일',       icon: '🔲', order: 5 },
-  wallpaper:  { label: '도배',       icon: '🎨', order: 6 },
-  painting:   { label: '도장',       icon: '🖌️', order: 7 },
+  wallpaper:  { label: '벽지',       icon: '🎨', order: 6 },
+  painting:   { label: '페인트',     icon: '🖌️', order: 7 },
   flooring:   { label: '바닥',       icon: '🟫', order: 8 },
-  fixture:    { label: '마감/설치',  icon: '🪑', order: 9 },
-  cleanup:    { label: '정리/청소',  icon: '🧹', order: 10 },
-  after:      { label: '완공',       icon: '✨', order: 11 },
+  fixture:    { label: '설치',       icon: '🪑', order: 9 },
+  cleanup:    { label: '청소',       icon: '🧹', order: 10 },
+  after:      { label: '완료',       icon: '✨', order: 11 },
   etc:        { label: '기타',       icon: '📸', order: 99 },
 }
 

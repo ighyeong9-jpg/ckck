@@ -30,9 +30,9 @@ const PHOTO_GUIDES: Record<ConstructionStage, GuideItem[]> = {
     { title: '폐기물 처리', required: true, description: '폐기물 분리 및 처리 상태' },
   ],
   framework: [
-    { title: '골조 설치 전', required: true, description: '벽체/천장 바탕' },
-    { title: '골조 시공 중', required: false, description: '골조 작업 과정' },
-    { title: '골조 완료', required: true, description: '수평/수직 확인' },
+    { title: '목공 작업 전', required: true, description: '벽체/천장 바탕' },
+    { title: '목공 작업 중', required: false, description: '작업 과정' },
+    { title: '목공 완료', required: true, description: '수평/수직 확인' },
   ],
   electric: [
     { title: '배선 작업 전', required: true, description: '기존 배선 상태' },
@@ -51,14 +51,14 @@ const PHOTO_GUIDES: Record<ConstructionStage, GuideItem[]> = {
     { title: '타일 완료', required: true, description: '줄눈 마감 후' },
   ],
   wallpaper: [
-    { title: '도배 전', required: true, description: '벽면 상태' },
-    { title: '초배지', required: false, description: '초배지 작업' },
-    { title: '도배 완료', required: true, description: '정배지 마감' },
+    { title: '벽지 작업 전', required: true, description: '벽면 상태' },
+    { title: '초배지', required: false, description: '밑바탕 작업' },
+    { title: '벽지 완료', required: true, description: '마감 완료' },
   ],
   painting: [
-    { title: '도장 전', required: true, description: '표면 처리 완료 상태' },
-    { title: '1차 도장', required: false, description: '초벌 도장' },
-    { title: '도장 완료', required: true, description: '재벌 마감' },
+    { title: '페인트 작업 전', required: true, description: '표면 처리 완료 상태' },
+    { title: '1차 페인트', required: false, description: '첫번째 칠' },
+    { title: '페인트 완료', required: true, description: '마감 완료' },
   ],
   flooring: [
     { title: '바닥 작업 전', required: true, description: '바탕 상태' },
