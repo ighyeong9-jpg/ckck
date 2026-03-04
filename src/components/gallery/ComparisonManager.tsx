@@ -1,6 +1,6 @@
 /**
  * ComparisonManager - 전후 비교 관리
- * 자동 쌍 매칭, 변경 사항 메모, 승인 시스템
+ * 자동 자동 매칭, 변경 사항 메모, 승인 시스템
  */
 
 'use client'
@@ -124,7 +124,7 @@ export default function ComparisonManager({ projectId, photos, onClose }: Props)
       // 추천 목록에서 제거
       setSuggestedPairs(prev => prev.filter(s => s !== suggestion))
 
-      toast.success(`${title} 비교 쌍이 생성되었습니다`)
+      toast.success(`${title} 공사 전후가 등록되었습니다`)
     } catch (err: any) {
       toast.error(`생성 실패: ${err.message}`)
     } finally {
@@ -196,12 +196,12 @@ export default function ComparisonManager({ projectId, photos, onClose }: Props)
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>🔄 시공 전후 비교 관리</h2>
+          <h2 className={styles.title}>🔄 공사 전후 비교 관리</h2>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
         <div className={styles.content}>
-          {/* 추천 비교 쌍 */}
+          {/* 추천 비교 항목 */}
           {suggestedPairs.length > 0 && (
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>✨ 추천 비교 (자동 매칭)</h3>
@@ -212,13 +212,13 @@ export default function ComparisonManager({ projectId, photos, onClose }: Props)
                     <div key={idx} className={styles.suggestionCard}>
                       <div className={styles.suggestionPhotos}>
                         <div className={styles.miniPhoto}>
-                          <img src={suggestion.before.url} alt="시공 전" />
-                          <span className={styles.miniLabel}>시공 전</span>
+                          <img src={suggestion.before.url} alt="공사 전" />
+                          <span className={styles.miniLabel}>공사 전</span>
                         </div>
                         <span className={styles.arrow}>→</span>
                         <div className={styles.miniPhoto}>
-                          <img src={suggestion.after.url} alt="시공 후" />
-                          <span className={styles.miniLabel}>시공 후</span>
+                          <img src={suggestion.after.url} alt="공사 후" />
+                          <span className={styles.miniLabel}>공사 후</span>
                         </div>
                       </div>
                       <div className={styles.suggestionInfo}>
@@ -230,7 +230,7 @@ export default function ComparisonManager({ projectId, photos, onClose }: Props)
                           onClick={() => createPairFromSuggestion(suggestion)}
                           disabled={saving}
                         >
-                          + 비교 쌍 생성
+                          + 공사 전후 등록
                         </button>
                       </div>
                     </div>
@@ -240,7 +240,7 @@ export default function ComparisonManager({ projectId, photos, onClose }: Props)
             </div>
           )}
 
-          {/* 생성된 비교 쌍 목록 */}
+          {/* 생성된 비교 항목 목록 */}
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>📋 등록된 비교 ({pairs.length}개)</h3>
             {pairs.length === 0 ? (

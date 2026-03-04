@@ -191,7 +191,7 @@ export default function GalleryPage() {
       <main className={styles.main}>
         <QuickActions compact actions={[
           { icon: '📷', label: '사진 분석', description: '현장 사진 AI 분석', message: '현장 사진 분석해줘' },
-          { icon: '🔄', label: '전후 비교', description: '시공 전후 비교', message: '시공 전후 비교해줘' },
+          { icon: '🔄', label: '전후 비교', description: '공사 전후 비교', message: '공사 전후 비교해줘' },
         ]} />
 
         {/* Header */}
@@ -291,12 +291,12 @@ export default function GalleryPage() {
         {/* Compare View */}
         {viewMode === 'compare' && (
           <div className={styles.compareSection}>
-            <h3 className={styles.sectionTitle}>시공 전/후 비교</h3>
+            <h3 className={styles.sectionTitle}>공사 전/후 비교</h3>
             {photos.length >= 2 ? (
               <>
                 <div className={styles.compareSelectors}>
                   <div className={styles.compareGroup}>
-                    <label>시공 전</label>
+                    <label>공사 전</label>
                     <select
                       value={comparePhotos.before}
                       onChange={e => setComparePhotos(prev => ({ ...prev, before: e.target.value }))}
@@ -308,7 +308,7 @@ export default function GalleryPage() {
                     </select>
                   </div>
                   <div className={styles.compareGroup}>
-                    <label>시공 후</label>
+                    <label>공사 후</label>
                     <select
                       value={comparePhotos.after}
                       onChange={e => setComparePhotos(prev => ({ ...prev, after: e.target.value }))}

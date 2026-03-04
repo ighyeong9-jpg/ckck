@@ -13,8 +13,8 @@ interface Props {
 export default function BeforeAfterSlider({
   beforeUrl,
   afterUrl,
-  beforeLabel = '시공 전',
-  afterLabel = '시공 후',
+  beforeLabel = '공사 전',
+  afterLabel = '공사 후',
 }: Props) {
   const [position, setPosition] = useState(50)
   const containerRef = useRef<HTMLDivElement>(null)
