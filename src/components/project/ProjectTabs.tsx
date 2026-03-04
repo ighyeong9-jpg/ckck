@@ -34,6 +34,8 @@ const tabs: Tab[] = [
   { key: 'fire-safety', label: '소방안전', icon: '🔥', path: 'fire-safety' },
   { key: 'warranty', label: '하자담보', icon: '🛡️', path: 'warranty' },
   { key: 'certificate', label: '인증서', icon: '🤖', path: 'certificate' },
+  { key: 'issues', label: '이슈관리', icon: '⚠️', path: 'issues' },
+  { key: 'members', label: '멤버관리', icon: '👥', path: 'settings/members' },
 ]
 
 const statusIcons: Record<TabStatus, string> = {

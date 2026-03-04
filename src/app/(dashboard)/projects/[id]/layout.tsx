@@ -46,6 +46,9 @@ export default async function ProjectDetailLayout({
       supabase.from('law_checks').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
       supabase.from('law_checks').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
       supabase.from('warranties').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
+      supabase.from('projects').select('id', { count: 'exact', head: true }).eq('id', projectId), // certificate: use project as placeholder
+      supabase.from('issues').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
+      supabase.from('project_members').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
     ]),
     // 전체 violated law_checks (법령 탭 배지용)
     supabase
@@ -66,6 +69,7 @@ export default async function ProjectDetailLayout({
     'overview', 'diagnostic', 'sow', 'cost-analysis', 'changes',
     'evidence-package', 'agreement', 'report',
     'process', 'workforce', 'materials', 'law-check', 'fire-safety', 'warranty',
+    'certificate', 'issues', 'members',
   ]
 
   const tabStatuses: Record<string, 'completed' | 'in_progress' | 'not_started'> = {}
