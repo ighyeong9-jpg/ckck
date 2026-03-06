@@ -34,9 +34,17 @@ export default function MembersPage() {
         .from('project_members')
         .select('*')
         .eq('project_id', projectId)
-        .order('created_at', { ascending: false })
+        .order('invited_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        })
+        throw error
+      }
       setMembers(data || [])
     } catch (err: any) {
       console.error('Error loading members:', err)

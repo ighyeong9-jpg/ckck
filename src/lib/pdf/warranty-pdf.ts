@@ -4,7 +4,7 @@
  * 공종별 하자담보기간 + 법적 근거 + 만료일 달력 출력
  */
 
-import { getJsPDF, getAutoTable, A4, drawHeader, drawFooter, formatDateKr } from './pdf-core'
+import { createKoreanPDF, getAutoTable, A4, drawHeader, drawFooter, formatDateKr } from './pdf-core'
 
 export interface WarrantyItem {
   processName: string       // 공종명
@@ -56,9 +56,9 @@ function getStatus(days: number): WarrantyItem['status'] {
 }
 
 const STATUS_CONFIG = {
-  active:         { label: 'Active',         color: [16, 185, 129] as [number, number, number],  bg: [240, 253, 244] as [number, number, number] },
-  expiring_soon:  { label: 'Expiring Soon',  color: [245, 158, 11] as [number, number, number],  bg: [255, 251, 235] as [number, number, number] },
-  expired:        { label: 'Expired',        color: [220, 38, 38]  as [number, number, number],  bg: [254, 242, 242] as [number, number, number] },
+  active:         { label: '유효',         color: [16, 185, 129] as [number, number, number],  bg: [240, 253, 244] as [number, number, number] },
+  expiring_soon:  { label: '만료임박',  color: [245, 158, 11] as [number, number, number],  bg: [255, 251, 235] as [number, number, number] },
+  expired:        { label: '만료',        color: [220, 38, 38]  as [number, number, number],  bg: [254, 242, 242] as [number, number, number] },
 }
 
 export async function exportWarrantyPdf(
@@ -66,14 +66,13 @@ export async function exportWarrantyPdf(
   projectName: string,
   contractorName?: string,
 ): Promise<void> {
-  const jsPDF = await getJsPDF()
   const autoTable = await getAutoTable()
 
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  const doc = await createKoreanPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const { margin, contentWidth } = A4
   const today = formatDateKr()
 
-  drawHeader(doc, 'Warranty Certificate', `${projectName} | ${today}`)
+  drawHeader(doc, '하자담보 증명서', `${projectName} | ${today}`)
 
   let y = 30
 
@@ -82,14 +81,14 @@ export async function exportWarrantyPdf(
   doc.roundedRect(margin, y, contentWidth, 18, 3, 3, 'F')
   doc.setTextColor(79, 70, 229)
   doc.setFontSize(10)
-  doc.setFont('helvetica', 'bold')
-  doc.text('WARRANTY CERTIFICATE', margin + contentWidth / 2, y + 7, { align: 'center' })
+  doc.setFont('NanumGothic', 'bold')
+  doc.text('하자담보 증명서', margin + contentWidth / 2, y + 7, { align: 'center' })
   doc.setFontSize(8)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('NanumGothic', 'normal')
   doc.setTextColor(107, 114, 128)
   const subtitle = contractorName
-    ? `Project: ${projectName}  |  Contractor: ${contractorName}  |  Date: ${today}`
-    : `Project: ${projectName}  |  Issued: ${today}`
+    ? `프로젝트: ${projectName}  |  시공사: ${contractorName}  |  발급일: ${today}`
+    : `프로젝트: ${projectName}  |  발급일: ${today}`
   doc.text(subtitle, margin + contentWidth / 2, y + 13, { align: 'center' })
   y += 22
 
@@ -99,10 +98,10 @@ export async function exportWarrantyPdf(
   const expiredCount = items.filter(i => i.status === 'expired').length
 
   const stats = [
-    { label: 'ACTIVE', value: activeCount, color: STATUS_CONFIG.active.color },
-    { label: 'EXPIRING', value: soonCount, color: STATUS_CONFIG.expiring_soon.color },
-    { label: 'EXPIRED', value: expiredCount, color: STATUS_CONFIG.expired.color },
-    { label: 'TOTAL', value: items.length, color: [79, 70, 229] as [number, number, number] },
+    { label: '유효', value: activeCount, color: STATUS_CONFIG.active.color },
+    { label: '만료임박', value: soonCount, color: STATUS_CONFIG.expiring_soon.color },
+    { label: '만료', value: expiredCount, color: STATUS_CONFIG.expired.color },
+    { label: '전체', value: items.length, color: [79, 70, 229] as [number, number, number] },
   ]
 
   const statW = contentWidth / 4
@@ -112,25 +111,25 @@ export async function exportWarrantyPdf(
     doc.roundedRect(x, y, statW - 2, 14, 2, 2, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(13)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('NanumGothic', 'bold')
     doc.text(String(s.value), x + statW / 2 - 1, y + 8, { align: 'center' })
     doc.setFontSize(6)
-    doc.setFont('helvetica', 'normal')
+    doc.setFont('NanumGothic', 'normal')
     doc.text(s.label, x + statW / 2 - 1, y + 12, { align: 'center' })
   })
   y += 18
 
   // ── 하자담보 목록 표 ──
   doc.setFontSize(9)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('NanumGothic', 'bold')
   doc.setTextColor(31, 41, 55)
-  doc.text('Warranty Items', margin, y)
+  doc.text('하자담보 항목', margin, y)
   y += 4
 
   const rows = items.map(item => [
     item.processName,
     formatDateKr(item.completedDate),
-    `${item.warrantyMonths}mo`,
+    `${item.warrantyMonths}개월`,
     formatDateKr(item.expiryDate),
     item.daysLeft < 0 ? `D+${Math.abs(item.daysLeft)}` : `D-${item.daysLeft}`,
     STATUS_CONFIG[item.status].label,
@@ -138,7 +137,7 @@ export async function exportWarrantyPdf(
 
   autoTable(doc, {
     startY: y,
-    head: [['Process', 'Completed', 'Period', 'Expires', 'D-Day', 'Status']],
+    head: [['공종', '완료일', '기간', '만료일', 'D-Day', '상태']],
     body: rows,
     theme: 'grid',
     headStyles: { fillColor: [31, 41, 55], textColor: 255, fontSize: 7.5, fontStyle: 'bold' },
@@ -172,21 +171,21 @@ export async function exportWarrantyPdf(
   y = (doc as any).lastAutoTable.finalY + 8
 
   // ── 법적 근거 섹션 ──
-  if (y > 230) { doc.addPage(); drawHeader(doc, 'Warranty Certificate', `${projectName} — Legal Basis`); y = 28 }
+  if (y > 230) { doc.addPage(); drawHeader(doc, '하자담보 증명서', `${projectName} — 법적 근거`); y = 28 }
 
   doc.setFontSize(9)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('NanumGothic', 'bold')
   doc.setTextColor(31, 41, 55)
-  doc.text('Legal Basis (Korean Construction Industry Basic Act Art.28)', margin, y)
+  doc.text('법적 근거 (건설산업기본법 제28조)', margin, y)
   y += 4
 
   autoTable(doc, {
     startY: y,
-    head: [['Category', 'Processes', 'Period', 'Legal Basis']],
+    head: [['구분', '공종', '기간', '법적근거']],
     body: WARRANTY_STANDARDS.map(s => [
       s.category,
       s.processes.slice(0, 4).join(', '),
-      `${s.months / 12}yr`,
+      `${s.months / 12}년`,
       s.law,
     ]),
     theme: 'striped',
@@ -208,10 +207,10 @@ export async function exportWarrantyPdf(
     doc.roundedRect(margin, y, contentWidth, expiringSoon.length * 8 + 10, 2, 2, 'S')
     doc.setTextColor(146, 64, 14)
     doc.setFontSize(8)
-    doc.setFont('helvetica', 'bold')
-    doc.text('⚠ Expiring Within 90 Days', margin + 3, y + 6)
+    doc.setFont('NanumGothic', 'bold')
+    doc.text('⚠ 90일 이내 만료 예정', margin + 3, y + 6)
     expiringSoon.forEach((item, i) => {
-      doc.setFont('helvetica', 'normal')
+      doc.setFont('NanumGothic', 'normal')
       doc.setFontSize(7.5)
       doc.text(
         `• ${item.processName}: ${formatDateKr(item.expiryDate)} (D-${item.daysLeft})`,

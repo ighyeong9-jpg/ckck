@@ -6,20 +6,19 @@
  */
 
 import type { BudgetGuideResult } from '@/lib/ai/quote-chat'
-import { getJsPDF, getAutoTable, A4, drawHeader, drawFooter, formatDateKr } from './pdf-core'
+import { createKoreanPDF, getAutoTable, A4, drawHeader, drawFooter, formatDateKr } from './pdf-core'
 
 // ─── 예산 가이드 PDF 생성 (텍스트 직접 작성) ───────────────
 
 export async function exportBudgetGuidePdf(result: BudgetGuideResult): Promise<void> {
-  const jsPDF = await getJsPDF()
   const autoTable = await getAutoTable()
 
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  const doc = await createKoreanPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const { margin, contentWidth } = A4
   const today = formatDateKr()
 
   // ── 헤더 ──
-  drawHeader(doc, 'AI Budget Guide', `${today} | ${result.area_pyeong}pyeong`)
+  drawHeader(doc, 'AI 예산 가이드', `${today} | ${result.area_pyeong}평`)
 
   let y = 32
 
@@ -28,30 +27,30 @@ export async function exportBudgetGuidePdf(result: BudgetGuideResult): Promise<v
   doc.roundedRect(margin, y, contentWidth, 14, 3, 3, 'F')
   doc.setTextColor(79, 70, 229)
   doc.setFontSize(9)
-  doc.setFont('helvetica', 'bold')
-  doc.text('AI Summary', margin + 4, y + 6)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('NanumGothic', 'bold')
+  doc.text('AI 요약', margin + 4, y + 6)
+  doc.setFont('NanumGothic', 'normal')
   doc.setFontSize(8)
   // 한글 요약은 ASCII로 대체 표기
-  doc.text(`Space: ${result.space_type} | Grade: ${result.grade} | Schedule: ${result.schedule}`, margin + 4, y + 11)
+  doc.text(`공간: ${result.space_type} | 등급: ${result.grade} | 일정: ${result.schedule}`, margin + 4, y + 11)
   y += 18
 
   // ── 3등급 비교표 ──
   doc.setTextColor(31, 41, 55)
   doc.setFontSize(10)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Grade Comparison', margin, y)
+  doc.setFont('NanumGothic', 'bold')
+  doc.text('등급별 비교', margin, y)
   y += 5
 
   const gradeRows = [
-    ['Economy', `${result.grades.economy.min.toLocaleString()}~${result.grades.economy.max.toLocaleString()} man`, result.grades.economy.per_pyeong, result.grades.economy.good_for],
-    ['Standard', `${result.grades.standard.min.toLocaleString()}~${result.grades.standard.max.toLocaleString()} man`, result.grades.standard.per_pyeong, result.grades.standard.good_for],
-    ['Premium', `${result.grades.premium.min.toLocaleString()}~${result.grades.premium.max.toLocaleString()} man`, result.grades.premium.per_pyeong, result.grades.premium.good_for],
+    ['보급형', `${result.grades.economy.min.toLocaleString()}~${result.grades.economy.max.toLocaleString()}만원`, result.grades.economy.per_pyeong, result.grades.economy.good_for],
+    ['표준형', `${result.grades.standard.min.toLocaleString()}~${result.grades.standard.max.toLocaleString()}만원`, result.grades.standard.per_pyeong, result.grades.standard.good_for],
+    ['프리미엄', `${result.grades.premium.min.toLocaleString()}~${result.grades.premium.max.toLocaleString()}만원`, result.grades.premium.per_pyeong, result.grades.premium.good_for],
   ]
 
   autoTable(doc, {
     startY: y,
-    head: [['Grade', 'Budget (10K KRW)', 'Per Pyeong', 'Best For']],
+    head: [['등급', '예산 (만원)', '평당단가', '추천대상']],
     body: gradeRows,
     theme: 'grid',
     headStyles: { fillColor: [79, 70, 229], textColor: 255, fontSize: 8, fontStyle: 'bold' },
@@ -70,14 +69,14 @@ export async function exportBudgetGuidePdf(result: BudgetGuideResult): Promise<v
   // ── 숨겨진 비용 ──
   if (result.hidden_costs.length > 0) {
     doc.setFontSize(10)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('NanumGothic', 'bold')
     doc.setTextColor(31, 41, 55)
-    doc.text('Hidden Costs to Watch', margin, y)
+    doc.text('주의할 숨은 비용', margin, y)
     y += 5
 
     autoTable(doc, {
       startY: y,
-      head: [['#', 'Item']],
+      head: [['#', '항목']],
       body: result.hidden_costs.map((c, i) => [i + 1, c]),
       theme: 'striped',
       headStyles: { fillColor: [245, 158, 11], textColor: 255, fontSize: 8 },
@@ -96,14 +95,14 @@ export async function exportBudgetGuidePdf(result: BudgetGuideResult): Promise<v
     }
 
     doc.setFontSize(10)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('NanumGothic', 'bold')
     doc.setTextColor(31, 41, 55)
-    doc.text('Pre-Construction Checklist', margin, y)
+    doc.text('착공 전 체크리스트', margin, y)
     y += 5
 
     autoTable(doc, {
       startY: y,
-      head: [['', 'Check Item']],
+      head: [['', '점검항목']],
       body: result.checklist.map((item, i) => [`${i + 1}`, item]),
       theme: 'plain',
       headStyles: { fillColor: [16, 185, 129], textColor: 255, fontSize: 8 },
@@ -126,11 +125,11 @@ export async function exportBudgetGuidePdf(result: BudgetGuideResult): Promise<v
   doc.roundedRect(margin, y, contentWidth, 16, 2, 2, 'S')
   doc.setTextColor(146, 64, 14)
   doc.setFontSize(7.5)
-  doc.setFont('helvetica', 'bold')
-  doc.text('[DISCLAIMER]', margin + 3, y + 5)
-  doc.setFont('helvetica', 'normal')
-  doc.text('This is an AI-generated reference budget. Not a legal contract.', margin + 3, y + 10)
-  doc.text('Actual costs may vary. Please consult a professional for accurate quotes.', margin + 3, y + 14)
+  doc.setFont('NanumGothic', 'bold')
+  doc.text('[면책 고지]', margin + 3, y + 5)
+  doc.setFont('NanumGothic', 'normal')
+  doc.text('본 자료는 AI 기반 참고용 예산이며, 법적 계약서가 아닙니다.', margin + 3, y + 10)
+  doc.text('실제 비용은 달라질 수 있으니, 정확한 견적은 전문가와 상담하시기 바랍니다.', margin + 3, y + 14)
 
   // ── 전체 페이지 푸터 ──
   const totalPages = doc.getNumberOfPages()

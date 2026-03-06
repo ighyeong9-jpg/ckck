@@ -4,7 +4,7 @@
  * 프로젝트 공정·인력·자재 데이터를 하루 단위로 출력
  */
 
-import { getJsPDF, getAutoTable, A4, drawHeader, drawFooter, formatDateKr } from './pdf-core'
+import { createKoreanPDF, getAutoTable, A4, drawHeader, drawFooter, formatDateKr } from './pdf-core'
 
 export interface DailyReportData {
   projectName: string
@@ -49,14 +49,13 @@ const STATUS_COLORS: Record<string, [number, number, number]> = {
 }
 
 export async function exportDailyReportPdf(data: DailyReportData): Promise<void> {
-  const jsPDF = await getJsPDF()
   const autoTable = await getAutoTable()
 
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  const doc = await createKoreanPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const { margin, contentWidth } = A4
   const today = formatDateKr(data.reportDate)
 
-  drawHeader(doc, 'Daily Site Report', `${data.projectName} | ${today}`)
+  drawHeader(doc, '현장 일일 보고서', `${data.projectName} | ${today}`)
 
   let y = 30
 
@@ -67,15 +66,15 @@ export async function exportDailyReportPdf(data: DailyReportData): Promise<void>
   doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'S')
 
   const infoItems = [
-    `Date: ${today}`,
-    data.weather ? `Weather: ${data.weather}` : '',
-    data.temperature ? `Temp: ${data.temperature}` : '',
-    data.supervisor ? `Supervisor: ${data.supervisor}` : '',
+    `날짜: ${today}`,
+    data.weather ? `날씨: ${data.weather}` : '',
+    data.temperature ? `온도: ${data.temperature}` : '',
+    data.supervisor ? `담당자: ${data.supervisor}` : '',
   ].filter(Boolean)
 
   doc.setTextColor(55, 65, 81)
   doc.setFontSize(8)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('NanumGothic', 'normal')
   const itemW = contentWidth / infoItems.length
   infoItems.forEach((item, i) => {
     doc.text(item, margin + i * itemW + 4, y + 8)
@@ -88,9 +87,9 @@ export async function exportDailyReportPdf(data: DailyReportData): Promise<void>
     doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F')
     doc.setTextColor(79, 70, 229)
     doc.setFontSize(7.5)
-    doc.setFont('helvetica', 'bold')
-    doc.text('AI Summary  ', margin + 3, y + 5)
-    doc.setFont('helvetica', 'normal')
+    doc.setFont('NanumGothic', 'normal')
+    doc.text('AI 요약  ', margin + 3, y + 5)
+    doc.setFont('NanumGothic', 'normal')
     doc.text(data.aiSummary.substring(0, 110), margin + 22, y + 5)
     y += 16
   }
@@ -98,14 +97,14 @@ export async function exportDailyReportPdf(data: DailyReportData): Promise<void>
   // ── 공정 현황 ──
   if (data.processes.length > 0) {
     doc.setFontSize(9)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('NanumGothic', 'normal')
     doc.setTextColor(31, 41, 55)
-    doc.text('Process Status', margin, y)
+    doc.text('공정 현황', margin, y)
     y += 4
 
     autoTable(doc, {
       startY: y,
-      head: [['Process', 'Status', 'Progress', 'Note']],
+      head: [['공정명', '상태', '진척도', '비고']],
       body: data.processes.map(p => [
         p.name,
         p.status,
@@ -142,22 +141,22 @@ export async function exportDailyReportPdf(data: DailyReportData): Promise<void>
 
   // ── 인력 현황 ──
   if (data.workforce.length > 0) {
-    if (y > 220) { doc.addPage(); drawHeader(doc, 'Daily Site Report', `${data.projectName} | ${today} (cont.)`); y = 28 }
+    if (y > 220) { doc.addPage(); drawHeader(doc, '현장 일일 보고서', `${data.projectName} | ${today} (계속)`); y = 28 }
 
     doc.setFontSize(9)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('NanumGothic', 'normal')
     doc.setTextColor(31, 41, 55)
-    doc.text('Workforce', margin, y)
+    doc.text('인력 현황', margin, y)
     y += 4
 
     const totalHours = data.workforce.reduce((s, w) => s + (w.hours ?? 0), 0)
 
     autoTable(doc, {
       startY: y,
-      head: [['Name', 'Role', 'Hours', 'Note']],
+      head: [['이름', '역할', '시간', '비고']],
       body: [
         ...data.workforce.map(w => [w.name, w.role, `${w.hours}h`, w.note ?? '']),
-        ['', 'TOTAL', `${totalHours}h`, ''],
+        ['', '합계', `${totalHours}h`, ''],
       ],
       theme: 'striped',
       headStyles: { fillColor: [16, 185, 129], textColor: 255, fontSize: 7.5, fontStyle: 'bold' },
@@ -175,17 +174,17 @@ export async function exportDailyReportPdf(data: DailyReportData): Promise<void>
 
   // ── 자재 현황 ──
   if (data.materials.length > 0) {
-    if (y > 220) { doc.addPage(); drawHeader(doc, 'Daily Site Report', `${data.projectName} | ${today} (cont.)`); y = 28 }
+    if (y > 220) { doc.addPage(); drawHeader(doc, '현장 일일 보고서', `${data.projectName} | ${today} (계속)`); y = 28 }
 
     doc.setFontSize(9)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('NanumGothic', 'normal')
     doc.setTextColor(31, 41, 55)
-    doc.text('Materials', margin, y)
+    doc.text('자재 현황', margin, y)
     y += 4
 
     autoTable(doc, {
       startY: y,
-      head: [['Material', 'Qty', 'Unit', 'Status']],
+      head: [['자재명', '수량', '단위', '상태']],
       body: data.materials.map(m => [m.name, m.quantity, m.unit, m.status]),
       theme: 'striped',
       headStyles: { fillColor: [245, 158, 11], textColor: 255, fontSize: 7.5, fontStyle: 'bold' },
@@ -197,12 +196,12 @@ export async function exportDailyReportPdf(data: DailyReportData): Promise<void>
 
   // ── 이슈 / 특이사항 ──
   if (data.issues && data.issues.length > 0) {
-    if (y > 240) { doc.addPage(); drawHeader(doc, 'Daily Site Report', `${data.projectName} | ${today} (cont.)`); y = 28 }
+    if (y > 240) { doc.addPage(); drawHeader(doc, '현장 일일 보고서', `${data.projectName} | ${today} (계속)`); y = 28 }
 
     doc.setFontSize(9)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('NanumGothic', 'normal')
     doc.setTextColor(220, 38, 38)
-    doc.text('Issues / Notes', margin, y)
+    doc.text('이슈 / 특이사항', margin, y)
     y += 5
 
     data.issues.forEach((issue, i) => {
@@ -210,7 +209,7 @@ export async function exportDailyReportPdf(data: DailyReportData): Promise<void>
       doc.rect(margin, y, contentWidth, 7, 'F')
       doc.setTextColor(153, 27, 27)
       doc.setFontSize(7.5)
-      doc.setFont('helvetica', 'normal')
+      doc.setFont('NanumGothic', 'normal')
       doc.text(`${i + 1}. ${issue.substring(0, 110)}`, margin + 3, y + 5)
       y += 9
     })
@@ -218,15 +217,15 @@ export async function exportDailyReportPdf(data: DailyReportData): Promise<void>
 
   // ── 내일 계획 ──
   if (data.tomorrowPlan) {
-    if (y > 255) { doc.addPage(); drawHeader(doc, 'Daily Site Report', `cont.`); y = 28 }
+    if (y > 255) { doc.addPage(); drawHeader(doc, '현장 일일 보고서', `계속`); y = 28 }
     y += 2
     doc.setFillColor(240, 249, 255)
     doc.roundedRect(margin, y, contentWidth, 12, 2, 2, 'F')
     doc.setTextColor(3, 105, 161)
     doc.setFontSize(8)
-    doc.setFont('helvetica', 'bold')
-    doc.text("Tomorrow's Plan: ", margin + 3, y + 7)
-    doc.setFont('helvetica', 'normal')
+    doc.setFont('NanumGothic', 'normal')
+    doc.text("내일 계획: ", margin + 3, y + 7)
+    doc.setFont('NanumGothic', 'normal')
     doc.text(data.tomorrowPlan.substring(0, 120), margin + 36, y + 7)
     y += 14
   }

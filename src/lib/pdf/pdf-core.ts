@@ -1,14 +1,27 @@
 /**
  * pdf-core.ts — jsPDF 공통 유틸
  *
- * 한글 지원: html2canvas → 이미지 → PDF 삽입 방식
- * 텍스트 전용: jsPDF 직접 작성 (영숫자+기호만)
+ * 한글 지원: NanumGothic 폰트 자동 로드
+ * 텍스트 전용: jsPDF 직접 작성 (한글 포함)
  */
+
+import { addKoreanFont } from './korean-font'
 
 // ─── jsPDF는 브라우저 전용이므로 dynamic import 사용 ─────
 export async function getJsPDF() {
   const { jsPDF } = await import('jspdf')
   return jsPDF
+}
+
+// ─── 한글 지원 jsPDF 인스턴스 생성 ─────
+export async function createKoreanPDF(options?: any) {
+  const jsPDF = await getJsPDF()
+  const doc = new jsPDF(options || { orientation: 'portrait', unit: 'mm', format: 'a4' })
+
+  // 한글 폰트 자동 로드
+  await addKoreanFont(doc)
+
+  return doc
 }
 
 export async function getAutoTable(): Promise<(doc: any, options: any) => void> {
@@ -66,12 +79,20 @@ export function drawHeader(
   // 로고
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  try {
+    doc.setFont('NanumGothic', 'normal')
+  } catch {
+    doc.setFont('helvetica', 'bold')
+  }
   doc.text('CHECK-IN', margin, 11)
 
   // 제목
   doc.setFontSize(9)
-  doc.setFont('helvetica', 'normal')
+  try {
+    doc.setFont('NanumGothic', 'normal')
+  } catch {
+    doc.setFont('helvetica', 'normal')
+  }
   doc.text(title, A4.width - margin, 11, { align: 'right' })
 
   if (subtitle) {
@@ -96,7 +117,11 @@ export function drawFooter(
 
   doc.setTextColor(156, 163, 175)
   doc.setFontSize(7)
-  doc.setFont('helvetica', 'normal')
+  try {
+    doc.setFont('NanumGothic', 'normal')
+  } catch {
+    doc.setFont('helvetica', 'normal')
+  }
   doc.text(
     `AI 예상 참고용 | 실측 후 확인 필요 | 계약서 효력 없음`,
     A4.margin,

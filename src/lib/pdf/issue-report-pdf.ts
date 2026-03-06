@@ -5,7 +5,7 @@
  * 심각도별 색상 강조
  */
 
-import { getJsPDF, getAutoTable, A4, drawHeader, drawFooter, formatDateKr } from './pdf-core'
+import { createKoreanPDF, getAutoTable, A4, drawHeader, drawFooter, formatDateKr } from './pdf-core'
 import type { SiteIssue } from '@/components/issues/IssueCard'
 
 const SEV_COLORS: Record<string, [number, number, number]> = {
@@ -16,18 +16,18 @@ const SEV_COLORS: Record<string, [number, number, number]> = {
 }
 
 const SEV_LABELS: Record<string, string> = {
-  critical: 'CRITICAL', high: 'HIGH', medium: 'MEDIUM', low: 'LOW',
+  critical: '긴급', high: '높음', medium: '보통', low: '낮음',
 }
 
 const CAT_LABELS: Record<string, string> = {
-  safety: 'Safety', quality: 'Quality', cost: 'Cost', schedule: 'Schedule',
-  legal: 'Legal', material: 'Material', labor: 'Labor', weather: 'Weather',
-  design_change: 'Design', other: 'Other',
+  safety: '안전', quality: '품질', cost: '비용', schedule: '일정',
+  legal: '법률', material: '자재', labor: '인력', weather: '날씨',
+  design_change: '설계변경', other: '기타',
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  open: 'Open', reviewing: 'Reviewing', approved: 'Approved',
-  rejected: 'Rejected', resolved: 'Resolved',
+  open: '대기중', reviewing: '검토중', approved: '승인됨',
+  rejected: '반려됨', resolved: '해결됨',
 }
 
 function formatDate(iso: string): string {
@@ -39,18 +39,17 @@ export async function exportIssueReportPdf(
   issues: SiteIssue[],
   projectName?: string,
 ): Promise<void> {
-  const jsPDF = await getJsPDF()
   const autoTable = await getAutoTable()
 
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  const doc = await createKoreanPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const { margin } = A4
   const today = formatDateKr()
 
   const subtitle = projectName
-    ? `Project: ${projectName} | ${today} | Total: ${issues.length}`
-    : `${today} | Total: ${issues.length} issues`
+    ? `프로젝트: ${projectName} | ${today} | 총 ${issues.length}건`
+    : `${today} | 총 ${issues.length}건`
 
-  drawHeader(doc, 'Site Issue Report', subtitle)
+  drawHeader(doc, '현장 이슈 보고서', subtitle)
 
   // ── 통계 요약 ──
   const critical = issues.filter(i => i.severity === 'critical').length
@@ -61,10 +60,10 @@ export async function exportIssueReportPdf(
   let y = 32
 
   const statCols = [
-    { label: 'CRITICAL', value: critical, color: SEV_COLORS.critical },
-    { label: 'HIGH', value: high, color: SEV_COLORS.high },
-    { label: 'OPEN', value: open, color: [59, 130, 246] as [number, number, number] },
-    { label: 'RESOLVED', value: resolved, color: [16, 185, 129] as [number, number, number] },
+    { label: '긴급', value: critical, color: SEV_COLORS.critical },
+    { label: '높음', value: high, color: SEV_COLORS.high },
+    { label: '대기중', value: open, color: [59, 130, 246] as [number, number, number] },
+    { label: '해결됨', value: resolved, color: [16, 185, 129] as [number, number, number] },
   ]
   const colW = A4.contentWidth / 4
   statCols.forEach((s, i) => {
@@ -73,10 +72,10 @@ export async function exportIssueReportPdf(
     doc.roundedRect(x, y, colW - 3, 16, 2, 2, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('NanumGothic', 'normal')
     doc.text(String(s.value), x + colW / 2 - 1.5, y + 9, { align: 'center' })
     doc.setFontSize(6)
-    doc.setFont('helvetica', 'normal')
+    doc.setFont('NanumGothic', 'normal')
     doc.text(s.label, x + colW / 2 - 1.5, y + 14, { align: 'center' })
   })
   y += 22
@@ -93,7 +92,7 @@ export async function exportIssueReportPdf(
 
   autoTable(doc, {
     startY: y,
-    head: [['Date', 'Severity', 'Category', 'Title', 'Summary', 'Status']],
+    head: [['날짜', '심각도', '분류', '제목', '요약', '상태']],
     body: rows,
     theme: 'grid',
     headStyles: {
@@ -128,13 +127,13 @@ export async function exportIssueReportPdf(
   const activeIssues = issues.filter(i => i.status !== 'resolved').slice(0, 10)
   if (activeIssues.length > 0) {
     doc.addPage()
-    drawHeader(doc, 'Site Issue Report', 'Action Items')
+    drawHeader(doc, '현장 이슈 보고서', '조치 필요 항목')
     y = 28
 
     activeIssues.forEach((issue, idx) => {
       if (y > 250) {
         doc.addPage()
-        drawHeader(doc, 'Site Issue Report', 'Action Items (cont.)')
+        drawHeader(doc, '현장 이슈 보고서', '조치 필요 항목 (계속)')
         y = 28
       }
 
@@ -144,11 +143,11 @@ export async function exportIssueReportPdf(
 
       doc.setTextColor(31, 41, 55)
       doc.setFontSize(9)
-      doc.setFont('helvetica', 'bold')
+      doc.setFont('NanumGothic', 'normal')
       doc.text(`${idx + 1}. ${issue.title}`, margin + 6, y + 6)
 
       doc.setFontSize(7.5)
-      doc.setFont('helvetica', 'normal')
+      doc.setFont('NanumGothic', 'normal')
       doc.setTextColor(107, 114, 128)
       doc.text(`${SEV_LABELS[issue.severity]} | ${CAT_LABELS[issue.category]} | ${formatDate(issue.created_at)}`, margin + 6, y + 11)
 
