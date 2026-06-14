@@ -1,0 +1,23 @@
+# Claude Code 컨텍스트 최적화
+# package-lock.json = 최대 80,000토큰 소모 → 반드시 제외
+
+node_modules/
+.next/
+coverage/
+dist/
+build/
+.git/
+*.log
+*.map
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.env*
+!.env.example
+*.tsbuildinfo
+.turbo/
+out/
+storybook-static/
+
+# DB mutation 위험 스크립트 차단 (Phase 1S Safety)
+scripts/check-schema.js
