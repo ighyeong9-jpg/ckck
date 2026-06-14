@@ -1160,8 +1160,10 @@ CREATE INDEX idx_notebooks_project ON notebooks(project_id);
 CREATE INDEX idx_notebooks_created ON notebooks(created_at DESC);
 
 -- knowledge_chunks
-CREATE INDEX knowledge_chunks_embedding_idx
-  ON knowledge_chunks USING hnsw (embedding vector_cosine_ops);
+-- Step 8Y-R2: HNSW index skipped — Supabase pgvector rejects HNSW on vector dimensions > 2000.
+-- knowledge_chunks.embedding is vector(3072) (gemini-embedding-001).
+-- The embedding column and match_knowledge_chunks RPC remain intact; only the performance index is skipped.
+-- To enable later: CREATE INDEX knowledge_chunks_embedding_idx ON knowledge_chunks USING hnsw (embedding vector_cosine_ops);
 CREATE INDEX knowledge_chunks_category_idx ON knowledge_chunks(category);
 
 -- Vector search RPC (3072 dimension — gemini-embedding-001)
