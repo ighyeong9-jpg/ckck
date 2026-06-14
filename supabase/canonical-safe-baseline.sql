@@ -136,38 +136,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Vector search RPC (3072 dimension — gemini-embedding-001)
-CREATE OR REPLACE FUNCTION match_knowledge_chunks(
-  query_embedding  vector(3072),
-  match_threshold  float    DEFAULT 0.65,
-  match_count      int      DEFAULT 5,
-  filter_category  text     DEFAULT NULL
-)
-RETURNS TABLE (
-  id          uuid,
-  content     text,
-  source      text,
-  category    text,
-  metadata    jsonb,
-  similarity  float
-)
-LANGUAGE sql STABLE
-AS $$
-  SELECT
-    kc.id,
-    kc.content,
-    kc.source,
-    kc.category,
-    kc.metadata,
-    1 - (kc.embedding <=> query_embedding) AS similarity
-  FROM knowledge_chunks kc
-  WHERE
-    (filter_category IS NULL OR kc.category = filter_category)
-    AND 1 - (kc.embedding <=> query_embedding) > match_threshold
-  ORDER BY kc.embedding <=> query_embedding
-  LIMIT match_count;
-$$;
-
 
 -- ============================================================
 -- PART 3A: CORE TABLES (from all-in-one.sql + v2 columns)
@@ -525,9 +493,12 @@ CREATE TABLE custom_checklist_items (
   category TEXT NOT NULL,
   subcategory TEXT NOT NULL,
   item TEXT NOT NULL,
-  priority TEXT NOT NULL CHECK (priority IN ('필수', '권장', '조건부')),
-  method TEXT NOT NULL CHECK (method IN ('육안확인', '작동확인', '측정확인')),
-  evidence TEXT NOT NULL CHECK (evidence IN ('사진', '점검표', '측정기록')),
+  priority TEXT NOT NULL CHECK (priority IN ('required', 'recommended', 'conditional')),
+  -- priority: required=필수, recommended=권장, conditional=조건부
+  method TEXT NOT NULL CHECK (method IN ('visual', 'functional', 'measurement')),
+  -- method: visual=육안확인, functional=작동확인, measurement=측정확인
+  evidence TEXT NOT NULL CHECK (evidence IN ('photo', 'checklist', 'measurement_record')),
+  -- evidence: photo=사진, checklist=점검표, measurement_record=측정기록
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -1192,6 +1163,39 @@ CREATE INDEX idx_notebooks_created ON notebooks(created_at DESC);
 CREATE INDEX knowledge_chunks_embedding_idx
   ON knowledge_chunks USING hnsw (embedding vector_cosine_ops);
 CREATE INDEX knowledge_chunks_category_idx ON knowledge_chunks(category);
+
+-- Vector search RPC (3072 dimension — gemini-embedding-001)
+-- Step 8Y: moved after knowledge_chunks table creation to avoid 42P01 error.
+CREATE OR REPLACE FUNCTION match_knowledge_chunks(
+  query_embedding  vector(3072),
+  match_threshold  float    DEFAULT 0.65,
+  match_count      int      DEFAULT 5,
+  filter_category  text     DEFAULT NULL
+)
+RETURNS TABLE (
+  id          uuid,
+  content     text,
+  source      text,
+  category    text,
+  metadata    jsonb,
+  similarity  float
+)
+LANGUAGE sql STABLE
+AS $$
+  SELECT
+    kc.id,
+    kc.content,
+    kc.source,
+    kc.category,
+    kc.metadata,
+    1 - (kc.embedding <=> query_embedding) AS similarity
+  FROM knowledge_chunks kc
+  WHERE
+    (filter_category IS NULL OR kc.category = filter_category)
+    AND 1 - (kc.embedding <=> query_embedding) > match_threshold
+  ORDER BY kc.embedding <=> query_embedding
+  LIMIT match_count;
+$$;
 
 -- ai_check_results
 CREATE INDEX ai_check_results_project_idx ON ai_check_results(project_id);
