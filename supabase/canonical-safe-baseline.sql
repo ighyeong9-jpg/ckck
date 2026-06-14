@@ -1,9 +1,11 @@
 -- ============================================================
 -- CANONICAL SAFE SQL BASELINE — Check-In Stable
 -- ============================================================
--- Version: 1.0
+-- Version: 2.0
 -- Date: 2026-06-14
--- Author: Claude Code (Phase 1S-E Step 7)
+-- Author: Claude Code (Phase 1S-E Step 8T)
+-- Baseline: Phase 1S-E Step 7 (d90abda)
+-- Correction Plan: Phase 1S-E Step 8S (0638c98)
 -- Target: New Supabase project lgdzhrdhawnafqbzptoa
 -- Status: PENDING CODEX REVIEW — DO NOT APPLY UNTIL PASS
 --
@@ -18,9 +20,11 @@
 --   [x] NO  WITH CHECK(true) on user data tables
 --   [x] NO  DROP TABLE / DELETE FROM / TRUNCATE
 --   [x] NO  authenticated-only storage policies (project_members based instead)
---   [x] YES USING(true) on public reference data (laws, knowledge_chunks) SELECT only
+--   [x] NO  anon public SELECT on shares or data tables (7 tables protected)
+--   [x] YES USING(true) on public reference data (laws, knowledge_chunks, benchmarks) SELECT only
 --   [x] YES All tables have ENABLE ROW LEVEL SECURITY
 --   [x] YES All tables have at least one RLS policy
+--   [x] YES Public share access via API route + service role only (not base table RLS)
 --
 -- DB execution: 0 (pending Codex review)
 -- ============================================================
@@ -109,23 +113,25 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Auto-add project owner to project_members
+-- Step 8T: owner_id → user_id
 CREATE OR REPLACE FUNCTION add_project_owner()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO project_members (project_id, user_id, role, status, joined_at, invited_by)
-  VALUES (NEW.id, NEW.owner_id, 'OWNER', 'ACTIVE', NOW(), NEW.owner_id);
+  VALUES (NEW.id, NEW.user_id, 'OWNER', 'ACTIVE', NOW(), NEW.user_id);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Migrate existing projects to project_members (one-time utility)
+-- Step 8T: owner_id → user_id
 CREATE OR REPLACE FUNCTION migrate_existing_projects_to_members()
 RETURNS void AS $$
 BEGIN
   INSERT INTO project_members (project_id, user_id, role, status, joined_at)
-  SELECT id, owner_id, 'OWNER', 'ACTIVE', created_at
+  SELECT id, user_id, 'OWNER', 'ACTIVE', created_at
   FROM projects
-  WHERE owner_id IS NOT NULL
+  WHERE user_id IS NOT NULL
   ON CONFLICT (project_id, user_id) DO NOTHING;
 END;
 $$ LANGUAGE plpgsql;
@@ -192,11 +198,12 @@ CREATE TABLE profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. projects (FK: profiles)
+-- 2. projects (FK: auth.users)
+-- Step 8T corrections: owner_id→user_id, title→name, +progress, status CHECK +review
 CREATE TABLE projects (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  owner_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
   industry TEXT NOT NULL DEFAULT 'general',
   address TEXT,
   client_name TEXT,
@@ -204,9 +211,10 @@ CREATE TABLE projects (
   start_date DATE,
   end_date DATE,
   budget DECIMAL(12,2),
+  progress INTEGER DEFAULT 0,
   risk_score DECIMAL(5,2) DEFAULT 0,
   risk_grade TEXT CHECK (risk_grade IN ('A', 'B', 'C', 'D', 'F')),
-  status TEXT DEFAULT 'planning' CHECK (status IN ('planning', 'diagnosis', 'in_progress', 'completed', 'disputed')),
+  status TEXT DEFAULT 'planning' CHECK (status IN ('planning', 'diagnosis', 'in_progress', 'review', 'completed', 'disputed')),
   -- 20260227 columns
   description TEXT,
   actual_end_date DATE,
@@ -306,16 +314,26 @@ CREATE TABLE quotes (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 10. quote_line_items (FK: quotes)
+-- 10. quote_line_items (FK: quotes + projects)
+-- Step 8T-R: project_id added (src uses .eq('project_id', ...) in 15+ calls).
+-- src INSERT: project_id, category, item_name, specification, unit, quantity, unit_price, total_price, notes, sort_order.
+-- quote_id kept for FK backward compatibility (quotes table exists in baseline).
 CREATE TABLE quote_line_items (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  quote_id UUID NOT NULL REFERENCES quotes(id) ON DELETE CASCADE,
+  quote_id UUID REFERENCES quotes(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
   category TEXT NOT NULL,
   item_name TEXT NOT NULL,
+  specification TEXT,
   quantity DECIMAL(10,2),
   unit TEXT,
   unit_price DECIMAL(12,2),
-  total_price DECIMAL(12,2)
+  total_price DECIMAL(12,2),
+  amount NUMERIC, -- Step 8T-R3: src compatibility column (scoreEngine.ts selects 'id, category, amount'). Synced with total_price by trg_quote_line_items_amount_sync trigger. NULL allowed, no DEFAULT 0 to prevent silent zero when total_price is inserted without amount.
+  notes TEXT,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- 11. payments (FK: projects)
@@ -860,14 +878,220 @@ CREATE TABLE warranties (
 
 
 -- ============================================================
+-- PART 3C: MISSING TABLES (Step 8T — from 8R/8S correction plan)
+-- 12 tables referenced in src .from() but absent from baseline.
+-- Field maps reverse-engineered from src Supabase calls.
+-- ============================================================
+
+-- 46. dispute_signals (P0 — 7 src refs: Sidebar, MobileTabBar, TodayStatusBar, brain.ts, etc.)
+CREATE TABLE dispute_signals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  signal_type TEXT NOT NULL,
+  description TEXT NOT NULL,
+  detected_from TEXT,
+  source_text TEXT,
+  legal_basis TEXT,
+  recommended_action TEXT,
+  resolved BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 47. warranty_tracking (P0 — 10 src refs: Sidebar, warranty/page, warranty-tracker.ts, etc.)
+-- warranty_expires_date is auto-calculated by trg_warranty_expires trigger (see PART 5).
+-- Step 8T-R2: user_id NULL allowed (src does not insert user_id).
+-- warranty/page.tsx inserts with project_id: null (standalone), no user_id.
+-- warranty-tracker.ts inserts with project_id: NOT NULL (service_role), no user_id.
+-- auto_fill_warranty_user_id trigger fills user_id from auth.uid() when NULL (see PART 5).
+CREATE TABLE warranty_tracking (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  process_name TEXT NOT NULL,
+  completed_date DATE NOT NULL,
+  warranty_period_months INTEGER NOT NULL,
+  warranty_expires_date DATE NOT NULL,
+  reminder_sent_30d BOOLEAN NOT NULL DEFAULT false,
+  reminder_sent_7d BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 48. site_issues (P1 — 6 src refs: issues/page, projects/page, autoWorkflow, classify-issue)
+-- Step 8T-R: src insert 필드 전수 반영 (autoWorkflow + classify-issue/route.ts)
+CREATE TABLE site_issues (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  severity TEXT NOT NULL,
+  category TEXT,
+  status TEXT NOT NULL DEFAULT 'open',
+  photo_url TEXT,
+  ai_classification JSONB,
+  issue_text TEXT,
+  reporter_note TEXT,
+  summary TEXT,
+  recommended_actions JSONB,
+  legal_basis TEXT,
+  cost_impact NUMERIC DEFAULT 0,
+  schedule_impact INTEGER DEFAULT 0,
+  requires_approval BOOLEAN DEFAULT false,
+  urgency_hours INTEGER,
+  resolved_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 49. verification_certificates (P1 — 12 src refs: certificate/page, certificateService, etc.)
+-- total_score = primary persisted column (TypeScript type + INSERT + display).
+-- overall_score = generated column for src compatibility (profile/page, share/page SELECT).
+-- SECURITY: anon public SELECT is PROHIBITED. Public share uses API route projection.
+CREATE TABLE verification_certificates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  code TEXT NOT NULL UNIQUE,
+  total_score NUMERIC NOT NULL,
+  overall_score NUMERIC GENERATED ALWAYS AS (total_score) STORED,
+  grade TEXT NOT NULL,
+  cost_score NUMERIC NOT NULL,
+  process_score NUMERIC NOT NULL,
+  contract_score NUMERIC NOT NULL,
+  schedule_score NUMERIC NOT NULL,
+  project_name TEXT NOT NULL,
+  industry TEXT,
+  client_name TEXT,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'expired', 'revoked')),
+  badge_eligible BOOLEAN NOT NULL,
+  issued_at TIMESTAMPTZ NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 50. proactive_notifications (P1 — 9 src refs: NotificationCenter, proactive-engine, handlers)
+-- trigger_type: TEXT without CHECK (9 observed values, service_role INSERT only, extensible).
+-- Observed values: WARRANTY_EXPIRING, AI_CHECK_PENDING, DISPUTE_UNRESOLVED,
+--   PROCESS_NEXT_STEP, DAILY_REPORT_MISSING, RISK_HIGH, DISPUTE_SIGNAL,
+--   WARRANTY_REGISTER, DEADLINE_OVERDUE.
+-- severity: 3-value CHECK (CRITICAL, WARNING, INFO).
+-- INSERT: service_role path only (proactive-engine cron + handlers eventBus).
+-- Client: SELECT/UPDATE only (NotificationCenter).
+-- Public access: PROHIBITED.
+CREATE TABLE proactive_notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  trigger_type TEXT NOT NULL,
+  severity TEXT NOT NULL CHECK (severity IN ('CRITICAL', 'WARNING', 'INFO')),
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  action_url TEXT,
+  action_label TEXT,
+  metadata JSONB,
+  read BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 51. quote_analyses (P2 — 4 src refs: quotes/page, quote-analyzer, budget-guide)
+CREATE TABLE quote_analyses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  total_amount NUMERIC,
+  overcharge_items JSONB,
+  undercharge_items JSONB,
+  overall_risk TEXT,
+  ai_comment TEXT,
+  analyzed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 52. daily_reports (P2 — 3 src refs: autoWorkflow, tools-extended)
+CREATE TABLE daily_reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  auto_check_count INTEGER DEFAULT 0,
+  go_count INTEGER DEFAULT 0,
+  nogo_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 53. contractor_badges (P2 — 1 src ref: ContractorBadge)
+CREATE TABLE contractor_badges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  badge_level TEXT,
+  usage_months INTEGER DEFAULT 0,
+  pass_rate NUMERIC,
+  dispute_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 54. price_benchmarks (P3 — 1 src ref: benchmarks.ts — public reference data)
+CREATE TABLE price_benchmarks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category TEXT NOT NULL,
+  space_type TEXT,
+  region TEXT,
+  size_min_pyeong NUMERIC,
+  size_max_pyeong NUMERIC,
+  price_per_pyeong NUMERIC,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 55. labor_rates (P3 — 1 src ref: benchmarks.ts — public reference data)
+CREATE TABLE labor_rates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trade_name TEXT NOT NULL,
+  daily_rate NUMERIC,
+  reference_year INTEGER,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 56. process_benchmarks (P3 — 2 src refs: benchmarks.ts — public reference data)
+CREATE TABLE process_benchmarks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  process_key TEXT NOT NULL,
+  avg_duration_days NUMERIC,
+  avg_cost_per_pyeong NUMERIC,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 57. estimate_validations (P3 — 1 src ref: estimate/validate/route)
+-- Step 8T-R: project_id NULL 허용 (버그8 수정), 누락 컬럼 추가
+CREATE TABLE estimate_validations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  quoted_total NUMERIC,
+  benchmark_low NUMERIC,
+  benchmark_avg NUMERIC,
+  benchmark_high NUMERIC,
+  deviation_percent NUMERIC,
+  overall_status TEXT,
+  total_amount_status TEXT,
+  process_items JSONB DEFAULT '[]',
+  missing_processes JSONB DEFAULT '[]',
+  risk_flags JSONB DEFAULT '[]',
+  regional_multiplier NUMERIC,
+  building_age_surcharge NUMERIC,
+  recommendation TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+-- ============================================================
 -- PART 4: INDEXES
 -- ============================================================
 
 -- profiles
 CREATE INDEX idx_profiles_token ON profiles(profile_token);
 
--- projects
-CREATE INDEX idx_projects_owner ON projects(owner_id);
+-- projects (Step 8T: owner_id → user_id)
+CREATE INDEX idx_projects_user ON projects(user_id);
 CREATE INDEX idx_projects_status ON projects(status);
 CREATE INDEX idx_projects_industry ON projects(industry);
 CREATE INDEX idx_projects_risk_score ON projects(risk_score);
@@ -898,6 +1122,9 @@ CREATE INDEX idx_notifications_user ON notifications(user_id, is_read);
 
 -- read_receipts
 CREATE INDEX idx_read_receipts_project ON read_receipts(project_id, reader_id);
+
+-- quote_line_items (Step 8T-R: project_id index added)
+CREATE INDEX idx_quote_line_items_project ON quote_line_items(project_id);
 
 -- shares
 CREATE INDEX idx_shares_token ON shares(share_token);
@@ -993,6 +1220,56 @@ CREATE INDEX idx_warranties_project ON warranties(project_id);
 CREATE INDEX idx_warranties_end_date ON warranties(end_date);
 CREATE INDEX idx_warranties_status ON warranties(status);
 
+-- dispute_signals (Step 8T)
+CREATE INDEX idx_dispute_signals_project ON dispute_signals(project_id);
+CREATE INDEX idx_dispute_signals_user ON dispute_signals(user_id);
+CREATE INDEX idx_dispute_signals_resolved ON dispute_signals(resolved);
+
+-- warranty_tracking (Step 8T + 8T-R: user_id index added)
+CREATE INDEX idx_warranty_tracking_project ON warranty_tracking(project_id);
+CREATE INDEX idx_warranty_tracking_user ON warranty_tracking(user_id);
+CREATE INDEX idx_warranty_tracking_expires ON warranty_tracking(warranty_expires_date);
+
+-- site_issues (Step 8T)
+CREATE INDEX idx_site_issues_project ON site_issues(project_id);
+CREATE INDEX idx_site_issues_status ON site_issues(status);
+
+-- verification_certificates (Step 8T)
+CREATE INDEX idx_verification_certificates_project ON verification_certificates(project_id);
+CREATE INDEX idx_verification_certificates_user ON verification_certificates(user_id);
+CREATE INDEX idx_verification_certificates_code ON verification_certificates(code);
+CREATE INDEX idx_verification_certificates_status ON verification_certificates(status);
+
+-- proactive_notifications (Step 8T)
+CREATE INDEX idx_proactive_notifications_user ON proactive_notifications(user_id);
+CREATE INDEX idx_proactive_notifications_read ON proactive_notifications(user_id, read);
+CREATE INDEX idx_proactive_notifications_created ON proactive_notifications(created_at DESC);
+
+-- quote_analyses (Step 8T)
+CREATE INDEX idx_quote_analyses_project ON quote_analyses(project_id);
+
+-- daily_reports (Step 8T)
+CREATE INDEX idx_daily_reports_project ON daily_reports(project_id);
+CREATE INDEX idx_daily_reports_user ON daily_reports(user_id);
+CREATE INDEX idx_daily_reports_date ON daily_reports(date);
+
+-- contractor_badges (Step 8T)
+CREATE INDEX idx_contractor_badges_user ON contractor_badges(user_id);
+
+-- price_benchmarks (Step 8T)
+CREATE INDEX idx_price_benchmarks_category ON price_benchmarks(category);
+CREATE INDEX idx_price_benchmarks_active ON price_benchmarks(is_active);
+
+-- labor_rates (Step 8T)
+CREATE INDEX idx_labor_rates_trade ON labor_rates(trade_name);
+
+-- process_benchmarks (Step 8T)
+CREATE INDEX idx_process_benchmarks_key ON process_benchmarks(process_key);
+
+-- estimate_validations (Step 8T)
+CREATE INDEX idx_estimate_validations_project ON estimate_validations(project_id);
+CREATE INDEX idx_estimate_validations_user ON estimate_validations(user_id);
+
 
 -- ============================================================
 -- PART 5: TRIGGERS
@@ -1012,6 +1289,75 @@ CREATE TRIGGER audit_defects AFTER INSERT OR UPDATE OR DELETE ON defects
 CREATE TRIGGER auto_add_project_owner
   AFTER INSERT ON projects
   FOR EACH ROW EXECUTE FUNCTION add_project_owner();
+
+-- warranty_tracking: auto-calculate warranty_expires_date (Step 8T)
+-- Source: warranty-tracker.ts:5 — "warranty_expires_date는 DB 트리거(trg_warranty_expires)가 자동 계산한다."
+CREATE OR REPLACE FUNCTION calculate_warranty_expires()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.warranty_expires_date := NEW.completed_date + (NEW.warranty_period_months * INTERVAL '1 month');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_warranty_expires
+  BEFORE INSERT OR UPDATE ON warranty_tracking
+  FOR EACH ROW EXECUTE FUNCTION calculate_warranty_expires();
+
+-- warranty_tracking: auto-fill user_id from auth.uid() when NULL (Step 8T-R2)
+-- Source: warranty/page.tsx and warranty-tracker.ts do not insert user_id.
+-- Session client (warranty/page.tsx) → auth.uid() available.
+-- Service_role client (warranty-tracker.ts) → auth.uid() is NULL, user_id stays NULL (acceptable).
+CREATE OR REPLACE FUNCTION auto_fill_warranty_user_id()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.user_id IS NULL THEN
+    NEW.user_id := auth.uid();
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+CREATE TRIGGER trg_warranty_auto_user_id
+  BEFORE INSERT ON warranty_tracking
+  FOR EACH ROW EXECUTE FUNCTION auto_fill_warranty_user_id();
+
+-- quote_line_items: sync amount ↔ total_price (Step 8T-R3)
+-- src INSERT paths write total_price only (tools-auto.ts:181, tools-extended.ts:886).
+-- src SELECT paths read amount only (scoreEngine.ts:44).
+-- This trigger ensures both columns stay in sync regardless of which is provided.
+-- INSERT rules:
+--   amount NULL + total_price NOT NULL → amount = total_price
+--   total_price NULL + amount NOT NULL → total_price = amount
+--   both NULL → both stay NULL (no silent zero injection)
+--   both provided → user values respected
+-- UPDATE rules:
+--   total_price changed + amount unchanged → amount = NEW.total_price
+--   amount changed + total_price unchanged → total_price = NEW.amount
+--   both changed → user values respected
+CREATE OR REPLACE FUNCTION sync_quote_line_item_amount()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    IF NEW.amount IS NULL AND NEW.total_price IS NOT NULL THEN
+      NEW.amount := NEW.total_price;
+    ELSIF NEW.total_price IS NULL AND NEW.amount IS NOT NULL THEN
+      NEW.total_price := NEW.amount;
+    END IF;
+  ELSIF TG_OP = 'UPDATE' THEN
+    IF NEW.total_price IS DISTINCT FROM OLD.total_price AND NEW.amount IS NOT DISTINCT FROM OLD.amount THEN
+      NEW.amount := NEW.total_price;
+    ELSIF NEW.amount IS DISTINCT FROM OLD.amount AND NEW.total_price IS NOT DISTINCT FROM OLD.total_price THEN
+      NEW.total_price := NEW.amount;
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_quote_line_items_amount_sync
+  BEFORE INSERT OR UPDATE ON quote_line_items
+  FOR EACH ROW EXECUTE FUNCTION sync_quote_line_item_amount();
 
 -- updated_at triggers
 CREATE TRIGGER update_comparison_pairs_updated_at
@@ -1075,6 +1421,20 @@ ALTER TABLE law_checks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE risk_scores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE warranties ENABLE ROW LEVEL SECURITY;
 
+-- Step 8T: 12 missing tables
+ALTER TABLE dispute_signals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE warranty_tracking ENABLE ROW LEVEL SECURITY;
+ALTER TABLE site_issues ENABLE ROW LEVEL SECURITY;
+ALTER TABLE verification_certificates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE proactive_notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quote_analyses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contractor_badges ENABLE ROW LEVEL SECURITY;
+ALTER TABLE price_benchmarks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE labor_rates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE process_benchmarks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE estimate_validations ENABLE ROW LEVEL SECURITY;
+
 
 -- ============================================================
 -- PART 7: RLS POLICIES (safe policies only)
@@ -1094,26 +1454,26 @@ CREATE POLICY "Users can update own profile" ON profiles
 CREATE POLICY "Public profiles are readable" ON profiles
   FOR SELECT USING (is_public = true);
 
--- ----- projects -----
+-- ----- projects (Step 8T: owner_id → user_id) -----
 CREATE POLICY "Project members can view" ON projects
   FOR SELECT USING (
-    owner_id = auth.uid() OR
+    user_id = auth.uid() OR
     EXISTS (SELECT 1 FROM project_members WHERE project_id = projects.id AND user_id = auth.uid())
   );
 CREATE POLICY "Project owner can update" ON projects
-  FOR UPDATE USING (owner_id = auth.uid());
+  FOR UPDATE USING (user_id = auth.uid());
 CREATE POLICY "Users can create projects" ON projects
-  FOR INSERT WITH CHECK (owner_id = auth.uid());
+  FOR INSERT WITH CHECK (user_id = auth.uid());
 
--- ----- project_members -----
+-- ----- project_members (Step 8T: owner_id → user_id) -----
 CREATE POLICY "Project members can view members" ON project_members
   FOR SELECT USING (
-    EXISTS (SELECT 1 FROM projects WHERE id = project_members.project_id AND owner_id = auth.uid())
+    EXISTS (SELECT 1 FROM projects WHERE id = project_members.project_id AND user_id = auth.uid())
     OR user_id = auth.uid()
   );
 CREATE POLICY "Project owner can manage members" ON project_members
   FOR ALL USING (
-    EXISTS (SELECT 1 FROM projects WHERE id = project_members.project_id AND owner_id = auth.uid())
+    EXISTS (SELECT 1 FROM projects WHERE id = project_members.project_id AND user_id = auth.uid())
   );
 
 -- ----- diagnostic_responses -----
@@ -1176,17 +1536,19 @@ CREATE POLICY "Project members can manage quotes" ON quotes
     EXISTS (SELECT 1 FROM project_members WHERE project_id = quotes.project_id AND user_id = auth.uid())
   );
 
--- ----- quote_line_items (via quotes → projects) -----
-CREATE POLICY "Project members can view quote_line_items" ON quote_line_items
+-- ----- quote_line_items (project_id direct + quote_id FK fallback) -----
+-- Step 8T-R: src uses .eq('project_id', ...) in 15+ calls. project_id-based RLS added.
+-- quote_id path kept for backward compatibility.
+CREATE POLICY "Project members can view quote_line_items via project" ON quote_line_items
   FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM quotes q
-      JOIN project_members pm ON pm.project_id = q.project_id
-      WHERE q.id = quote_line_items.quote_id AND pm.user_id = auth.uid()
-    )
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = quote_line_items.project_id AND user_id = auth.uid())
   );
-CREATE POLICY "Project members can manage quote_line_items" ON quote_line_items
+CREATE POLICY "Project members can manage quote_line_items via project" ON quote_line_items
   FOR ALL USING (
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = quote_line_items.project_id AND user_id = auth.uid())
+  );
+CREATE POLICY "Project members can view quote_line_items via quote" ON quote_line_items
+  FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM quotes q
       JOIN project_members pm ON pm.project_id = q.project_id
@@ -1284,27 +1646,32 @@ CREATE POLICY "Project members can manage reports" ON reports
     EXISTS (SELECT 1 FROM project_members WHERE project_id = reports.project_id AND user_id = auth.uid())
   );
 
--- ----- shares (Phase 1S-B safe design) -----
--- Public: active + not expired shares are readable (for QR code sharing)
-CREATE POLICY "Active shares are publicly readable" ON shares
-  FOR SELECT USING (
-    is_active = true
-    AND (expires_at IS NULL OR expires_at > now())
-  );
+-- ----- shares (Step 8T: public policy 삭제, owner_id → user_id) -----
+-- SECURITY NOTE: anon public SELECT on shares is PROHIBITED.
+-- Public share page does NOT query shares directly.
+-- /api/share/[shareId] API route uses service_role to validate share_token internally.
+-- API route verifies: token/shareId match, is_active = true, expires_at > NOW().
+-- API route returns allowlisted projection only. select * is never exposed.
+--
 -- Project owner can view all shares (including inactive)
 CREATE POLICY "Project owner can view all shares" ON shares
   FOR SELECT USING (
-    EXISTS (SELECT 1 FROM projects WHERE id = shares.project_id AND owner_id = auth.uid())
+    EXISTS (SELECT 1 FROM projects WHERE id = shares.project_id AND user_id = auth.uid())
+  );
+-- Project members can view active shares
+CREATE POLICY "Project members can view shares" ON shares
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = shares.project_id AND user_id = auth.uid())
   );
 -- Project owner can create shares
 CREATE POLICY "Project owner can create shares" ON shares
   FOR INSERT WITH CHECK (
-    EXISTS (SELECT 1 FROM projects WHERE id = shares.project_id AND owner_id = auth.uid())
+    EXISTS (SELECT 1 FROM projects WHERE id = shares.project_id AND user_id = auth.uid())
   );
 -- Project owner can update shares (deactivate, etc.)
 CREATE POLICY "Project owner can update shares" ON shares
   FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM projects WHERE id = shares.project_id AND owner_id = auth.uid())
+    EXISTS (SELECT 1 FROM projects WHERE id = shares.project_id AND user_id = auth.uid())
   );
 
 -- ----- special_terms -----
@@ -1362,7 +1729,7 @@ CREATE POLICY "Project members can update checklist items" ON custom_checklist_i
   );
 CREATE POLICY "Project owner can delete checklist items" ON custom_checklist_items
   FOR DELETE USING (
-    EXISTS (SELECT 1 FROM projects WHERE id = custom_checklist_items.project_id AND owner_id = auth.uid())
+    EXISTS (SELECT 1 FROM projects WHERE id = custom_checklist_items.project_id AND user_id = auth.uid())
   );
 
 -- ----- evidence_files -----
@@ -1559,6 +1926,135 @@ CREATE POLICY "Project members can manage warranties" ON warranties
     EXISTS (SELECT 1 FROM project_members WHERE project_id = warranties.project_id AND user_id = auth.uid())
   );
 
+-- ============================================================
+-- PART 7B: RLS POLICIES for Step 8T missing tables
+-- ============================================================
+-- SECURITY NOTE for 7 tables with NO anon public SELECT:
+--   shares, projects, processes, quote_line_items, change_orders,
+--   diagnostic_responses, verification_certificates.
+-- Public share page does NOT query base tables directly.
+-- /api/share/[shareId] API route uses service_role for internal queries.
+-- API route validates share_token, is_active, expires_at.
+-- API route returns allowlisted projection only.
+-- ============================================================
+
+-- ----- dispute_signals (project_members scoped, service_role INSERT) -----
+CREATE POLICY "Project members can view dispute_signals" ON dispute_signals
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = dispute_signals.project_id AND user_id = auth.uid())
+  );
+CREATE POLICY "Project members can manage dispute_signals" ON dispute_signals
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = dispute_signals.project_id AND user_id = auth.uid())
+  );
+
+-- ----- warranty_tracking (project_members + user fallback for standalone) -----
+-- Step 8T-R2: user_id NULL allowed. trg_warranty_auto_user_id auto-fills from auth.uid().
+-- Session client INSERT: trigger fills user_id → INSERT WITH CHECK passes.
+-- Service_role INSERT: RLS bypassed entirely → user_id stays NULL (acceptable).
+-- project_id IS NOT NULL → project_members scoped.
+-- project_id IS NULL → user_id = auth.uid() scoped.
+CREATE POLICY "Project members can view warranty_tracking" ON warranty_tracking
+  FOR SELECT USING (
+    (project_id IS NOT NULL AND EXISTS (SELECT 1 FROM project_members WHERE project_id = warranty_tracking.project_id AND user_id = auth.uid()))
+    OR (project_id IS NULL AND user_id = auth.uid())
+  );
+CREATE POLICY "Project members can manage warranty_tracking" ON warranty_tracking
+  FOR ALL USING (
+    (project_id IS NOT NULL AND EXISTS (SELECT 1 FROM project_members WHERE project_id = warranty_tracking.project_id AND user_id = auth.uid()))
+    OR (project_id IS NULL AND user_id = auth.uid())
+  );
+CREATE POLICY "Users can insert own warranty_tracking" ON warranty_tracking
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+
+-- ----- site_issues (project_members + user fallback) -----
+-- Step 8T-R: project_id can be NULL (classify-issue/route.ts: projectId ?? null).
+-- project_id IS NOT NULL → project_members scoped.
+-- project_id IS NULL → user_id = auth.uid() scoped.
+CREATE POLICY "Project members can view site_issues" ON site_issues
+  FOR SELECT USING (
+    (project_id IS NOT NULL AND EXISTS (SELECT 1 FROM project_members WHERE project_id = site_issues.project_id AND user_id = auth.uid()))
+    OR (project_id IS NULL AND user_id = auth.uid())
+  );
+CREATE POLICY "Project members can manage site_issues" ON site_issues
+  FOR ALL USING (
+    (project_id IS NOT NULL AND EXISTS (SELECT 1 FROM project_members WHERE project_id = site_issues.project_id AND user_id = auth.uid()))
+    OR (project_id IS NULL AND user_id = auth.uid())
+  );
+CREATE POLICY "Users can insert own site_issues" ON site_issues
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+
+-- ----- verification_certificates (project_members SELECT, service_role INSERT) -----
+-- SECURITY: anon public SELECT is PROHIBITED. Public share uses API route projection.
+-- INSERT/UPDATE: service_role only (certificateService uses createAdminClient).
+CREATE POLICY "Project members can view verification_certificates" ON verification_certificates
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = verification_certificates.project_id AND user_id = auth.uid())
+  );
+
+-- ----- proactive_notifications (user scoped, public access PROHIBITED) -----
+-- INSERT paths:
+--   1. proactive-engine.ts: Vercel Cron → service_role key (bypasses RLS)
+--   2. handlers.ts: eventBus → createClient(@/lib/supabase/server) = anon+session client (needs RLS INSERT)
+-- Step 8T-R: authenticated INSERT policy added for handlers.ts path.
+-- Client: SELECT/UPDATE only (NotificationCenter).
+-- anon/public unrestricted INSERT: PROHIBITED.
+CREATE POLICY "Users can view own notifications" ON proactive_notifications
+  FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Users can update own notifications" ON proactive_notifications
+  FOR UPDATE USING (user_id = auth.uid());
+CREATE POLICY "Authenticated users can insert own notifications" ON proactive_notifications
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+
+-- ----- quote_analyses (project_members scoped) -----
+CREATE POLICY "Project members can view quote_analyses" ON quote_analyses
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = quote_analyses.project_id AND user_id = auth.uid())
+  );
+CREATE POLICY "Project members can manage quote_analyses" ON quote_analyses
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = quote_analyses.project_id AND user_id = auth.uid())
+  );
+
+-- ----- daily_reports (project_members scoped) -----
+CREATE POLICY "Project members can view daily_reports" ON daily_reports
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = daily_reports.project_id AND user_id = auth.uid())
+  );
+CREATE POLICY "Project members can manage daily_reports" ON daily_reports
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM project_members WHERE project_id = daily_reports.project_id AND user_id = auth.uid())
+  );
+
+-- ----- contractor_badges (user scoped) -----
+CREATE POLICY "Users can view own contractor_badges" ON contractor_badges
+  FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Users can manage own contractor_badges" ON contractor_badges
+  FOR ALL USING (user_id = auth.uid());
+
+-- ----- price_benchmarks (public reference data — SELECT only) -----
+-- NOTE: USING(true) is intentional for public benchmark reference data.
+-- No INSERT/UPDATE/DELETE policies = only service_role can modify.
+CREATE POLICY "Anyone can read price_benchmarks" ON price_benchmarks
+  FOR SELECT USING (true);
+
+-- ----- labor_rates (public reference data — SELECT only) -----
+CREATE POLICY "Anyone can read labor_rates" ON labor_rates
+  FOR SELECT USING (true);
+
+-- ----- process_benchmarks (public reference data — SELECT only) -----
+CREATE POLICY "Anyone can read process_benchmarks" ON process_benchmarks
+  FOR SELECT USING (true);
+
+-- ----- estimate_validations (user scoped — project_id NULL allowed) -----
+-- Step 8T-R: project_id can be NULL (버그8). RLS uses user_id as primary scope.
+CREATE POLICY "Users can view own estimate_validations" ON estimate_validations
+  FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Users can create own estimate_validations" ON estimate_validations
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "Users can manage own estimate_validations" ON estimate_validations
+  FOR UPDATE USING (user_id = auth.uid());
+
 
 -- ============================================================
 -- PART 8: STORAGE BUCKETS + POLICIES
@@ -1665,8 +2161,8 @@ CREATE POLICY "Project members can delete evidence" ON storage.objects
 -- 5. Check NO USING(true) on user data tables:
 --    SELECT tablename, policyname, qual FROM pg_policies
 --    WHERE schemaname = 'public' AND qual = 'true'
---    AND tablename NOT IN ('laws', 'knowledge_chunks');
---    -- Expected: 0 rows (only laws and knowledge_chunks should have USING(true))
+--    AND tablename NOT IN ('laws', 'knowledge_chunks', 'price_benchmarks', 'labor_rates', 'process_benchmarks');
+--    -- Expected: 0 rows (only laws, knowledge_chunks, and benchmark tables should have USING(true))
 --
 -- 6. Check NO DISABLE RLS:
 --    SELECT tablename FROM pg_tables
@@ -1675,10 +2171,13 @@ CREATE POLICY "Project members can delete evidence" ON storage.objects
 --
 -- ============================================================
 -- END OF CANONICAL SAFE SQL BASELINE
--- Total tables: 45
--- Total RLS ENABLE: 45
--- Total policies: ~100
+-- Total tables: 57 (45 original + 12 Step 8T additions)
+-- Total RLS ENABLE: 57
+-- Total policies: ~130
 -- Storage buckets: 3
 -- DISABLE RLS: 0
 -- USING(true) on user data: 0
+-- USING(true) on public reference: laws, knowledge_chunks, price_benchmarks, labor_rates, process_benchmarks
+-- anon public SELECT on shares: 0 (PROHIBITED)
+-- anon public SELECT on data tables: 0 (7 tables protected)
 -- ============================================================
