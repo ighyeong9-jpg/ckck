@@ -4,11 +4,7 @@
 
 'use client';
 
-interface RiskFlag {
-  type: 'HIGH_PRICE' | 'MISSING_PROCESS' | 'SUSPICIOUS_PROCESS' | 'UNBALANCED';
-  message: string;
-  severity: 'HIGH' | 'MEDIUM' | 'LOW';
-}
+import type { RiskFlag } from '@/lib/estimate/constants';
 
 interface RiskBadgeProps {
   flag: RiskFlag;
@@ -38,6 +34,14 @@ const severityConfig = {
     iconBg: 'bg-yellow-100',
     icon: '⚡',
     label: '낮음',
+  },
+  CRITICAL: {
+    bg: 'bg-red-100',
+    border: 'border-red-400',
+    text: 'text-red-900',
+    iconBg: 'bg-red-200',
+    icon: '🔴',
+    label: '심각',
   },
 };
 

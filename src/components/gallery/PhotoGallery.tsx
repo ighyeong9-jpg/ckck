@@ -67,8 +67,8 @@ export default function PhotoGallery({ photos, onAutoCheck, checkingPhotoId }: P
                   onClick={() => setSelectedIndex(globalIndex)}
                 >
                   <img src={photo.url} alt={photo.file_name} loading="lazy" />
-                  {photo.category && (
-                    <span className={styles.photoCategory}>{photo.category}</span>
+                  {photo.stage && (
+                    <span className={styles.photoCategory}>{photo.stage}</span>
                   )}
                   {onAutoCheck && (
                     <button
