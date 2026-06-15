@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import styles from './page.module.scss'
 
 interface SharePageData {
@@ -10,8 +9,6 @@ interface SharePageData {
     id: string
     name: string
     industry: string
-    address: string
-    client_name: string
     risk_score: number
     risk_grade: string
     progress: number
@@ -38,10 +35,38 @@ interface SharePageData {
   certificate: { grade: string; score: number } | null
 }
 
+const DEMO_DATA: SharePageData = {
+  project: {
+    id: 'demo',
+    name: '데모 카페 인테리어',
+    industry: 'cafe',
+    risk_score: 25,
+    risk_grade: 'B',
+    progress: 65,
+    status: 'in_progress',
+    start_date: new Date(Date.now() - 30 * 86400000).toISOString(),
+    end_date: new Date(Date.now() + 30 * 86400000).toISOString(),
+    created_at: new Date().toISOString(),
+  },
+  shareLink: {
+    expires_at: new Date(Date.now() + 90 * 86400000).toISOString(),
+    created_at: new Date().toISOString(),
+  },
+  processes: [
+    { id: '1', name: '철거', status: 'completed', progress: 100, start_date: null, end_date: null },
+    { id: '2', name: '목공', status: 'in_progress', progress: 70, start_date: null, end_date: null },
+    { id: '3', name: '전기', status: 'pending', progress: 0, start_date: null, end_date: null },
+    { id: '4', name: '도장', status: 'pending', progress: 0, start_date: null, end_date: null },
+  ],
+  quoteTotal: 5200000,
+  changeTotal: 300000,
+  checklistStats: { total: 25, completed: 18 },
+  certificate: { grade: 'A', score: 92 },
+}
+
 export default function SharePage() {
   const params = useParams()
   const shareId = params.shareId as string
-  const supabase = createClient()
 
   const [data, setData] = useState<SharePageData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -50,145 +75,23 @@ export default function SharePage() {
   useEffect(() => {
     const loadShareData = async () => {
       try {
-        // 데모 모드 (demo123 입력 시)
         if (shareId === 'demo123') {
-          setData({
-            project: {
-              id: 'demo',
-              name: '데모 카페 인테리어',
-              industry: 'cafe',
-              address: '서울시 강남구 테헤란로 123',
-              client_name: '김고객',
-              risk_score: 25,
-              risk_grade: 'B',
-              progress: 65,
-              status: 'in_progress',
-              start_date: new Date(Date.now() - 30 * 86400000).toISOString(),
-              end_date: new Date(Date.now() + 30 * 86400000).toISOString(),
-              created_at: new Date().toISOString(),
-            },
-            shareLink: {
-              expires_at: new Date(Date.now() + 90 * 86400000).toISOString(),
-              created_at: new Date().toISOString(),
-            },
-            processes: [
-              { id: '1', name: '철거', status: 'completed', progress: 100, start_date: null, end_date: null },
-              { id: '2', name: '목공', status: 'in_progress', progress: 70, start_date: null, end_date: null },
-              { id: '3', name: '전기', status: 'pending', progress: 0, start_date: null, end_date: null },
-              { id: '4', name: '도장', status: 'pending', progress: 0, start_date: null, end_date: null },
-            ],
-            quoteTotal: 5200000,
-            changeTotal: 300000,
-            checklistStats: { total: 25, completed: 18 },
-            certificate: { grade: 'A', score: 92 },
-          })
+          setData(DEMO_DATA)
           setLoading(false)
           return
         }
 
-        // 1. shares 조회 + 검증
-        const { data: shareLink, error: shareError } = await supabase
-          .from('shares')
-          .select('*')
-          .eq('share_token', shareId)
-          .single()
+        const res = await fetch(`/api/share/${encodeURIComponent(shareId)}`)
+        const json = await res.json()
 
-        if (shareError || !shareLink) {
-          setError('유효하지 않은 공유 링크입니다. 데모를 보려면 "demo123"을 입력하세요.')
+        if (!res.ok) {
+          setError(json.error || '유효하지 않은 공유 링크입니다.')
           return
         }
 
-        // 만료 확인
-        if (new Date(shareLink.expires_at) < new Date()) {
-          setError('만료된 공유 링크입니다.')
-          return
-        }
-
-        // view_count 증가 (migration 후 사용 가능)
-        if (shareLink.view_count !== undefined) {
-          await supabase
-            .from('shares')
-            .update({ view_count: (shareLink.view_count || 0) + 1 })
-            .eq('id', shareLink.id)
-        }
-
-        // 2. 프로젝트 데이터
-        const { data: project, error: projError } = await supabase
-          .from('projects')
-          .select('*')
-          .eq('id', shareLink.project_id)
-          .single()
-
-        if (projError || !project) {
-          setError('프로젝트를 찾을 수 없습니다.')
-          return
-        }
-
-        // 3. 병렬로 나머지 데이터 로드
-        const [processesRes, quoteRes, changeRes, diagnosticRes, certRes] = await Promise.all([
-          supabase.from('processes').select('id, name, status, progress, start_date, end_date')
-            .eq('project_id', project.id).order('order_index'),
-          supabase.from('quote_line_items').select('quantity, unit_price')
-            .eq('project_id', project.id),
-          supabase.from('change_orders').select('amount')
-            .eq('project_id', project.id),
-          supabase.from('diagnostic_responses').select('checked')
-            .eq('project_id', project.id),
-          supabase.from('verification_certificates').select('grade, overall_score')
-            .eq('project_id', project.id)
-            .order('created_at', { ascending: false }).limit(1).maybeSingle(),
-        ])
-
-        const quoteTotal = (quoteRes.data || []).reduce(
-          (sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0
-        )
-        const changeTotal = (changeRes.data || []).reduce(
-          (sum, item) => sum + (Number(item.amount) || 0), 0
-        )
-        const diagItems = diagnosticRes.data || []
-        const checklistStats = {
-          total: diagItems.length,
-          completed: diagItems.filter((d: any) => d.checked).length,
-        }
-        const certificate = certRes.data
-          ? { grade: certRes.data.grade, score: certRes.data.overall_score }
-          : null
-
-        // 리스크 등급 계산
-        const riskScore = project.risk_score || 0
-        let riskGrade = 'A'
-        if (riskScore > 80) riskGrade = 'F'
-        else if (riskScore > 60) riskGrade = 'D'
-        else if (riskScore > 40) riskGrade = 'C'
-        else if (riskScore > 20) riskGrade = 'B'
-
-        setData({
-          project: {
-            id: project.id,
-            name: project.name,
-            industry: project.industry || '',
-            address: project.address || '',
-            client_name: project.client_name || '',
-            risk_score: riskScore,
-            risk_grade: riskGrade,
-            progress: project.progress || 0,
-            status: project.status || 'planning',
-            start_date: project.start_date,
-            end_date: project.end_date,
-            created_at: project.created_at,
-          },
-          shareLink: {
-            expires_at: shareLink.expires_at,
-            created_at: shareLink.created_at,
-          },
-          processes: processesRes.data || [],
-          quoteTotal,
-          changeTotal,
-          checklistStats,
-          certificate,
-        })
-      } catch (err: any) {
-        setError(err.message || '데이터를 불러올 수 없습니다.')
+        setData(json as SharePageData)
+      } catch {
+        setError('데이터를 불러올 수 없습니다.')
       } finally {
         setLoading(false)
       }
@@ -270,7 +173,6 @@ export default function SharePage() {
               <h1 className={styles.projectTitle}>{project.name}</h1>
             </div>
             <p className={styles.shareDate}>
-              {project.client_name && `${project.client_name} · `}
               {getStatusLabel(project.status)}
             </p>
           </div>
